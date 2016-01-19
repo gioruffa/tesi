@@ -1,0 +1,213 @@
+% draft 3rd year diploma thesis, by Nick Manini, 2013/03/22
+\documentclass[a4paper,12pt]{article}
+\usepackage[english]{babel} % or other languages, e.g:
+%\usepackage[italian]{babel} % needs debian package texlive-lang-italian
+%\usepackage[latin1]{inputenc} % use to reproduce accented characters correctly
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{physics}
+\usepackage[width=125mm]{caption}
+
+\usepackage[document]{ragged2e}
+
+% Dimensione della pagina
+\setlength{\oddsidemargin}{.3in}  % Distance from the left edge -1 inch 
+\setlength{\textwidth}{145mm}     % Normal width of the text
+\setlength{\topmargin}{.25in}     % Distance from top to PAGE'S HEAD -1 inch
+\setlength{\textheight}{225mm}    % Height of the body of page
+\setlength{\headheight}{0mm}      % Height of a box containing the head
+\setlength{\parskip}{0.5mm}         % Extra vertical space before a paragraph
+\setlength{\parindent}{9mm}       % Width of the indentation 
+\linespread{1.12}                 % Line spacing        
+\renewcommand{\floatpagefraction}{.9}
+
+\usepackage{xcolor}
+\newcommand\mynotes[1]{\begin{flushright}\textcolor{red}{TODO: #1}\end{flushright}}
+
+\begin{document}
+
+\title{\bf \Huge Titolazzo della tesi, if seems long\\go to newline }
+
+
+\author{Giorgio Ruffa\\
+Dipartimento di Fisica, Universit\`a degli Studi di Milano,\\
+Via Celoria 16, 20133 Milano, Italia
+}
+\date{April 22, 2016} % the exact date of graduation, when available
+
+
+\include {frontespizio} % eccezionalmente qui include il frontespizio
+% in general avoid \include altoghether, it is looking for trouble !!
+
+\newpage\qquad
+\newpage
+
+\maketitle
+
+%---------------------------------------------------------
+\begin{abstract}
+
+A long time ago in a galaxy far, far away...
+
+\vskip0.75cm
+\hskip5cm
+\parbox[t]{7cm}
+{
+Advisor: {\it Prof. Dario Tamascelli}\\
+Co-Advisor: {\it Prof. Michele Ceotto}
+}
+\end{abstract}
+%--------------------------------------------------------
+
+\newpage
+\tableofcontents
+\newpage
+
+%----------------------------------------------------------------------------
+\section{Quantum Espresso}
+%----------------------------------------------------------------------------
+
+Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electronic-structure calculations and materials modeling at the nanoscale.
+It is based on density-functional theory, plane waves, and pseudopotentials.
+
+\mynotes{Scritto per girare su un gazilione di architetture}
+
+\section{Theoretical Introduction}\label{model:sec}
+
+This section will cover the basic theory upon which Quantum ESPRESSO is based.
+
+By starting with a very general approach we can say that the Hamiltonian associated to a system of atoms with $N_N$ nuclei and $N_e$ electrons can be written as:
+
+\begin{equation}\label{eq_theHamiltonian}
+\hat{H}_{tot} = \hat{T}_{N} + \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{NN} + \hat{V}_{ee}
+\end{equation}
+
+Where:
+
+\begin{equation}
+\hat{T}_{N} = \frac{\hbar}{2} \sum_{\alpha}^{N_N} \frac{\nabla_{\alpha}^2}{M_{\alpha}}
+\end{equation}
+Is the kinetic energy of the nuclei
+
+\begin{equation}
+\hat{T}_{e} = \frac{\hbar}{2m_{e}} \sum_{i}^{N_e} \nabla_{i}^2
+\end{equation}
+Is the kinetic energy of the electrons
+
+\begin{equation}
+\hat{V}_{Ne} = -\frac{e^2}{4\pi\epsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid }
+\end{equation}
+is the electron-ion attraction potential energy
+
+\begin{equation}
+\hat{V}_{NN} = \frac{e^2}{4\pi\epsilon_{0}} \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}}{\mid R_{\alpha} - R_{\beta} \mid }
+\end{equation}
+is the nucleus-nucleus repulsion potential energy
+
+\begin{equation}
+\hat{V}_{ee} = \frac{e^2}{4\pi\epsilon_{0}} \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{\mid r_{i} - r_{j} \mid }
+\end{equation}
+is the electron-electron repulsion potential energy
+
+A state function $\ket{\psi}$ describing all the particles involved in the system will evolve following the Schrodinger equation.
+\begin{equation}\label{eq:eq_sch}
+	i\hbar\dv{t}\ket{\psi(t)} = \hat{H}_{tot}\ket{\psi(t)}
+\end{equation}
+
+Although the universality of this equation, we know very well that for not-so-complex systems the solution is not analytical. 
+
+Thus, even from a computational standpoint, a set of approximations must be performed.
+
+
+\subsection{The Bohr-Oppenheimer Approximation}
+
+The Bohr-Oppenheimer approximation takes note of the great difference in masses of electrons and nuclei.
+Nuclear mass is much higher than electron mass, thus we expect that the electrons will have much higher velocities than the nuclei. So we can separate the motion of the system in two distinct movements: the "slow" movement of the nuclei, and the "fast" movement of the electrons.
+
+Another formulation is that from the point of view of electrons, the nuclei appear to be fixed. 
+From a physical standpoint the electrons are moving in the static field produced by the nuclei while still interacting with each others.
+
+\mynotes{ATKINS pg 241}
+
+In this approximation we reduce our general Hamiltonian in the following form:
+
+\begin{equation}
+	\hat{H}_{tot} = \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{ee}
+\end{equation}
+
+What we are neglecting is the effect the electrons have on the nuclear structure of each nucleus.
+
+\subsection{The electron-electon Potential Problem}
+
+
+
+
+
+
+
+
+\section{Computational Architectures} \label{comparch:sec}
+
+
+We have tested on NUMA and GALILEO and ...
+
+
+\subsection{NetXScale Cluster Architecture}\label{galileoarch:sec}
+\subsection{NUMA-CC Architecture}\label{numaarch:sec}
+
+%\begin{figure}
+%\centerline{
+%\hfill
+%% NOTE the rotation here below:
+%\includegraphics[angle=18,width=30mm,clip=]{Common_Cockroach.eps}
+%% this is a way to combine a second picture horizontally:
+%\hfill
+%\includegraphics[angle=-18,width=30mm,clip=]{Common_Cockroach.eps}
+%\hfill
+%}
+%\caption{\label{rot_Cockroach:fig}
+%Small rotated coakroaches.
+%}
+%\end{figure}
+
+
+%See more details in Fig.~\ref{rot_Cockroach:fig}
+
+
+\section{Discussion and Conclusion}
+
+May the force be with you.
+
+%In this work, we relate the insect concentration fluctuations to the
+%dissipation of Milan University budget to catering companies.
+%%
+%We find it appropriate to name the present result ``{\em
+%fluctuation-dissipation theorem}''.
+
+
+%------------------------------------------------------------------
+%  BIBLIOGRAPHY
+%------------------------------------------------------------------
+\clearpage
+\addcontentsline{toc}{section}{Bibliography}
+\begin{thebibliography}{9}
+
+% note that the references must be listed in the same order as they are cited
+% in the text above:
+
+\bibitem{Manini82} % standard format for a book:
+X. Manini and G. D'Annunzio,
+{\it Terra Vergine} (Springer-Verlag, Berlin, 1882).
+
+\bibitem{Jones55} % standard format for a journal article:
+M. Jones and J. Mones, J. Irreprod. Results {\bf 83}, 2322 (1955).
+
+\bibitem{Dragoni11}  % standard format for a thesis:
+D. Dragoni, {\it Interfacial layering of ionic liquids on solid surfaces},
+diploma thesis (University Milan, 2011),
+\url{http://www.mi.infm.it/manini/theses/dragoni.pdf}.
+
+\end{thebibliography}
+\end{document}
