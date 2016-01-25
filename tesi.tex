@@ -75,6 +75,7 @@ It is based on density-functional theory, plane waves, and pseudopotentials.
 \mynotes{Scritto per girare su un gazilione di architetture}
 
 \section{Theoretical Introduction}\label{model:sec}
+\mynotes{metti citazione da manuale giocoleria su divisione del problema in piccole parti risolvibili}
 
 This section will cover the basic theory upon which Quantum ESPRESSO is based.
 
@@ -172,8 +173,27 @@ Equation from \eqref{eq:H_elec} to \eqref{eq:totEn1} constitutes the so called \
 
 Once solved one could then apply the same principle to the nuclear problem.
 Since the electrons moves much faster then the nuclei, it is reasonable to approximate \eqref{eq_theHamiltonian} by replacing electronic coordinates by their average value, averaged over $\Phi_{elec}$.
+The nuclear Hamiltonian will be :
+\begin{equation}
+	H_{nucl} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \epsilon_{tot}(\{ R_{\alpha}\})
+\end{equation}
 
-The nuclear soluzion $\Phi_{nucl}(\{R_{\alpha}\})$ will describe vibration, rotation, and translation of the molecule.
+We can see that $\epsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
+
+Thus the nuclei in the Born-Oppenheimer move on a potential energy surface obtained by solving the electronic problem.
+
+The nuclear Schrodinger equation  
+\begin{equation}
+	H_{nucl} \Phi_{nucl} = \epsilon \Phi_{nucl} 
+\end{equation}
+
+with solution 
+
+\begin{equation}
+	\Phi_{nucl}=\Phi_{nucl}(\{R_{\alpha}\})
+\end{equation}
+
+will describe vibration, rotation, and translation of the molecule.
 
 The complete approximate solution to \eqref{eq_theHamiltonian} will be  \cite[p.43-45]{Attila}
 
@@ -182,9 +202,51 @@ The complete approximate solution to \eqref{eq_theHamiltonian} will be  \cite[p.
 \end{equation}
 
 
+\subsection{The Hartree Product}
+\subsubsection{Spin-Orbit}
+We introduce two spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
+The only conditions we impose is that these two functions are complete and orthonormal.
 
-\subsection{The electron-electon Potential Problem}
+\begin{equation}
+	\bra{\alpha}\ket{\alpha} = \bra{\beta}\ket{\beta} = 1
+\end{equation}
 
+\begin{equation}
+	\bra{\alpha}\ket{\beta} = \bra{\beta}\ket{\alpha} = 0
+\end{equation}
+
+An electron is described both by three spacial coordinates $\vec{r}$ and one spin coordinate $\omega$.
+\begin{equation}
+	\vec{x} = \{\vec{r},\omega\}
+\end{equation}
+
+We define $\psi_i(\vec{r})$ a spacial orbital as a function of the position vector $\vec{r}$ describing the spacial distribution of an electron, so that $\mid\psi_i(\vec{r})\mid^2 {dr}^3$ is the probability of finding the electron in a small volume ${dr}^3$ centered at position $\vec{r}$.
+
+Given a set of spatial orbitals we will assume them to be orthonormal, thus if the set is complete we can express any spatial state function as a linear combination of spatial orbitals.
+
+In general, for the set to be complete, one should consider it as infinite. As you can imagine, in practice, an infinite orbitals' set is not available and we will consider only a finite set composed of $K$ such orbitals. The finite set will only cover a certain region of the complete space, but we will consider the results to be ``exact" within the subspace covered by the finite set of spatial orbitals.
+
+The combination of a spatial orbital and a spin function is called a spin orbital and completely describes the electron. 
+\begin{equation}
+	\chi_{i}(\vec{x}) = \psi_i(\vec{r}) \alpha(\omega)
+\end{equation}
+
+
+For a set of K spatial orbital will have a corresponding set of $2K$ spin orbitals, each pair sharing the same spatial orbital but with different spin function:
+
+\begin{equation}
+	\chi_{2i} = \psi_i(\vec{r}) \alpha(\omega)
+\end{equation}
+\begin{equation}
+	\chi_{2i-1} = \psi_i(\vec{r}) \beta(\omega)
+\end{equation}
+
+Being the spatial orbital and spin orbitals orthonormal, so are the spin orbitals.
+
+\subsubsection{Separating the problem}
+\mynotes{il vero hartree product}
+
+\mynotes{dopo}
 The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
 
 
