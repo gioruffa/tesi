@@ -244,15 +244,58 @@ For a set of K spatial orbital will have a corresponding set of $2K$ spin orbita
 Being the spatial orbital and spin orbitals orthonormal, so are the spin orbitals.
 
 \subsubsection{Separating the problem}
-\mynotes{il vero hartree product}
 
-\mynotes{dopo}
+It is evident that the term $V_{ee}$ in \eqref{eq:H_elec} is the more complicated to handle in order to find an exact solution to the electronic problem.
+To simplify the system we start by neglecting $V_{ee}$, considering the electrons as non interacting.
 The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
+\begin{equation}\label{eq:HartreeHamiltonian}
+	H  = \sum_{i}^{N_e} h_i
+\end{equation}
+\begin{equation}\label{eq:singleEl}
+	h_i = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{r_{i\alpha}}
+\end{equation}
+\begin{equation}
+	r_{i\alpha} = \mid r_i - R_{\alpha} \mid
+\end{equation}
+
+In this form $H_{elec}$ is composed by a sum of $N_e$ independent single electron Hamiltonians of the form \eqref{eq:singleEl}.
+
+Each operator $h_i$ will have a set of spin orbitals eigenfunctions with eigenvalues given by
+\begin{equation}
+	h_i \chi_{j}(\vec{x}_i) = \epsilon_{i} \chi_{j}(\vec{x}_i)
+\end{equation}
+
+Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be a product of $h_i$ eigenfunctions
+\begin{equation}\label{eq:HartreeProduct}
+	\Psi^{HP}(\vec{x}_1,...,\vec{x}_{N_e}) = \chi_i(\vec{x}_1)...\chi_k(\vec{x}_{N_e})
+\end{equation}
+with eigenvalue
+\begin{equation}
+	H\Psi^{HP} = E\Psi^{HP}
+\end{equation}
+\begin{equation}
+	E = \epsilon_i + \epsilon_j + ... + \epsilon_k
+\end{equation}
+
+Equation \eqref{eq:HartreeProduct} is called an Hartree Product and has the following property :
+\begin{equation}\label{eq:uncorrelated}
+	\mid\Psi^{HP}(\vec{x}_1,...,\vec{x}_{N_e}) \mid^2 dx_1^3 ... dx_{N_e}^3 = \mid\chi_i(\vec{x}_1)\mid^2 dx_1^3 ...\mid \chi_k(\vec{x}_{N_e})\mid^2 dx_{N_e}^2
+\end{equation}
+
+Meaning that the probability of finding simultaneously each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (``by independent measurements").
+For this reason $\Psi^{HP}$ is called an uncorrelated or electron-independent wave function. Namely the position of an electron has no effect on the position of the others. 
+
+This is, of course, a strong assumption but we will see how the Hartree-Foch method will sharpen the approximation.
+
+\subsubsection{Identical Particles and Slater Determinant}
+
+$\Psi^{HP}$ is the simplest representation of a multi-electron state function, but it does not respect the invariance by exchange of identical particles.
 
 
 
 
 
+\mynotes{metti citazione a \cite{Dan}}
 
 
 
@@ -311,5 +354,17 @@ A. Szabo, N. S. Ostlund
 Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory,
 Dover Pubblications, New York,
 1996.
+
+\bibitem{Dan}
+D. Dan, Notes on General Chemistry,
+Chapter 3.5, Many-electron atoms: Fermi holes and Fermi heaps,
+W. H. Freeman Publisher,
+2006
+
+
 \end{thebibliography}
+
+
 \end{document}
+
+
