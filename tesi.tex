@@ -290,10 +290,45 @@ This is, of course, a strong assumption but we will see how the Hartree-Foch met
 \subsubsection{Identical Particles and Slater Determinant}
 
 $\Psi^{HP}$ is the simplest representation of a multi-electron state function, but it does not respect the invariance by exchange of identical particles.
+Since elementary particles like electrons are identical or indistinguishable, the probability distribution associated to the state function describing the entire system should remain the same if the coordinates of two or more particles are exchanged.
 
+\begin{equation}
+	\mid \Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) \mid^2 = \mid \Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e}) \mid^2
+\end{equation}
 
+This implies one of the following conditions:
+\begin{align}
+	\Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) = +\Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e})\\
+	\Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) = -\Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e}) 
+\end{align}
 
+Namely that the state function is respectively symmetric or antisymmetric.
+Particles with integer spin, like protons, are called bosons and are always represented by symmetric wave functions.
+Particles with half integer spin, like electrons, are called fermions and are always represented by antisymmetric wave functions.
 
+We can immediately verify that even the simplest Hartree product composed by only two spin orbit does not respect the antisymmetry principle.
+
+\begin{equation*}
+	\Psi^{HP}(\vec{x}_1,\vec{x}_2) = \chi_1(\vec{x}_1) \chi_2(\vec{x}_2) \neq \chi_1(\vec{x}_2) \chi_2(\vec{x}_1)
+\end{equation*}
+
+The easiest way to make $\Psi^{HP}$ antisymmetric is to introduce what is called an \textit{exchange term}.
+
+\begin{equation}\label{eq:slater2}
+	\Psi(\vec{x}_1,\vec{x}_2) = \frac{1}{\sqrt{2}} (\chi_1(\vec{x}_1) \chi_2(\vec{x}_2) - \chi_1(\vec{x}_2) \chi_2(\vec{x}_1))
+\end{equation}
+
+We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
+\begin{equation}
+\Psi(\vec{x}_1,\vec{x}_2) = \frac{1}{\sqrt{2}}
+\begin{vmatrix}
+\chi_1(\vec{x}_1) & \chi_2(\vec{x}_1) \\
+\chi_1(\vec{x}_2) & \chi_2(\vec{x}_2) 
+\end{vmatrix}
+\end{equation}
+
+The generalization to $N_e$ electrons held to:
+\mynotes{Slater determinant}
 
 \mynotes{metti citazione a \cite{Dan}}
 
