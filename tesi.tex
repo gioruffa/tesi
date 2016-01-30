@@ -215,12 +215,12 @@ The only conditions we impose is that these two functions are complete and ortho
 	\bra{\alpha}\ket{\beta} = \bra{\beta}\ket{\alpha} = 0
 \end{equation}
 
-An electron is described both by three spacial coordinates $\vec{r}$ and one spin coordinate $\omega$.
+An electron is described both by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$.
 \begin{equation}
-	\vec{x} = \{\vec{r},\omega\}
+	\mathbf{x} = \{\mathbf{r},\omega\}
 \end{equation}
 
-We define $\psi_i(\vec{r})$ a spacial orbital as a function of the position vector $\vec{r}$ describing the spacial distribution of an electron, so that $\mid\psi_i(\vec{r})\mid^2 {dr}^3$ is the probability of finding the electron in a small volume ${dr}^3$ centered at position $\vec{r}$.
+We define $\psi_i(\mathbf{r})$ a spacial orbital as a function of the position vector $\mathbf{r}$ describing the spacial distribution of an electron, so that $\mid\psi_i(\mathbf{r})\mid^2 {dr}^3$ is the probability of finding the electron in a small volume ${dr}^3$ centered at position $\mathbf{r}$.
 
 Given a set of spatial orbitals we will assume them to be orthonormal, thus if the set is complete we can express any spatial state function as a linear combination of spatial orbitals.
 
@@ -228,17 +228,17 @@ In general, for the set to be complete, one should consider it as infinite. As y
 
 The combination of a spatial orbital and a spin function is called a spin orbital and completely describes the electron. 
 \begin{equation}
-	\chi_{i}(\vec{x}) = \psi_i(\vec{r}) \alpha(\omega)
+	\chi_{i}(\mathbf{x}) = \psi_i(\mathbf{r}) \alpha(\omega)
 \end{equation}
 
 
 For a set of K spatial orbital will have a corresponding set of $2K$ spin orbitals, each pair sharing the same spatial orbital but with different spin function:
 
 \begin{equation}
-	\chi_{2i} = \psi_i(\vec{r}) \alpha(\omega)
+	\chi_{2i} = \psi_i(\mathbf{r}) \alpha(\omega)
 \end{equation}
 \begin{equation}
-	\chi_{2i-1} = \psi_i(\vec{r}) \beta(\omega)
+	\chi_{2i-1} = \psi_i(\mathbf{r}) \beta(\omega)
 \end{equation}
 
 Being the spatial orbital and spin orbitals orthonormal, so are the spin orbitals.
@@ -262,12 +262,12 @@ In this form $H_{elec}$ is composed by a sum of $N_e$ independent single electro
 
 Each operator $h_i$ will have a set of spin orbitals eigenfunctions with eigenvalues given by
 \begin{equation}
-	h_i \chi_{j}(\vec{x}_i) = \epsilon_{i} \chi_{j}(\vec{x}_i)
+	h_i \chi_{j}(\mathbf{x}_i) = \epsilon_{i} \chi_{j}(\mathbf{x}_i)
 \end{equation}
 
 Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be a product of $h_i$ eigenfunctions
 \begin{equation}\label{eq:HartreeProduct}
-	\Psi^{HP}(\vec{x}_1,...,\vec{x}_{N_e}) = \chi_i(\vec{x}_1)...\chi_k(\vec{x}_{N_e})
+	\Psi^{HP}(\mathbf{x}_1,...,\mathbf{x}_{N_e}) = \chi_i(\mathbf{x}_1)...\chi_k(\mathbf{x}_{N_e})
 \end{equation}
 with eigenvalue
 \begin{equation}
@@ -279,7 +279,7 @@ with eigenvalue
 
 Equation \eqref{eq:HartreeProduct} is called an Hartree Product and has the following property :
 \begin{equation}\label{eq:uncorrelated}
-	\mid\Psi^{HP}(\vec{x}_1,...,\vec{x}_{N_e}) \mid^2 dx_1^3 ... dx_{N_e}^3 = \mid\chi_i(\vec{x}_1)\mid^2 dx_1^3 ...\mid \chi_k(\vec{x}_{N_e})\mid^2 dx_{N_e}^2
+	\mid\Psi^{HP}(\mathbf{x}_1,...,\mathbf{x}_{N_e}) \mid^2 dx_1^3 ... dx_{N_e}^3 = \mid\chi_i(\mathbf{x}_1)\mid^2 dx_1^3 ...\mid \chi_k(\mathbf{x}_{N_e})\mid^2 dx_{N_e}^2
 \end{equation}
 
 Meaning that the probability of finding simultaneously each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (``by independent measurements").
@@ -293,13 +293,13 @@ $\Psi^{HP}$ is the simplest representation of a multi-electron state function, b
 Since elementary particles like electrons are identical or indistinguishable, the probability distribution associated to the state function describing the entire system should remain the same if the coordinates of two or more particles are exchanged.
 
 \begin{equation}
-	\mid \Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) \mid^2 = \mid \Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e}) \mid^2
+	\mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) \mid^2 = \mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) \mid^2
 \end{equation}
 
 This implies one of the following conditions:
 \begin{align}
-	\Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) = +\Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e})\\
-	\Psi(\vec{x}_1,\dots,\vec{x}_i,\dots,\vec{x}_j,\dots,\vec{x}_{N_e}) = -\Psi(\vec{x}_1,\dots,\vec{x}_j,\dots,\vec{x}_i,\dots,\vec{x}_{N_e}) 
+	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = +\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e})\\
+	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = -\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) 
 \end{align}
 
 Namely that the state function is respectively symmetric or antisymmetric.
@@ -309,21 +309,21 @@ Particles with half integer spin, like electrons, are called fermions and are al
 We can immediately verify that even the simplest Hartree product composed by only two spin orbit does not respect the antisymmetry principle.
 
 \begin{equation*}
-	\Psi^{HP}(\vec{x}_1,\vec{x}_2) = \chi_1(\vec{x}_1) \chi_2(\vec{x}_2) \neq \chi_1(\vec{x}_2) \chi_2(\vec{x}_1)
+	\Psi^{HP}(\mathbf{x}_1,\mathbf{x}_2) = \chi_1(\mathbf{x}_1) \chi_2(\mathbf{x}_2) \neq \chi_1(\mathbf{x}_2) \chi_2(\mathbf{x}_1)
 \end{equation*}
 
 The easiest way to make $\Psi^{HP}$ antisymmetric is to introduce what is called an \textit{exchange term}.
 
 \begin{equation}\label{eq:slater2}
-	\Psi(\vec{x}_1,\vec{x}_2) = \frac{1}{\sqrt{2}} (\chi_1(\vec{x}_1) \chi_2(\vec{x}_2) - \chi_1(\vec{x}_2) \chi_2(\vec{x}_1))
+	\Psi(\mathbf{x}_1,\mathbf{x}_2) = \frac{1}{\sqrt{2}} (\chi_1(\mathbf{x}_1) \chi_2(\mathbf{x}_2) - \chi_1(\mathbf{x}_2) \chi_2(\mathbf{x}_1))
 \end{equation}
 
 We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
 \begin{equation}
-\Psi(\vec{x}_1,\vec{x}_2) = \frac{1}{\sqrt{2}}
+\Psi(\mathbf{x}_1,\mathbf{x}_2) = \frac{1}{\sqrt{2}}
 \begin{vmatrix}
-\chi_1(\vec{x}_1) & \chi_2(\vec{x}_1) \\
-\chi_1(\vec{x}_2) & \chi_2(\vec{x}_2) 
+\chi_1(\mathbf{x}_1) & \chi_2(\mathbf{x}_1) \\
+\chi_1(\mathbf{x}_2) & \chi_2(\mathbf{x}_2) 
 \end{vmatrix}
 \end{equation}
 
@@ -348,7 +348,7 @@ The generalization to $N_e$ electrons held to:
 
 Equation \eqref{eq:SlaterDet} is called the \textit{Slater Determinant} and is the simplest asymmetrical representation of a multi-electron state function.
 
-Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can express the exchange two coordinates in \eqref{eq:HartreeProduct} as the action of the transposition operator $P_{ij}$
+Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can express the exchange of two coordinates in \eqref{eq:HartreeProduct} as the action of the transposition operator $P_{ij}$
 \begin{align*}
 	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
 	& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_j)  \cdots  \chi_i(\mathbf{x}_i) \cdots  \chi_N(\mathbf{x}_N)} 
@@ -358,7 +358,7 @@ Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can expres
 	\hat{P}_{ij}^2 = \mathbf{1}
 \end{equation*}
 
-For the ket state to be antisymmetric it must be an eigenfunction of $\hat{P}$ with eigenvalue $-1$.
+For the ket state to be antisymmetric it must be an eigenfunction of $\hat{P}_{ij}$ with eigenvalue $-1$.
 \begin{align*}
 	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
 	-1 & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} 
@@ -398,7 +398,10 @@ This formalism will be useful when dealing with one-electron and two-electrons o
 
 \mynotes{The Pauli principle postulates that a wave function of identical fermions must be an eigenfunction of a transposition operator with its parity as eigenvalue}
 
-\mynotes{metti citazione a \cite{Dan}}
+\mynotes{
+The first consequences of the asymmetry of the fermions ket state is that ...
+Pauli Fermi Hole e Fermi Heap. Metti citazione a \cite{Dan}
+}
 
 
 
@@ -466,9 +469,10 @@ W. H. Freeman Publisher,
 
 \bibitem{Sakurai}
 J. J. Sakurai,
-Advanced Quantum Mechanics,
+Modern Quantum Mechanics,
 Addison-Wesley,
-1967.
+Revised Edition,
+1994.
 
 \end{thebibliography}
 
