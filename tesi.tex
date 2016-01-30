@@ -328,7 +328,75 @@ We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
 \end{equation}
 
 The generalization to $N_e$ electrons held to:
-\mynotes{Slater determinant}
+
+\begin{equation}\label{eq:SlaterDet}
+\Psi(\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_N) =
+\frac{1}{\sqrt{N!}}
+\left|
+	\begin{matrix} 
+   		\chi_1(\mathbf{x}_1) & \chi_2(\mathbf{x}_1) & \cdots & \chi_N(\mathbf{x}_1) \\
+        \chi_1(\mathbf{x}_2) & \chi_2(\mathbf{x}_2) & \cdots & \chi_N(\mathbf{x}_2) \\
+		\vdots & \vdots & \ddots & \vdots \\
+        \chi_1(\mathbf{x}_N) & \chi_2(\mathbf{x}_N) & \cdots & \chi_N(\mathbf{x}_N)
+    \end{matrix} 
+	\right|\equiv \left| 
+	\begin{matrix}
+		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
+	\end{matrix}
+   \right|,
+\end{equation}
+
+Equation \eqref{eq:SlaterDet} is called the \textit{Slater Determinant} and is the simplest asymmetrical representation of a multi-electron state function.
+
+Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can express the exchange two coordinates in \eqref{eq:HartreeProduct} as the action of the transposition operator $P_{ij}$
+\begin{align*}
+	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
+	& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_j)  \cdots  \chi_i(\mathbf{x}_i) \cdots  \chi_N(\mathbf{x}_N)} 
+\end{align*}
+\begin{equation*}
+	\hat{P}_{ij} = \hat{P}_{ji} ~;~
+	\hat{P}_{ij}^2 = \mathbf{1}
+\end{equation*}
+
+For the ket state to be antisymmetric it must be an eigenfunction of $\hat{P}$ with eigenvalue $-1$.
+\begin{align*}
+	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
+	-1 & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} 
+\end{align*}
+
+It can be shown that an arbitrary permutation of N objects can be written as a product of transpositions and that the number of transposition in this decomposition is of fixed parity. That is, either a permutation is always decomposed in an even number of transpositions (the permutation is called even and has the parity $+1$), or a permutation is always decomposed in an odd number of transpositions and then it is an odd permutation with parity  $ - 1$.
+
+Denoting the parity of the arbitrary permutation as $\sigma_P$ it follows that antisymmetric function must respect the following condition :
+\begin{align*}
+	\hat{P} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} = \\
+	(-1)^{\sigma_P}  & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)}
+\end{align*}
+
+If $S_N$ is the group of all possible $N!$ permutations we can define the \textit{antisymmetrizer} operator as :
+\begin{equation}\label{eq:antisymmetrizer}
+	\mathcal{A} = \frac{1}{N!} \sum_{\hat{P} \in S_n} (-1)^{\sigma_P} \hat{P}
+\end{equation}
+
+We can now re-express the slater determinant \eqref{eq:SlaterDet} in a more useful form. Using the Leibniz formula for determinants we rewrite the slater determinant as:
+\begin{equation}
+	\left|
+	\begin{matrix}
+		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
+	\end{matrix} 
+	\right| = \frac{1}{\sqrt{N!}} \sum_{\hat{P} \in S_n} (-1)^{\sigma_P} \hat{P} \ket{\chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N)}
+\end{equation}
+Thus:
+\begin{equation}
+	\left|
+	\begin{matrix}
+		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
+	\end{matrix} 
+	\right| =  (\sqrt{N!}) \mathcal{A} \ket{ \chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N) }
+\end{equation}
+
+This formalism will be useful when dealing with one-electron and two-electrons operators.
+
+\mynotes{The Pauli principle postulates that a wave function of identical fermions must be an eigenfunction of a transposition operator with its parity as eigenvalue}
 
 \mynotes{metti citazione a \cite{Dan}}
 
@@ -394,8 +462,13 @@ Dover Pubblications, New York,
 D. Dan, Notes on General Chemistry,
 Chapter 3.5, Many-electron atoms: Fermi holes and Fermi heaps,
 W. H. Freeman Publisher,
-2006
+2006.
 
+\bibitem{Sakurai}
+J. J. Sakurai,
+Advanced Quantum Mechanics,
+Addison-Wesley,
+1967.
 
 \end{thebibliography}
 
