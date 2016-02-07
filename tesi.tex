@@ -82,7 +82,7 @@ This section will cover the basic theory upon which Quantum ESPRESSO is based.
 By starting with a very general approach we can say that the Hamiltonian associated to a system of atoms with $N_N$ nuclei and $N_e$ electrons can be written as:
 
 
-\begin{equation}\label{eq_theHamiltonian}
+\begin{equation}\label{eq:theHamiltonianLong}
 \hat{H}_{tot} = \hat{T}_{N} + \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{NN} + \hat{V}_{ee}
 \end{equation}
 
@@ -118,7 +118,29 @@ A state function $\ket{\psi}$ describing all the particles involved in the syste
 	i\hbar\dv{t}\ket{\psi(t)} = \hat{H}_{tot}\ket{\psi(t)}
 \end{equation}
 
-Although the universality of this equation, we know very well that even a simple molecule like $H_2^{+}$ has no analytical solution.
+If not explicitly specified, from now on we will use atomic units \cite[p.42]{Attila} to express any equation.
+We shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant form:
+
+
+\begin{equation}\label{eq:theHamiltonian}
+\boxed{
+	\hat{H}_{tot}   = - \sum_{\alpha}^{N_N} \frac{\nabla^2_{\alpha}}{2M_{\alpha}}
+					+ \frac{1}{2}\sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}} {R_{\alpha \beta}}
+					- \sum_{i}^{N_e} \frac{\nabla_{i}^2}{2}
+					- \sum_{i}^{N_e} \sum_{\alpha}^{N_N} \frac{ Z_{\alpha} }{r_{i \alpha}}				
+					+ \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{r_{ij}}
+}
+\end{equation}
+With:
+\begin{align*}
+	r_{ij} & = \mid r_{i} - r_{j} \mid 
+\\
+	r_{i \alpha} & = \mid r_{i} - R_{\alpha} \mid 
+\\
+	R_{\alpha \beta} & = \mid R_{\alpha} - R_{\beta} \mid 
+\end{align*}
+
+Although the universality of this equation\footnote{It must be noted that we are neglecting any relativistic effect.}, we know very well that even a simple molecule like $H_2^{+}$ has no analytical solution.
 
 Thus, even from a computational standpoint, a set of approximations must be performed.
 
@@ -126,9 +148,9 @@ Thus, even from a computational standpoint, a set of approximations must be perf
 \subsection{The Bohr-Oppenheimer Approximation}
 
 The Bohr-Oppenheimer approximation takes note of the great difference in masses of electrons and nuclei.
-Nuclear mass is much higher than electron mass, so we expect that the electrons will have much higher velocities than the nuclei. 
+Nuclear mass is much higher than electron mass, so we expect electrons to have much higher velocities than	 nuclei. 
 
-It's now reasonable to separate the motion of the system in two distinct movements: the "slow" movement of the nuclei, and the "fast" movement of the electrons.
+It's now reasonable to separate the motion of the system in two distinct movements: the \textit{``slow"} movement of the nuclei, and the \textit{``fast"} movement of the electrons.
 
 We can say that from the point of view of electrons, the nuclei appear to be fixed. 
 From a physical standpoint the electrons are moving in the static field produced by the nuclei while still interacting within each others \cite[p.241]{Atkins97}.
@@ -138,44 +160,46 @@ Using this approximation the kinetic energy of the nuclei $\hat{T}_{NN}$ can be 
 
 We will consider now the electronic Hamiltonian $H_{elec}$ :
 \begin{equation}
-	\hat{H}_{elec} = \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{ee}
+	\hat{H}_{e} = \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{ee}
 \end{equation}
 
-Rewriting $H_{elec}$  using atomic units:
+Rewriting $\hat{H}_{e}$  using atomic units:
 \begin{equation}\label{eq:H_elec}
-	H_{elec} = - \sum_{i}^{N_{e}} \frac{1}{2} \nabla_{i}^2  - \sum_{i}^{N_{e}} \sum_{\alpha}^{N_{\alpha}} \frac{Z_{\alpha}}{r_{i\alpha}}  + \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}
+	\hat{H}_{e} = 	- \sum_{i}^{N_{e}} \frac{1}{2} \nabla_{i}^2  
+					- \sum_{i}^{N_{e}} \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}}  
+					+ \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}
 \end{equation}
 
 The associate Schroedinger equation is,
 \begin{equation}
-	H_{elec} \Phi_{elec} = \epsilon_{elec} \Phi_{elec}
+	\hat{H}_{e} \ket{\Phi_{e}} = \epsilon_{e} \ket{\Phi_{e}}
 \end{equation}
 
 With solution
 \begin{equation}
-	\Phi_{elec} = \Phi_{elec}(r_{\{i\}};R_{\{\alpha\}})
+	\ket{\Phi_{e}} = \ket{\Phi_{e}( \{r_{i}\};\{R_{\alpha}\} )}
 \end{equation}
 
 Where the dependency from the electronic coordinates $\{r_i\}$ is explicit, but the dependency from nuclear coordinates $\{R_{\alpha}\}$ is parametrical.
 This implies that also the electronic energy depends parametrically on $\{R_{\alpha}\}$
 
 \begin{equation}
-	\epsilon_{elec} = \epsilon_{elec}(\{R_{\alpha}\})
+	\epsilon_{e} = \epsilon_{e}(\{R_{\alpha}\})
 \end{equation}
 
 To obtain the total energy (with fixed nuclei) we have to add the constant ion-ion Coulomb potential energy
 
 \begin{equation}\label{eq:totEn1}
-	\epsilon_{tot} = \epsilon_{elec} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}
+	\epsilon_{tot} = \epsilon_{e} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}
 \end{equation}
 
-Equation from \eqref{eq:H_elec} to \eqref{eq:totEn1} constitutes the so called \textit{``Electronic Problem"}.
+Equation from \eqref{eq:H_elec} to \eqref{eq:totEn1} constitutes the so called \textit{``Electronic Problem"} \cite[p.44]{Attila}.
 
 Once solved one could then apply the same principle to the nuclear problem.
-Since the electrons moves much faster then the nuclei, it is reasonable to approximate \eqref{eq_theHamiltonian} by replacing electronic coordinates by their average value, averaged over $\Phi_{elec}$.
+Since the electrons moves much faster then the nuclei, it is reasonable to approximate \eqref{eq:theHamiltonian} by replacing electronic coordinates by their average value, averaged over $\Phi_{e}$.
 The nuclear Hamiltonian will be :
 \begin{equation}
-	H_{nucl} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \epsilon_{tot}(\{ R_{\alpha}\})
+	H_{N} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \epsilon_{tot}(\{ R_{\alpha}\})
 \end{equation}
 
 We can see that $\epsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
@@ -184,38 +208,37 @@ Thus the nuclei in the Born-Oppenheimer move on a potential energy surface obtai
 
 The nuclear Schrodinger equation  
 \begin{equation}
-	H_{nucl} \Phi_{nucl} = \epsilon \Phi_{nucl} 
+	\hat{H}_{N} \ket{\Phi_{N}} = \epsilon \ket{\Phi_{N} }
 \end{equation}
 
 with solution 
 
 \begin{equation}
-	\Phi_{nucl}=\Phi_{nucl}(\{R_{\alpha}\})
+	\ket{\Phi_{N}}=\ket{\Phi_{N}(\{R_{\alpha}\})}
 \end{equation}
 
 will describe vibration, rotation, and translation of the molecule.
 
-The complete approximate solution to \eqref{eq_theHamiltonian} will be  \cite[p.43-45]{Attila}
+The complete approximate solution to \eqref{eq:theHamiltonian} will be  \cite[p.43-45]{Attila}
 
 \begin{equation}
-	\Phi(\{r_i\};\{R_{\alpha}\}) = \Phi_{elec}(\{r_i\};\{R_{\alpha}\})~\Phi_{nucl}(\{R_{\alpha}\})
+	\ket{ \Phi(\{r_i\};\{R_{\alpha}\}) } 	= \ket{ \Phi_{e}(\{r_i\};\{R_{\alpha}\})} 
+											~ \ket{ \Phi_{N}(\{R_{\alpha}\})}
 \end{equation}
 
+Since \textit{``electronic problem"} is of much more interest in this work, from now on we will drop the suffix ``$e$" for the Hamiltonian $H_{e}$.
 
 \subsection{The Hartree Product}
 \subsubsection{Spin-Orbit}
 We introduce two spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
-The only conditions we impose is that these two functions are complete and orthonormal.
+The only conditions we impose is that these two functions are orthonormal and a complete set of auto-functions for the spin operator $\hat{S}_z$ .
 
-\begin{equation}
-	\bra{\alpha}\ket{\alpha} = \bra{\beta}\ket{\beta} = 1
-\end{equation}
-
-\begin{equation}
+\begin{align*}
+	\bra{\alpha}\ket{\alpha} = \bra{\beta}\ket{\beta} = 1 \\
 	\bra{\alpha}\ket{\beta} = \bra{\beta}\ket{\alpha} = 0
-\end{equation}
+\end{align*}
 
-An electron is described both by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$.
+An electron is described by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$.
 \begin{equation}
 	\mathbf{x} = \{\mathbf{r},\omega\}
 \end{equation}
@@ -224,7 +247,7 @@ We define $\psi_i(\mathbf{r})$ a spacial orbital as a function of the position v
 
 Given a set of spatial orbitals we will assume them to be orthonormal, thus if the set is complete we can express any spatial state function as a linear combination of spatial orbitals.
 
-In general, for the set to be complete, one should consider it as infinite. As you can imagine, in practice, an infinite orbitals' set is not available and we will consider only a finite set composed of $K$ such orbitals. The finite set will only cover a certain region of the complete space, but we will consider the results to be ``exact" within the subspace covered by the finite set of spatial orbitals.
+In general, for the set to be complete, one should consider it as infinite. As you can imagine, in practice, an infinite orbitals' set is not available and we will consider only a finite set composed of $K$ such orbitals. The finite set will only cover a certain region of the complete space, but we will consider the results to be ``exact" within the subspace generated by the finite set of spatial orbitals.
 
 The combination of a spatial orbital and a spin function is called a spin orbital and completely describes the electron. 
 \begin{equation}
@@ -248,44 +271,49 @@ Being the spatial orbital and spin orbitals orthonormal, so are the spin orbital
 It is evident that the term $V_{ee}$ in \eqref{eq:H_elec} is the more complicated to handle in order to find an exact solution to the electronic problem.
 To simplify the system we start by neglecting $V_{ee}$, considering the electrons as non interacting.
 The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
-\begin{equation}\label{eq:HartreeHamiltonian}
-	H  = \sum_{i}^{N_e} h_i
-\end{equation}
-\begin{equation}\label{eq:singleEl}
-	h_i = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{r_{i\alpha}}
-\end{equation}
+\begin{align}
+	\hat{H} & = \sum_{i}^{N_{e}} \hat{h}_{i} \label{eq:HartreeHamiltonian} 
+	\\
+	\hat{h}_{i} & = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}} \label{eq:singleEl}
+\end{align}
+
+
+In this form $\hat{H}$ is composed by a sum of $N_e$ independent single electron Hamiltonians of the form \eqref{eq:singleEl}.
+
+Each operator $\hat{h}_i$ will have his spin orbital eigenfunction with eigenvalue given by
 \begin{equation}
-	r_{i\alpha} = \mid r_i - R_{\alpha} \mid
+	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \epsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }
 \end{equation}
 
-In this form $H_{elec}$ is composed by a sum of $N_e$ independent single electron Hamiltonians of the form \eqref{eq:singleEl}.
-
-Each operator $h_i$ will have a set of spin orbitals eigenfunctions with eigenvalues given by
-\begin{equation}
-	h_i \chi_{j}(\mathbf{x}_i) = \epsilon_{i} \chi_{j}(\mathbf{x}_i)
-\end{equation}
-
-Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be a product of $h_i$ eigenfunctions
-\begin{equation}\label{eq:HartreeProduct}
-	\Psi^{HP}(\mathbf{x}_1,...,\mathbf{x}_{N_e}) = \chi_i(\mathbf{x}_1)...\chi_k(\mathbf{x}_{N_e})
-\end{equation}
+Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be the tensor product of $\hat{h}_i$ eigenfunctions
+\begin{align}\label{eq:HartreeProduct}
+	\ket{\Psi^{HP}(\mathbf{x}_{1},...,\mathbf{x}_{N_e})} = & \ket{\chi_1(\mathbf{x}_{1})} \otimes \cdots  \otimes \ket{\chi_N(\mathbf{x}_{N})} \\
+	:= & \ket{ \chi_{1}(\mathbf{x}_{1}) \cdots \chi_{N}(\mathbf{x}_{N}) }
+\end{align}
 with eigenvalue
 \begin{equation}
-	H\Psi^{HP} = E\Psi^{HP}
+	\hat{H}\ket{\Psi^{HP}} = E\ket{\Psi^{HP}}
 \end{equation}
 \begin{equation}
 	E = \epsilon_i + \epsilon_j + ... + \epsilon_k
 \end{equation}
 
-Equation \eqref{eq:HartreeProduct} is called an Hartree Product and has the following property :
+It must be noted that in equation \eqref{eq:HartreeProduct} there is no correlation between the index of the spin-orbital $\chi_{i}$ to the index of the electron's coordinates $\mathbf{x}_i$. It is absolutely and completely reasonable to have the $j$-th electron in the $i$-th spin-orbital e.g : $\chi_{j}(\mathbf{x}_{i})$.
+One should also consider that the number of spin-orbitals that describes our system can be (and often is) greater than the total number of electrons. The use of the same index is, by any means, an excess of notation.
+
+
+Equation \eqref{eq:HartreeProduct} is called an \textit{Hartree Product} and has the following straightforward property: 
 \begin{equation}\label{eq:uncorrelated}
-	\mid\Psi^{HP}(\mathbf{x}_1,...,\mathbf{x}_{N_e}) \mid^2 dx_1^3 ... dx_{N_e}^3 = \mid\chi_i(\mathbf{x}_1)\mid^2 dx_1^3 ...\mid \chi_k(\mathbf{x}_{N_e})\mid^2 dx_{N_e}^2
+	\mid\Psi^{HP}(\mathbf{x}_1,\cdots,\mathbf{x}_{N_e}) \mid^2 dx_1^3 \cdots dx_{N_e}^3 = \mid\chi_i(\mathbf{x}_1)\mid^2 dx_1^3 \cdots \mid \chi_k(\mathbf{x}_{N_e})\mid^2 dx_{N_e}^2
 \end{equation}
 
-Meaning that the probability of finding simultaneously each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (``by independent measurements").
-For this reason $\Psi^{HP}$ is called an uncorrelated or electron-independent wave function. Namely the position of an electron has no effect on the position of the others. 
+Meaning that the probability of finding simultaneously (with an unique measure) each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (by independent measurements).
+For this reason $\Psi^{HP}$ is called an uncorrelated or electron-independent wave function. 
+Namely, the position of one electron has no effect on the position of the others. 
 
-This is, of course, a strong assumption but we will see how the Hartree-Foch method will sharpen the approximation.
+This is, of course, a strong assumption but we will see how the Hartree-Foch method will correct the approximation.
+
+
 
 \subsubsection{Identical Particles and Slater Determinant}
 
@@ -298,8 +326,10 @@ Since elementary particles like electrons are identical or indistinguishable, th
 
 This implies one of the following conditions:
 \begin{align}
-	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = +\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e})\\
-	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = -\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) 
+	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = 
+		+\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e})\\
+	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = 
+		-\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) 
 \end{align}
 
 Namely that the state function is respectively symmetric or antisymmetric.
@@ -309,18 +339,18 @@ Particles with half integer spin, like electrons, are called fermions and are al
 We can immediately verify that even the simplest Hartree product composed by only two spin orbit does not respect the antisymmetry principle.
 
 \begin{equation*}
-	\Psi^{HP}(\mathbf{x}_1,\mathbf{x}_2) = \chi_1(\mathbf{x}_1) \chi_2(\mathbf{x}_2) \neq \chi_1(\mathbf{x}_2) \chi_2(\mathbf{x}_1)
+	\ket{\Psi^{HP}(\mathbf{x}_1,\mathbf{x}_2)} = \ket{\chi_1(\mathbf{x}_1)} \ket{\chi_2(\mathbf{x}_2)} \neq \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)}
 \end{equation*}
 
 The easiest way to make $\Psi^{HP}$ antisymmetric is to introduce what is called an \textit{exchange term}.
 
 \begin{equation}\label{eq:slater2}
-	\Psi(\mathbf{x}_1,\mathbf{x}_2) = \frac{1}{\sqrt{2}} (\chi_1(\mathbf{x}_1) \chi_2(\mathbf{x}_2) - \chi_1(\mathbf{x}_2) \chi_2(\mathbf{x}_1))
+	\ket{\Psi(\mathbf{x}_1,\mathbf{x}_2)} = \frac{1}{\sqrt{2}} (\ket{\chi_1(\mathbf{x}_1)} \ket{ \chi_2(\mathbf{x}_2)} - \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)} )
 \end{equation}
 
 We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
 \begin{equation}
-\Psi(\mathbf{x}_1,\mathbf{x}_2) = \frac{1}{\sqrt{2}}
+\ket{\Psi(\mathbf{x}_1,\mathbf{x}_2)} = \frac{1}{\sqrt{2}}
 \begin{vmatrix}
 \chi_1(\mathbf{x}_1) & \chi_2(\mathbf{x}_1) \\
 \chi_1(\mathbf{x}_2) & \chi_2(\mathbf{x}_2) 
@@ -330,7 +360,7 @@ We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
 The generalization to $N_e$ electrons held to:
 
 \begin{equation}\label{eq:SlaterDet}
-\Psi(\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_N) =
+\ket{\Psi(\mathbf{x}_1, \mathbf{x}_2, \ldots, \mathbf{x}_N)} =
 \frac{1}{\sqrt{N!}}
 \left|
 	\begin{matrix} 
@@ -348,15 +378,25 @@ The generalization to $N_e$ electrons held to:
 
 Equation \eqref{eq:SlaterDet} is called the \textit{Slater Determinant} and is the simplest asymmetrical representation of a multi-electron state function.
 
-Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can express the exchange of two coordinates in \eqref{eq:HartreeProduct} as the action of the transposition operator $P_{ij}$
-\begin{align*}
-	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
-	& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_j)  \cdots  \chi_i(\mathbf{x}_i) \cdots  \chi_N(\mathbf{x}_N)} 
-\end{align*}
+Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can express the exchange of two coordinates in \eqref{eq:HartreeProduct} as the action of the transposition operator $\hat{P}_{ij}$ 
+\begin{align} \label{eq:transpositionOp}
+	\begin{split}
+		\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_j(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =   \\ 
+		& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_j(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} 
+	\end{split}
+\end{align}
 \begin{equation*}
 	\hat{P}_{ij} = \hat{P}_{ji} ~;~
 	\hat{P}_{ij}^2 = \mathbf{1}
 \end{equation*}
+
+Note that in equation \eqref{eq:transpositionOp} we maintained the position of the electron index and switched the spin-orbital index. In this way it is possible to rewrite \eqref{eq:transpositionOp} in a more compact way :
+\begin{equation}
+	\hat{P_{ij}}  \ket{\chi_1  \cdots  \chi_j  \cdots  \chi_i  \cdots   \chi_N} =  
+		 \ket{\chi_1   \cdots  \chi_j  \cdots  \chi_i \cdots  \chi_N} 
+\end{equation}
+The sequential position of the spin-orbitals indicates coincides with the index of the electron represented \cite{Sakurai}.
+
 
 For the ket state to be antisymmetric it must be an eigenfunction of $\hat{P}_{ij}$ with eigenvalue $-1$.
 \begin{align*}
@@ -377,8 +417,8 @@ If $S_N$ is the group of all possible $N!$ permutations we can define the \texti
 	\mathcal{A} = \frac{1}{N!} \sum_{\hat{P} \in S_n} (-1)^{\sigma_P} \hat{P}
 \end{equation}
 
-We can now re-express the slater determinant \eqref{eq:SlaterDet} in a more useful form. Using the Leibniz formula for determinants we rewrite the slater determinant as:
-\begin{equation}
+We can now re-express the Slater determinant \eqref{eq:SlaterDet} in a more useful form. Using the Leibniz formula for determinants we rewrite the determinant as:
+\begin{equation}\label{eq:SlaterLeibniz}
 	\left|
 	\begin{matrix}
 		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
@@ -396,12 +436,63 @@ Thus:
 
 This formalism will be useful when dealing with one-electron and two-electrons operators.
 
-\mynotes{The Pauli principle postulates that a wave function of identical fermions must be an eigenfunction of a transposition operator with its parity as eigenvalue}
+\subsubsection{Properties of the Slater determinant}
 
-\mynotes{
-The first consequences of the asymmetry of the fermions ket state is that ...
-Pauli Fermi Hole e Fermi Heap. Metti citazione a \cite{Dan}
-}
+It is immediate to verify that by exchanging two electrons in \eqref{eq:SlaterDet} the sign of the determinant changes by a factor of $- 1$, respecting the antisymmetry principle.
+
+Another interesting property is that if two different electrons occupy completely the same spin-orbitals, the matrix will have two identical rows (because the electrons are identical the electron index is to be considered mute) and the determinant will be null. So the Slater determinant respect the Pauli principle, two identical fermions cannot occupy the same spacial orbital having both the same spin (i.e. cannot be described by the same quantum numbers) \footnote{A different formulation of the Pauli principle is that a wave function of identical fermions must be an eigenfunction of a transposition operator with its parity as eigenvalue}.
+
+
+To see the effects of the anti-simmetrisation requirement we now consider a system made of two particles. We pick a starting Hartree product of the type: 
+\begin{align*}
+	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \alpha(\omega_{1})\\
+	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2})
+\end{align*}
+where the two particles occupies two different orbitals each with different spin.
+
+If we anti-symmetrize the product (using the associated Slater determinant), the probability $P(\mathbf{r}_{1},\mathbf{r}_{2}) d\mathbf{r_{1}} d\mathbf{r_{2}}$ of finding electron 1 in position $\mathbf{r}_{1}$ and electron 2 in position $\mathbf{r}_{2}$ within a small volume is equal to \cite[p.52]{Attila}:
+\begin{equation*}
+	P(\mathbf{r}_{1},\mathbf{r}_{2}) = 
+		\frac{1}{2} ( 
+			\mid \psi_{1}(\mathbf{r}_1) \mid ^2    
+			\mid \psi_{2}(\mathbf{r}_2) \mid ^2   
+				+
+			\mid \psi_{1}(\mathbf{r}_2) \mid ^2    
+			\mid \psi_{2}(\mathbf{r}_1) \mid ^2   
+			)
+\end{equation*}
+In this case the probability is the average of the two possible configuration: electron 1 in $\psi_1$ and electron 2 in $\psi_2$; electron 1 in $\psi_2$ and electron 2 in $\psi_1$.
+In this case the probabilities are said to be \textit{uncorrelated}.
+
+But what happens if we try to exchange two particles with the same spin but different orbitals?
+\begin{align*}
+	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \beta(\omega_{1})\\
+	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2})
+\end{align*}
+
+What we obtain is \cite[p.53]{Attila}:
+\begin{align*}
+	P(\mathbf{r}_{1},\mathbf{r}_{2}) = 
+		\frac{1}{2} [ &
+			\mid \psi_{1}(\mathbf{r}_1) \mid ^2    
+			\mid \psi_{2}(\mathbf{r}_2) \mid ^2   
+				+
+			\mid \psi_{1}(\mathbf{r}_2) \mid ^2    
+			\mid \psi_{2}(\mathbf{r}_1) \mid ^2   
+\\
+			& - ( \psi_{1}^*(\mathbf{r}_1) \psi_{2}(\mathbf{r}_1) \psi_{2}^*(\mathbf{r}_2) \psi_{1}(\mathbf{r}_2)
+			 + \psi_{1}(\mathbf{r}_1) \psi_{2}^*(\mathbf{r}_1) \psi_{2}(\mathbf{r}_2) \psi_{1}^*(\mathbf{r}_2))]
+\end{align*}
+where we obtained an extra cross term that makes the probabilities \textit{correlated}. Note that thanks to the extra term we have that $P(\mathbf{r}_{1},\mathbf{r}_{1}) = 0$, respecting the Pauli principle.
+
+This two situations are called respectively a \textit{Fermi Heap} and a \textit{Fermi Hole} \cite{Dan}.
+
+
+\begin{equation}
+\Psi^2
+\end{equation}
+
+
 
 
 
