@@ -157,7 +157,7 @@ Nuclear mass is much higher than electron mass, so we expect electrons to have m
 It's now reasonable to separate the motion of the system in two distinct movements: the \textit{``slow"} movement of the nuclei, and the \textit{``fast"} movement of the electrons.
 
 We can say that from the point of view of electrons, the nuclei appear to be fixed. 
-From a physical standpoint the electrons are moving in the static field produced by the nuclei while still interacting within each others \cite[p.241]{Atkins97}.
+From a physical standpoint the electrons are moving in the static field produced by the nuclei while still interacting within each others \cite[p.241]{Atkins}.
 
 
 Using this approximation the kinetic energy of the nuclei $\hat{T}_{NN}$ can be neglected and the repulsion between the nuclei $\hat{V}_{NN}$, can be considered to be constant.
@@ -654,7 +654,7 @@ By picking this set $\{\chi'_j\}$ as our base\footnote{We just need to know that
 
 Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canonical equation} and reduces our problem of finding the ground state of a given quantum system to a set of $K$ eigenvalue equations, with $K$ being the number of spin-orbitals selected to describe the system. 
 
-$K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}". But the number of elements to compute in Fock matrix will go as $\frac{K^2}{2}$ seriously impacting on the complexity of the problem, especially from a computational standpoint.
+$K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}". But the number of elements to compute in Fock matrix will go as $\frac{K^2}{2}$, seriously impacting the complexity of the problem, especially from a computational standpoint.
 
 \subsubsection{Closed shell HF and the Roothaan equations}
 
@@ -698,7 +698,7 @@ Thus the Hartree-Fock equation became:
 
 Instead of using a numerical approach to solve the integro-differential equation \eqref{eq:hfSpatial}, Roothaan showed how to convert the problem to a set of algebraic equations, solvable using matrix techniques.
 
-We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{It is common for the basis set not to be orthogonal. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$.
+We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{Not orthogonal basis set are common. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$.
 
 \begin{equation}
 	\ket{\psi_i} = \sum_{\mu}^{K} C_{\mu i} \ket{\phi_{\mu}}
@@ -717,7 +717,7 @@ multiplying by $\bra{\phi_{\mu}}$ we get :
 \end{equation}
 
 Taking under consideration every $\psi_i$ we can write the equation in matrix form:
-\begin{equation}
+\begin{equation}\label{eq:RoothaanEquation}
 \boxed{
 \mathbf{FC} = \mathbf{SC\varepsilon}
 }
@@ -732,17 +732,36 @@ Being :
 \end{itemize}
 All these matrices have dimension $K\times K$.
 
+Equation \eqref{eq:RoothaanEquation} is called the \textit{Roothaan equation} and has a non-trivial solution only if the following  equation is satisfied \cite[p.309]{Atkins}:
+\begin{equation}\label{eq:secular}
+	\det \mid \mathbf{F - \varepsilon S} \mid =0
+\end{equation}
+
 
 \subsubsection{The Self Consistent Field Method}
 
-We have finally obtained an expression of $V_{ee}$ that keeps the electronic Hamiltonian \eqref{eq:H_elec} separated.
+
+
+We have finally obtained an expression of $\hat{V}_{ee}$ that keeps the electronic Hamiltonian \eqref{eq:H_elec} separated.
 
 Each electron on the $i$-th spin-orbital is subject to the following external potential:
 \begin{align}
-	\hat{v}^{HF} = \sum_{j}^{N} \hat{J}_{j} - \hat{K}_{j}
+	\hat{v}^{HF}(1) = \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1)
 \end{align}
 
-$\hat{v}^{HF}$ is referred as an average potential because it consider the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration any exchange correlation thanks to the exchange operator $\hat{K}_j$.
+Rewriting the Hartree-Fock equation for the $i$-th electron we have:
+\begin{align}
+	\left[- \frac{\nabla_{i}^{2}}{2} + \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}} + \sum_{j}^{N} \hat{J}_{j} - \hat{K}_{j}  \right] \ket{\chi_i}  & = \varepsilon_i \ket{\chi_i} \\
+	\left[\hat{h} + \hat{v}^{HF}\right] \ket{\chi_i} & = \varepsilon_i \ket{\chi_i}
+\end{align}
+
+$\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
+
+$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it consider the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration any electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin.
+
+In the case of closed-shell Hartree-Fock we have restricted our problem to only spatial orbitals, and in a more handy matrix form expressed in equation \eqref{eq:RoothaanEquation}.
+
+We still have not taken under account a very important property of the Fock operator.
 
 As shown in equations \eqref{eq:coulombOperator} and \eqref{eq:exchangeOperator},
 the Fock operator appears to be an implicit operator because it depends on the basis set we pick for the Slater determinant.
@@ -750,10 +769,32 @@ the Fock operator appears to be an implicit operator because it depends on the b
 \hat{f} = \hat{f}[\{\psi_{j}\}]
 \end{equation}
 
+This is also true for the Fock matrix: 
 
-This forbids the possibility to solve the problem with a direct approach. Instead it is necessary to follow an iterative method.
+because the spin-orbitals $\{\psi_{j}\}$ are expressed in terms of expansion coefficients, the Roothaan equation \eqref{eq:RoothaanEquation} can be rewritten as :
+\begin{equation}
+	\mathbf{F(C)~C} = \mathbf{SC\varepsilon}
+\end{equation}
 
-We need a set of starting pre-defined orbitals $\{\psi_i\}$. 
+
+This forbids the possibility to solve the problem with a direct approach. 
+The equations appears to be non-linear so it is necessary to use an iterative approach.
+
+The following iterative method will be explained in term of Roothaan equations, since they are much more relevant in computational implementations of the Hartree-Fock method.
+
+\begin{enumerate}
+	\item We define the position of every nucleus that won't change until the electronic problem is solved \footnote{Remember that we are under Bohr-Oppenheimer approximation}
+	\item We start by picking a basis set $\{\phi_{\mu}\}$ and guessing the matrix of expansion coefficients $\mathbf{C}$.
+	\item We calculate all required molecular integrals in $\mathbf{S}$ and $\mathbf{F}$. Which implies the calculation of every coulomb and exchange integral, and the elements of the $\mathbf{H}^{core}$ matrix.
+	\item We solve equation \eqref{eq:secular} to obtain matrices $\mathbf{C'}$ and $\varepsilon$ 
+	\item If $\mathbf{C'} - \mathbf{C} $ is under our consistency threshold, we reached self-consistency and the computation is concluded. Otherwise the iteration is repeated from step 3 with $\mathbf{C'}$ as the new matrix of the expansion coefficients. Alternatively it is possible to check that the total energy has reached a minimum (even though usually only the lowest $\varepsilon_i$ is used in the confrontation).
+\end{enumerate}
+
+
+\mynotes{spiega questione computazione come fatto su Atkins e poi piazza immagine}
+
+
+
 
 
 
@@ -805,7 +846,7 @@ May the force be with you.
 %diploma thesis (University Milan, 2011),
 %\url{http://www.mi.infm.it/manini/theses/dragoni.pdf}.
 
-\bibitem{Atkins97}
+\bibitem{Atkins}
 P. W. Atkins and R. S. Friedman,
 Molecular Quantum Mechanics,
 Oxford University Press, New York,
