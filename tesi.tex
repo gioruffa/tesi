@@ -25,6 +25,8 @@
 
 \usepackage{xcolor}
 \newcommand\mynotes[1]{\begin{flushright}\textcolor{red}{TODO: #1}\end{flushright}}
+\newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
+\newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
 
 \begin{document}
 
@@ -274,7 +276,7 @@ The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
 \begin{align}
 	\hat{H} & = \sum_{i}^{N_{e}} \hat{h}_{i} \label{eq:HartreeHamiltonian} 
 	\\
-	\hat{h}_{i} & = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}} \label{eq:singleEl}
+	\hat{h}_{i} & = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}}  \label{eq:singleElHam}
 \end{align}
 
 
@@ -436,7 +438,7 @@ Thus:
 
 This formalism will be useful when dealing with one-electron and two-electrons operators.
 
-\subsubsection{Properties of the Slater determinant}
+\subsubsection{Properties of the Slater determinant}\label{sec:slaterPropr}
 
 It is immediate to verify that by exchanging two electrons in \eqref{eq:SlaterDet} the sign of the determinant changes by a factor of $- 1$, respecting the antisymmetry principle.
 
@@ -486,6 +488,264 @@ What we obtain is \cite[p.53]{Attila}:
 where we obtained an extra cross term that makes the probabilities \textit{correlated}. Note that thanks to the extra term we have that $P(\mathbf{r}_{1},\mathbf{r}_{1}) = 0$, respecting the Pauli principle.
 
 This two situations are called respectively a \textit{Fermi Heap} and a \textit{Fermi Hole} \cite{Dan}.
+
+
+\subsection{The Hartree-Fock method}
+We have seen that by the use of the Bohr-Oppenheimer approximation it is possible to consider the motion of nuclei and the motion of electrons as separated. 
+We focused on the electronic problem seeing that, by neglecting $\hat{V}_{ee}$ it is possible to separate the Hamiltonian \eqref{eq:H_elec} into $N_e$ independent Hamiltonians \eqref{eq:HartreeHamiltonian}.
+What the Hartree-Fock method aims to do is to take under consideration the interaction between electrons while keeping the advantage of a separable Hamiltonian.
+
+\subsubsection{One-electron and Two-electrons Operators}
+
+We rewrite \eqref{eq:H_elec} in his complete form using \eqref{eq:singleElHam} \footnote{Where we have dropped the \textit{e} index}
+\begin{equation}
+	\hat{H} = \sum_{i}^{N} \hat{h}_{i} + \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
+\end{equation}
+
+The operator $\sum_{i}^{N} \hat{h}_{i}$ is called a \textit{one-electron operator} with the following formal definition:
+
+\begin{equation}\label{eq:singleEl}
+	\mathcal{O}_{1} := \sum_{i}^{N} \hat{h}_{i}
+\end{equation}
+
+Similarly, operator $\frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}$ is called a \textit{two-electron operator}:
+
+\begin{equation}
+	\mathcal{O}_{2} := \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
+\end{equation}
+
+We are interested in the effect this two operators have when applied on a single Slater determinant.
+
+Using \eqref{eq:SlaterLeibniz}, the orthonormality of the spin-orbitals composing the Slater determinant \eqref{eq:SlaterDet} and the fact that $r_{ij} = r_{ji}$ one can show that \cite[p.74-81]{Attila}:
+
+\begin{align}
+	& \bra{\Psi} \mathcal{O}_{1} \ket{\Psi} = \sum_{i}^{N} \bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} \\
+	& \bra{\Psi} \mathcal{O}_{2} \ket{\Psi} = \frac{1}{2} \sum_{i \neq j}^{N} \bra{\chi_i \chi_i} \frac{1}{r_{ij}} \ket{ \chi_{i} \chi_{i}} - \bra{\chi_i \chi_j} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}}
+\end{align}
+
+Introducing the following notation:
+\begin{align}
+	\bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} = \bra{i} \hat{h} \ket{i}
+	\\
+	\bra{\chi_{i} \chi_{j}} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}} = \jsqrt{i}{j}
+\end{align}
+
+We can write expectation energy for a single Slater determinant as :
+\begin{equation}
+	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{i} - \ksqrt{i}{j}
+\end{equation}
+
+The equation is still not separable and far from being reduced to an eigenvalue problem, but we have an handy expression for the expectation energy of the state of the system
+
+\subsubsection{Variational Method}
+So far we made no consideration on the spin-orbitals $\{ \chi_{i} \}$ composing \eqref{eq:SlaterDet}, besides the condition that they are orthonormal.
+
+But what if we want to pick the $\{ \chi_{i} \}$ that correspond to the ground state of our system?
+
+The variational principle comes in help stating that the exact ground state solution to the Schroedinger equation $\hat{H} \ket{\Psi} = E \ket{\Psi}$ is the one that minimizes the functional 
+\begin{equation} \label{eq:hamFunctional}
+	E_{0}[\{\chi_{i}\}] = \bra{\chi_1 \cdots \chi_N} \hat{H} \ket{\chi_1 \cdots \chi_N} = \bra{\Psi} \hat{H} \ket{\Psi}
+\end{equation}
+
+To find the minimum of the functional\eqref{eq:hamFunctional} we must consider his variation for a small variation $\var{\Psi}$ of the test solution $\Psi$  \cite[p.165]{Carati}.  
+
+\begin{align}
+	\ket{\Psi} & \rightarrow \ket{\Psi + \var{\Psi}} 
+\\
+	\bra{\Psi + \var{\Psi}} \hat{H} \ket{\Psi + \var{\Psi}} & = 
+		\bra{\Psi} \hat{H} \ket{\Psi} 
+		+ \bra{\var{\Psi}} \hat{H} \ket{\Psi} 
+		+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
+		+ \cdots
+\\
+		 & = E_{0}[\{\chi_{i}\}] + \var{E} + \cdots
+\end{align}
+Where
+\begin{equation}
+	\var{E} = \bra{\var{\Psi}} \hat{H} \ket{\Psi} 	+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
+\end{equation}
+is the first order differential of the functional \eqref{eq:hamFunctional} \footnote{$\var{E}$ is not a real function differential, but a functional differential}.
+
+We are looking for the set $\{\chi_i\}$ for which $\var{E} = 0$ \footnote{note that $\Psi$ is a Slater determinant $\mid \chi_1 \cdots \chi_i \cdots \chi_N \mid$}, but we want them to be orthonormal.
+
+To satisfy these two requirements we minimize the following functional \footnote{$\delta_{ij}$ is the Kronecker delta} 
+\begin{align}
+	\mathcal{L}[\{\chi_{i}\}] & = E[\{\chi_i\}] - \sum_{ij}^{N} \epsilon_{ij} (\bra{\chi_{i}}\ket{\chi_{j}} - \delta_{ij})
+\\
+	\var{\mathcal{L}} & = \var{E} - \sum_{ij}^{N} \epsilon_{ij} \var{(\bra{\chi_{i}}\ket{\chi_{j}})}	
+\end{align}
+
+If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ will have the minimum in the same \textit{``point"}. The elements $\epsilon_{ij}$ are called the \textit{Lagrange multipliers}, and they form an Hermitian matrix $\{ \epsilon \}_{ij}$.
+
+\begin{align}
+	\var{E} 	& = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \bra{i} \hat{h}  \ket{\var{i}} \\
+			& + \frac{1}{2} \sum_{ij}^{N} [ (\var{i})i \mid j j ] + [ i(\var{i}) \mid j j ] + [ i i \mid (\var{j}) j ] + [ i i \mid j (\var{j}) ]\\
+			& - \frac{1}{2} \sum_{ij}^{N} [ (\var{i})j \mid j i ] + [ i(\var{j}) \mid j i ] + [ i j \mid (\var{i}) j ] + [ i j \mid j (\var{i}) ]
+\end{align}
+
+by splitting the sum and inverting the indexes we have \cite[p.117-119]{Attila}:
+\begin{align}
+	\var{E} = &  \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ]  \label{eq:trick} \\
+	& +  cc
+\end{align}
+where $cc$ is the complex conjugate of \eqref{eq:trick}.
+
+Also
+\begin{align}
+	\sum_{ij}^{N} \epsilon_{ij} \var{(\bra{i}\ket{j})} = \sum_{ij}^{N} \epsilon_{ij} \bra{\var{i}}\ket{j} \label{eq:trick2}
+\end{align}
+
+Putting together \eqref{eq:trick} and \eqref{eq:trick2}:
+\begin{align}
+	\var{\mathcal{L}} & = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ] + \sum_{ij}^{N} \epsilon_{ij} \bra{\var{i}}\ket{j}\\
+	& = \sum_{i}^{N} \bra{\var{i}} \left( 
+		 \hat{h}  \ket{i} + \sum_{j}^{N}  [ i \mid j j ] - [  j \mid j i ] + \sum_{j}^{N} \epsilon_{ij} \ket{j}
+	\right) \label{eq:toNull}
+	\\
+	& = 0
+\end{align}
+
+since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero.
+
+\begin{equation}
+	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \epsilon_{ij} \ket{j} = 0
+\end{equation}
+
+We define respectively the \textit{Coulomb operator} and the \textit{Exchange operator} by:
+\begin{align}
+	J_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{j}(2) \right] \chi_i(1) \label{eq:coulombOperator} \\
+	K_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{i}(2) \right] \chi_j(1)	
+\label{eq:exchangeOperator}
+\end{align}
+
+where ``$(1)$" is the index of the integration variable of the function.
+
+We finally have that for every $i$:
+\begin{align}
+	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \epsilon_{ij} \ket{\chi_{j}(1)} \label{eq:HartreeNonCan}
+\end{align}
+
+We define the \textit{Fock operator}\footnote{note that for $i=j$ the term is null}
+\begin{equation}\label{eq:FockOperator}
+	\hat{f}(1) = \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1)
+\end{equation}
+then :
+\begin{align}
+	\hat{f}(1)\ket{\chi_i(1)} = \sum_{j}^{N} \epsilon_{ij} \ket{\chi_{j}(1)} 
+\end{align}
+
+
+Because under unitary transformations two Slater determinant can differ only by a phase factor \cite[p.120]{Attila}, the Exchange and Coulomb operator are invariant under any transformation between two orthonormal sets $(\{\chi_j\}$, $\{\chi'_j\})$ .
+
+Since :
+\begin{equation}
+	\bra{\chi_k}\hat{f}\ket{\chi_i} = \epsilon_{ki}
+\end{equation}
+
+The matrix of Lagrange multipliers is the matrix representation of the Fock operator.
+Because it is hermitian, it exists a set of orthonormal $\{\chi'_j\}$ that diagonalizes it.
+By picking this set $\{\chi'_j\}$ as our base\footnote{We just need to know that they exists because their nature will be exposed by solving \eqref{eq:HartreeFockEquation}} we can rewrite equation \eqref{eq:HartreeNonCan} into:
+
+\begin{align}
+	\hat{f} \ket{\chi_i} = \epsilon_{i} \ket{\chi_{i}} \label{eq:HartreeFockEquation}
+\end{align}
+
+Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canonical equation} and reduces our problem of finding the ground state of a given quantum system to a set of $K$ eigenvalue equations, with $K$ being the number of spin-orbitals selected to describe the system. 
+
+$K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}". But the number of elements to compute in Fock matrix will go as $\frac{K^2}{2}$ seriously impacting on the complexity of the problem, especially from a computational standpoint.
+
+\subsubsection{Closed shell HF and the Roothaan equations}
+
+A set of spin orbitals is said to be \textit{restricted} if :
+
+
+\[\chi_{i}(\mathbf{x}) = \left\{
+  \begin{array}{lr}
+    \psi_{j}(\mathbf{r}) \alpha(w)\\
+    \psi_{j}(\mathbf{r}) \beta(w)
+  \end{array}
+\right.
+\]
+
+And the closed shell restricted ground state is :
+\begin{align}
+	\ket{\Psi_{0}} & = \ket{ \psi_{1} \overline{\psi}_{1} \cdots  
+	\psi_{j} \overline{\psi}_{j}
+	\cdots	
+	\psi_{\frac{N}{2}} \overline{\psi}_{\frac{N}{2}}}
+	\\
+	\psi_{j} & = \psi_{j} \alpha
+	\\
+	\overline{\psi}_{j} & = \psi_{j} \beta
+\end{align}
+
+We can say that every spatial orbital $\psi(\mathbf{r})$ is occupied by both spin-up and spin-down electrons (there is no ``odd" electron alone in a spatial orbital).
+
+Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator became :
+
+\begin{equation}
+\hat{f}(1) = \hat{h}(1) +\sum_{j=1}^{N/2}[2\hat J_j(1)-\hat K_j(1)]
+\end{equation}
+
+Where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi_i\}$.
+
+Thus the Hartree-Fock equation became:
+\begin{equation}\label{eq:hfSpatial}
+	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \epsilon_i \ket{\psi(\mathbf{r_1})}
+\end{equation}
+
+Instead of using a numerical approach to solve the integro-differential equation \eqref{eq:hfSpatial}, Roothaan showed how to convert the problem to a set of algebraic equations, solvable using matrix techniques.
+
+We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{It is common for the basis set not to be orthogonal. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$.
+
+\begin{equation}
+	\ket{\psi_i} = \sum_{\mu}^{K} C_{\mu i} \ket{\phi_{\mu}}
+\end{equation}
+
+Substituting inside \eqref{eq:hfSpatial} :
+\begin{equation}
+	\hat{f}(1) \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}  = \epsilon_i \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}
+\end{equation}
+
+multiplying by $\bra{\phi_{\mu}}$ we get :
+
+\begin{equation}
+	 \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\hat{f}(1)\ket{\phi_{\nu}(1)}  
+	 = \epsilon_i \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\ket{\phi_{\nu}(1)}
+\end{equation}
+
+Taking under consideration every $\psi_i$ we can write the equation in matrix form:
+\begin{equation}
+\boxed{
+\mathbf{FC} = \mathbf{SC\epsilon}
+}
+\end{equation}
+
+\subsubsection{The Self Consistent Field Method}
+
+We have finally obtained an expression of $V_{ee}$ that keeps the electronic Hamiltonian \eqref{eq:H_elec} separated.
+
+Each electron on the $i$-th spin-orbital is subject to the following external potential:
+\begin{align}
+	\hat{v}^{HF} = \sum_{j}^{N} \hat{J}_{j} - \hat{K}_{j}
+\end{align}
+
+$\hat{v}^{HF}$ is referred as an average potential because it consider the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration any exchange correlation thanks to the exchange operator $\hat{K}_j$.
+
+As shown in equations \eqref{eq:coulombOperator} and \eqref{eq:exchangeOperator},
+the Fock operator appears to be an implicit operator because it depends on the basis set we pick for the Slater determinant.
+\begin{equation}
+\hat{f} = \hat{f}[\{\psi_{j}\}]
+\end{equation}
+
+
+This forbids the possibility to solve the problem with a direct approach. Instead it is necessary to follow an iterative method.
+
+We need a set of starting pre-defined orbitals $\{\psi_i\}$. 
+
+
+
+
 
 
 
@@ -541,7 +801,7 @@ Oxford University Press, New York,
 1997.
 
 \bibitem{Attila}
-A. Szabo, N. S. Ostlund
+A. Szabo, N. S. Ostlund,
 Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory,
 Dover Pubblications, New York,
 1996.
@@ -558,6 +818,11 @@ Modern Quantum Mechanics,
 Addison-Wesley,
 Revised Edition,
 1994.
+
+\bibitem{Carati}
+A. Carati, L.Galgani,
+Appunti di Meccanica Razionale 1,
+\url{http://users.mat.unimi.it/users/carati/#Didattica}.
 
 \end{thebibliography}
 
