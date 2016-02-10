@@ -24,7 +24,9 @@
 \renewcommand{\floatpagefraction}{.9}
 
 \usepackage{xcolor}
-\newcommand\mynotes[1]{\begin{flushright}\textcolor{red}{TODO: #1}\end{flushright}}
+\newcommand\mynotes[1]{\begin{flushright}
+
+\textcolor{red}{TODO: #1}\end{flushright}}
 \newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
 
@@ -101,17 +103,17 @@ Is the kinetic energy of the nuclei
 Is the kinetic energy of the electrons
 
 \begin{equation}
-\hat{V}_{Ne} = -\frac{e^2}{4\pi\epsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid }
+\hat{V}_{Ne} = -\frac{e^2}{4\pi\varepsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid }
 \end{equation}
 is the electron-ion attraction potential energy
 
 \begin{equation}
-\hat{V}_{NN} = \frac{e^2}{4\pi\epsilon_{0}} \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}}{\mid R_{\alpha} - R_{\beta} \mid }
+\hat{V}_{NN} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}}{\mid R_{\alpha} - R_{\beta} \mid }
 \end{equation}
 is the nucleus-nucleus repulsion potential energy
 
 \begin{equation}
-\hat{V}_{ee} = \frac{e^2}{4\pi\epsilon_{0}} \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{\mid r_{i} - r_{j} \mid }
+\hat{V}_{ee} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{\mid r_{i} - r_{j} \mid }
 \end{equation}
 is the electron-electron repulsion potential energy
 
@@ -174,7 +176,7 @@ Rewriting $\hat{H}_{e}$  using atomic units:
 
 The associate Schroedinger equation is,
 \begin{equation}
-	\hat{H}_{e} \ket{\Phi_{e}} = \epsilon_{e} \ket{\Phi_{e}}
+	\hat{H}_{e} \ket{\Phi_{e}} = \varepsilon_{e} \ket{\Phi_{e}}
 \end{equation}
 
 With solution
@@ -186,13 +188,13 @@ Where the dependency from the electronic coordinates $\{r_i\}$ is explicit, but 
 This implies that also the electronic energy depends parametrically on $\{R_{\alpha}\}$
 
 \begin{equation}
-	\epsilon_{e} = \epsilon_{e}(\{R_{\alpha}\})
+	\varepsilon_{e} = \varepsilon_{e}(\{R_{\alpha}\})
 \end{equation}
 
 To obtain the total energy (with fixed nuclei) we have to add the constant ion-ion Coulomb potential energy
 
 \begin{equation}\label{eq:totEn1}
-	\epsilon_{tot} = \epsilon_{e} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}
+	\varepsilon_{tot} = \varepsilon_{e} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}
 \end{equation}
 
 Equation from \eqref{eq:H_elec} to \eqref{eq:totEn1} constitutes the so called \textit{``Electronic Problem"} \cite[p.44]{Attila}.
@@ -201,16 +203,16 @@ Once solved one could then apply the same principle to the nuclear problem.
 Since the electrons moves much faster then the nuclei, it is reasonable to approximate \eqref{eq:theHamiltonian} by replacing electronic coordinates by their average value, averaged over $\Phi_{e}$.
 The nuclear Hamiltonian will be :
 \begin{equation}
-	H_{N} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \epsilon_{tot}(\{ R_{\alpha}\})
+	H_{N} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \varepsilon_{tot}(\{ R_{\alpha}\})
 \end{equation}
 
-We can see that $\epsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
+We can see that $\varepsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
 
 Thus the nuclei in the Born-Oppenheimer move on a potential energy surface obtained by solving the electronic problem.
 
 The nuclear Schrodinger equation  
 \begin{equation}
-	\hat{H}_{N} \ket{\Phi_{N}} = \epsilon \ket{\Phi_{N} }
+	\hat{H}_{N} \ket{\Phi_{N}} = \varepsilon \ket{\Phi_{N} }
 \end{equation}
 
 with solution 
@@ -284,7 +286,7 @@ In this form $\hat{H}$ is composed by a sum of $N_e$ independent single electron
 
 Each operator $\hat{h}_i$ will have his spin orbital eigenfunction with eigenvalue given by
 \begin{equation}
-	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \epsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }
+	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \varepsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }
 \end{equation}
 
 Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be the tensor product of $\hat{h}_i$ eigenfunctions
@@ -297,7 +299,7 @@ with eigenvalue
 	\hat{H}\ket{\Psi^{HP}} = E\ket{\Psi^{HP}}
 \end{equation}
 \begin{equation}
-	E = \epsilon_i + \epsilon_j + ... + \epsilon_k
+	E = \varepsilon_i + \varepsilon_j + ... + \varepsilon_k
 \end{equation}
 
 It must be noted that in equation \eqref{eq:HartreeProduct} there is no correlation between the index of the spin-orbital $\chi_{i}$ to the index of the electron's coordinates $\mathbf{x}_i$. It is absolutely and completely reasonable to have the $j$-th electron in the $i$-th spin-orbital e.g : $\chi_{j}(\mathbf{x}_{i})$.
@@ -570,12 +572,12 @@ We are looking for the set $\{\chi_i\}$ for which $\var{E} = 0$ \footnote{note t
 
 To satisfy these two requirements we minimize the following functional \footnote{$\delta_{ij}$ is the Kronecker delta} 
 \begin{align}
-	\mathcal{L}[\{\chi_{i}\}] & = E[\{\chi_i\}] - \sum_{ij}^{N} \epsilon_{ij} (\bra{\chi_{i}}\ket{\chi_{j}} - \delta_{ij})
+	\mathcal{L}[\{\chi_{i}\}] & = E[\{\chi_i\}] - \sum_{ij}^{N} \varepsilon_{ij} (\bra{\chi_{i}}\ket{\chi_{j}} - \delta_{ij})
 \\
-	\var{\mathcal{L}} & = \var{E} - \sum_{ij}^{N} \epsilon_{ij} \var{(\bra{\chi_{i}}\ket{\chi_{j}})}	
+	\var{\mathcal{L}} & = \var{E} - \sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{\chi_{i}}\ket{\chi_{j}})}	
 \end{align}
 
-If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ will have the minimum in the same \textit{``point"}. The elements $\epsilon_{ij}$ are called the \textit{Lagrange multipliers}, and they form an Hermitian matrix $\{ \epsilon \}_{ij}$.
+If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ will have the minimum in the same \textit{``point"}. The elements $\varepsilon_{ij}$ are called the \textit{Lagrange multipliers}, and they form an Hermitian matrix $\{ \varepsilon \}_{ij}$.
 
 \begin{align}
 	\var{E} 	& = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \bra{i} \hat{h}  \ket{\var{i}} \\
@@ -592,14 +594,14 @@ where $cc$ is the complex conjugate of \eqref{eq:trick}.
 
 Also
 \begin{align}
-	\sum_{ij}^{N} \epsilon_{ij} \var{(\bra{i}\ket{j})} = \sum_{ij}^{N} \epsilon_{ij} \bra{\var{i}}\ket{j} \label{eq:trick2}
+	\sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{i}\ket{j})} = \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j} \label{eq:trick2}
 \end{align}
 
 Putting together \eqref{eq:trick} and \eqref{eq:trick2}:
 \begin{align}
-	\var{\mathcal{L}} & = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ] + \sum_{ij}^{N} \epsilon_{ij} \bra{\var{i}}\ket{j}\\
+	\var{\mathcal{L}} & = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ] + \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j}\\
 	& = \sum_{i}^{N} \bra{\var{i}} \left( 
-		 \hat{h}  \ket{i} + \sum_{j}^{N}  [ i \mid j j ] - [  j \mid j i ] + \sum_{j}^{N} \epsilon_{ij} \ket{j}
+		 \hat{h}  \ket{i} + \sum_{j}^{N}  [ i \mid j j ] - [  j \mid j i ] + \sum_{j}^{N} \varepsilon_{ij} \ket{j}
 	\right) \label{eq:toNull}
 	\\
 	& = 0
@@ -608,7 +610,7 @@ Putting together \eqref{eq:trick} and \eqref{eq:trick2}:
 since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero.
 
 \begin{equation}
-	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \epsilon_{ij} \ket{j} = 0
+	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0
 \end{equation}
 
 We define respectively the \textit{Coulomb operator} and the \textit{Exchange operator} by:
@@ -622,7 +624,7 @@ where ``$(1)$" is the index of the integration variable of the function.
 
 We finally have that for every $i$:
 \begin{align}
-	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \epsilon_{ij} \ket{\chi_{j}(1)} \label{eq:HartreeNonCan}
+	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} \label{eq:HartreeNonCan}
 \end{align}
 
 We define the \textit{Fock operator}\footnote{note that for $i=j$ the term is null}
@@ -631,7 +633,7 @@ We define the \textit{Fock operator}\footnote{note that for $i=j$ the term is nu
 \end{equation}
 then :
 \begin{align}
-	\hat{f}(1)\ket{\chi_i(1)} = \sum_{j}^{N} \epsilon_{ij} \ket{\chi_{j}(1)} 
+	\hat{f}(1)\ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} 
 \end{align}
 
 
@@ -639,7 +641,7 @@ Because under unitary transformations two Slater determinant can differ only by 
 
 Since :
 \begin{equation}
-	\bra{\chi_k}\hat{f}\ket{\chi_i} = \epsilon_{ki}
+	\bra{\chi_k}\hat{f}\ket{\chi_i} = \varepsilon_{ki}
 \end{equation}
 
 The matrix of Lagrange multipliers is the matrix representation of the Fock operator.
@@ -647,7 +649,7 @@ Because it is hermitian, it exists a set of orthonormal $\{\chi'_j\}$ that diago
 By picking this set $\{\chi'_j\}$ as our base\footnote{We just need to know that they exists because their nature will be exposed by solving \eqref{eq:HartreeFockEquation}} we can rewrite equation \eqref{eq:HartreeNonCan} into:
 
 \begin{align}
-	\hat{f} \ket{\chi_i} = \epsilon_{i} \ket{\chi_{i}} \label{eq:HartreeFockEquation}
+	\hat{f} \ket{\chi_i} = \varepsilon_{i} \ket{\chi_{i}} \label{eq:HartreeFockEquation}
 \end{align}
 
 Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canonical equation} and reduces our problem of finding the ground state of a given quantum system to a set of $K$ eigenvalue equations, with $K$ being the number of spin-orbitals selected to describe the system. 
@@ -691,7 +693,7 @@ Where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi
 
 Thus the Hartree-Fock equation became:
 \begin{equation}\label{eq:hfSpatial}
-	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \epsilon_i \ket{\psi(\mathbf{r_1})}
+	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \varepsilon_i \ket{\psi(\mathbf{r_1})}
 \end{equation}
 
 Instead of using a numerical approach to solve the integro-differential equation \eqref{eq:hfSpatial}, Roothaan showed how to convert the problem to a set of algebraic equations, solvable using matrix techniques.
@@ -704,22 +706,32 @@ We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu 
 
 Substituting inside \eqref{eq:hfSpatial} :
 \begin{equation}
-	\hat{f}(1) \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}  = \epsilon_i \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}
+	\hat{f}(1) \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}  = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}
 \end{equation}
 
 multiplying by $\bra{\phi_{\mu}}$ we get :
 
 \begin{equation}
 	 \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\hat{f}(1)\ket{\phi_{\nu}(1)}  
-	 = \epsilon_i \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\ket{\phi_{\nu}(1)}
+	 = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\ket{\phi_{\nu}(1)}
 \end{equation}
 
 Taking under consideration every $\psi_i$ we can write the equation in matrix form:
 \begin{equation}
 \boxed{
-\mathbf{FC} = \mathbf{SC\epsilon}
+\mathbf{FC} = \mathbf{SC\varepsilon}
 }
 \end{equation}
+
+Being :
+\begin{itemize}
+	\item $\mathbf{F}$ the Fock matrix expressed using our basis set
+	\item $\mathbf{C}$ the matrix of the expansion coefficients
+	\item $\mathbf{S}$ the overlap matrix between the orbitals of the basis set
+	\item $\mathbf{\varepsilon}$ is the diagonal matrix of the orbitals energies	
+\end{itemize}
+All these matrices have dimension $K\times K$.
+
 
 \subsubsection{The Self Consistent Field Method}
 
