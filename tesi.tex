@@ -79,7 +79,6 @@ It is based on density-functional theory, plane waves, and pseudopotentials.
 \mynotes{Scritto per girare su un gazilione di architetture}
 
 \section{Theoretical Introduction}\label{model:sec}
-\mynotes{metti citazione da manuale giocoleria su divisione del problema in piccole parti risolvibili}
 
 This section will cover the basic theory upon which Quantum ESPRESSO is based.
 
@@ -757,11 +756,11 @@ Rewriting the Hartree-Fock equation for the $i$-th electron we have:
 
 $\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
 
-$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it consider the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration any electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin.
+$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin.
 
 In the case of closed-shell Hartree-Fock we have restricted our problem to only spatial orbitals, and in a more handy matrix form expressed in equation \eqref{eq:RoothaanEquation}.
 
-We still have not taken under account a very important property of the Fock operator.
+We still need to consider a very important property of the Fock operator.
 
 As shown in equations \eqref{eq:coulombOperator} and \eqref{eq:exchangeOperator},
 the Fock operator appears to be an implicit operator because it depends on the basis set we pick for the Slater determinant.
@@ -769,9 +768,9 @@ the Fock operator appears to be an implicit operator because it depends on the b
 \hat{f} = \hat{f}[\{\psi_{j}\}]
 \end{equation}
 
-This is also true for the Fock matrix: 
+This is also true for the Fock matrix.
 
-because the spin-orbitals $\{\psi_{j}\}$ are expressed in terms of expansion coefficients, the Roothaan equation \eqref{eq:RoothaanEquation} can be rewritten as :
+Because the spin-orbitals $\{\psi_{j}\}$ are expressed in terms of expansion coefficients, the Roothaan equation \eqref{eq:RoothaanEquation} can be rewritten as :
 \begin{equation}
 	\mathbf{F(C)~C} = \mathbf{SC\varepsilon}
 \end{equation}
@@ -787,11 +786,69 @@ The following iterative method will be explained in term of Roothaan equations, 
 	\item We start by picking a basis set $\{\phi_{\mu}\}$ and guessing the matrix of expansion coefficients $\mathbf{C}$.
 	\item We calculate all required molecular integrals in $\mathbf{S}$ and $\mathbf{F}$. Which implies the calculation of every coulomb and exchange integral, and the elements of the $\mathbf{H}^{core}$ matrix.
 	\item We solve equation \eqref{eq:secular} to obtain matrices $\mathbf{C'}$ and $\varepsilon$ 
-	\item If $\mathbf{C'} - \mathbf{C} $ is under our consistency threshold, we reached self-consistency and the computation is concluded. Otherwise the iteration is repeated from step 3 with $\mathbf{C'}$ as the new matrix of the expansion coefficients. Alternatively it is possible to check that the total energy has reached a minimum (even though usually only the lowest $\varepsilon_i$ is used in the confrontation).
+	\item If the difference between $\mathbf{C'}$ and $\mathbf{C} $ is under our consistency threshold, we reached self-consistency and the computation is concluded. Otherwise the iteration is repeated from step 3 with $\mathbf{C'}$ as the new matrix of the expansion coefficients. Alternatively it is possible to check that the total energy has reached a minimum (even though usually only the lowest $\varepsilon_i$ is used in the confrontation).
 \end{enumerate}
 
+\mynotes{ma una bella immaginetta???}
 
-\mynotes{spiega questione computazione come fatto su Atkins e poi piazza immagine}
+The iteration proceeds until the expansion coefficients are stable withing multiple iterations. In reality the matrix $\mathbf{C'}$ is not used ``\textit{as is}"" to start the next iteration, it's usually combined with a subset of the previously obtained coefficients matrices. This is done to speed up the convergence towards self consistency.
+
+When the iteration is concluded, an Hartree-Fock ground state functions is obtained. Coming back to the nuclear problem, the ground geometry of the molecule is obtained following the guidelines of the Bohr-Oppenheimer approximation.
+A set of \textit{post Hartree-Fock} methods can be applied to obtain the excited electronic states, but this won't be covered in this work.
+
+\subsubsection{The Fock matrix and the Density Matrix}
+Although the iteration scheme seems rather simple, it is convenient to investigate the nature of the Fock matrix to better understand the computational complexity of SCF calculations.
+
+Each Fock matrix element is calculated as :
+\begin{align}
+	F_{\mu \nu} & = \bra{\phi_{\mu}(1)}\hat{f}(1)\ket{\phi_{\nu}(1)}  \\
+	& = \int \phi_{\mu}^*(\mathbf{r}_1) h(1) \phi_{\nu}(\mathbf{r}_1) \dd\mathbf{r}_1 + \\
+	&  + 2 \sum_{j} \int \phi_{\mu}^*(1) \psi_{j}^*(2) \frac{1}{r_{12}} \psi_{j}(2) \phi_{\nu}(1) \dd\mathbf{r}_1  \dd\mathbf{r}_2  + \\
+	&  - ~~ \sum_{j} \int \phi_{\mu}^*(1) \psi_{j}^*(2) \frac{1}{r_{12}} \phi_{\nu}(2) \psi_{j}(1)  \dd\mathbf{r}_1 \dd\mathbf{r}_2
+\end{align}
+
+by expanding $\psi_j$ and using the following definition \cite[p.295,296]{Atkins} \cite[p.141	]{Attila}
+\begin{equation}
+	(ab|cd) = \int \phi_a(1) \phi_b(1) \frac{1}{r_{12}}  \phi_c(2) \phi_d(2) \dd\mathbf{r}_1 \dd\mathbf{r}_2
+\end{equation}
+
+We obtain 
+
+\begin{equation}
+	F_{\mu \nu} = H_{\mu \nu}^{core} +
+		\sum_{j} \sum_{\lambda \sigma} C_{\lambda j} C_{\sigma j}^* \left[ 2(\mu \nu | \sigma \lambda) - (\mu \lambda | \sigma \nu)   \right]
+\end{equation}
+
+If we define \cite[p.139]{Attila}
+\begin{equation}
+	P_{\mu \nu} = 2 \sum_{j} C_{\lambda j} C_{\sigma j}^* 
+\end{equation}
+
+The final form of the Fock matrix element is :
+
+\begin{equation} \label{eq:fockElement}
+F_{\mu \nu} = H_{\mu \nu}^{core} +
+		\sum_{j} \sum_{\lambda \sigma} P_{\mu \nu} \left[ (\mu \nu | \sigma \lambda) - \frac{1}{2} (\mu \lambda | \sigma \nu)   \right]
+\end{equation}
+
+The matrix $\mathbf{P}$ is called the \textit{density matrix}, because 
+\begin{equation}
+\rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
+\end{equation}
+
+the element $P_{\mu \nu}$ are referred to as density matrix elements, and are interpreted as the total electron density in the overlap region of $\phi_{\mu}$ and $\phi_{\nu}$.
+
+Because the number of integrals in \eqref{eq:fockElement} that has to be evaluated is of the order of $K^4$, where K is the size of our basis set $\{\phi_{\mu}\}$, even small basis sets for moderately-sized molecules can rapidly approach millions of two-electron integrals. Even tough some of of them would result null because of their mutual distance, or the calculation isn't needed because of molecular symmetries, their efficient calculation poses the greatest challenge in an HF-SCF calculation.
+
+In equation \eqref{eq:FockOperator} we have re-expressed the Fock operator in terms of electron density, instead of the expansion coefficient matrix. 
+
+When starting the HF-SCF method, instead of guessing the expansion coefficients $\mathbf{C}$, one could guess the electronic density and perform all the calculation accordingly.
+
+
+This idea of shifting the problem towards the electron density is the starting point of the so called \textit{Density Functional Theory}.
+
+
+
 
 
 
