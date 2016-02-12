@@ -148,9 +148,9 @@ Although the universality of this equation\footnote{It must be noted that we are
 Thus, even from a computational standpoint, a set of approximations must be performed.
 
 
-\subsection{The Bohr-Oppenheimer Approximation}
+\subsection{The Born-Oppenheimer Approximation}
 
-The Bohr-Oppenheimer approximation takes note of the great difference in masses of electrons and nuclei.
+The Born-Oppenheimer approximation takes note of the great difference in masses of electrons and nuclei.
 Nuclear mass is much higher than electron mass, so we expect electrons to have much higher velocities than	 nuclei. 
 
 It's now reasonable to separate the motion of the system in two distinct movements: the \textit{``slow"} movement of the nuclei, and the \textit{``fast"} movement of the electrons.
@@ -492,13 +492,13 @@ This two situations are called respectively a \textit{Fermi Heap} and a \textit{
 
 
 \subsection{The Hartree-Fock method}
-We have seen that by the use of the Bohr-Oppenheimer approximation it is possible to consider the motion of nuclei and the motion of electrons as separated. 
-We focused on the electronic problem seeing that, by neglecting $\hat{V}_{ee}$ it is possible to separate the Hamiltonian \eqref{eq:H_elec} into $N_e$ independent Hamiltonians \eqref{eq:HartreeHamiltonian}.
+We have seen that thanks to the Born-Oppenheimer approximation it is possible to consider as separated the motion of nuclei and the motion of electrons. 
+Focusing on the electronic problem we show that, by neglecting $\hat{V}_{ee}$, it is possible to separate the Hamiltonian \eqref{eq:H_elec} into $N_e$ independent Hamiltonians \eqref{eq:HartreeHamiltonian}.
 What the Hartree-Fock method aims to do is to take under consideration the interaction between electrons while keeping the advantage of a separable Hamiltonian.
 
 \subsubsection{One-electron and Two-electrons Operators}
 
-We rewrite \eqref{eq:H_elec} in his complete form using \eqref{eq:singleElHam} \footnote{Where we have dropped the \textit{e} index}
+Using  equation \eqref{eq:singleElHam} we rewrite equation \eqref{eq:H_elec} in his complete form \footnote{Where we have dropped the \textit{e} index}
 \begin{equation}
 	\hat{H} = \sum_{i}^{N} \hat{h}_{i} + \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
 \end{equation}
@@ -515,7 +515,7 @@ Similarly, operator $\frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}$ is called
 	\mathcal{O}_{2} := \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
 \end{equation}
 
-We are interested in the effect this two operators have when applied on a single Slater determinant.
+We are interested in the effect these two operators have when applied on a single Slater determinant.
 
 Using \eqref{eq:SlaterLeibniz}, the orthonormality of the spin-orbitals composing the Slater determinant \eqref{eq:SlaterDet} and the fact that $r_{ij} = r_{ji}$ one can show that \cite[p.74-81]{Attila}:
 
@@ -528,18 +528,18 @@ Introducing the following notation:
 \begin{align}
 	\bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} = \bra{i} \hat{h} \ket{i}
 	\\
-	\bra{\chi_{i} \chi_{j}} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}} = \jsqrt{i}{j}
+	\bra{\chi_{i} \chi_{j}} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}} = \jsqrt{i}{j} \label{eq:squareNotation}
 \end{align}
 
-We can write expectation energy for a single Slater determinant as :
+we can express expectation energy for a single Slater determinant as :
 \begin{equation}
 	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{i} - \ksqrt{i}{j}
 \end{equation}
 
-The equation is still not separable and far from being reduced to an eigenvalue problem, but we have an handy expression for the expectation energy of the state of the system
+Still the equation is not separable and far from being reduced to an eigenvalue problem, but we have an handy expression for the expectation energy of the state of the system
 
 \subsubsection{Variational Method}
-So far we made no consideration on the spin-orbitals $\{ \chi_{i} \}$ composing \eqref{eq:SlaterDet}, besides the condition that they are orthonormal.
+So far we made no consideration on the spin-orbitals $\{ \chi_{i} \}$ composing \eqref{eq:SlaterDet}, besides the orthonormality condition.
 
 But what if we want to pick the $\{ \chi_{i} \}$ that correspond to the ground state of our system?
 
@@ -548,7 +548,7 @@ The variational principle comes in help stating that the exact ground state solu
 	E_{0}[\{\chi_{i}\}] = \bra{\chi_1 \cdots \chi_N} \hat{H} \ket{\chi_1 \cdots \chi_N} = \bra{\Psi} \hat{H} \ket{\Psi}
 \end{equation}
 
-To find the minimum of the functional\eqref{eq:hamFunctional} we must consider his variation for a small variation $\var{\Psi}$ of the test solution $\Psi$  \cite[p.165]{Carati}.  
+To find the minimum of the functional\eqref{eq:hamFunctional} we must consider his differential for a small variation $\var{\Psi}$ of the test solution $\Psi$  \cite[p.165]{Carati}.  
 
 \begin{align}
 	\ket{\Psi} & \rightarrow \ket{\Psi + \var{\Psi}} 
@@ -562,14 +562,15 @@ To find the minimum of the functional\eqref{eq:hamFunctional} we must consider h
 		 & = E_{0}[\{\chi_{i}\}] + \var{E} + \cdots
 \end{align}
 Where
-\begin{equation}
-	\var{E} = \bra{\var{\Psi}} \hat{H} \ket{\Psi} 	+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
-\end{equation}
-is the first order differential of the functional \eqref{eq:hamFunctional} \footnote{$\var{E}$ is not a real function differential, but a functional differential}.
+\begin{align}
+	E_{0}[\{\chi_{i}\}] & = 	\bra{\Psi} \hat{H} \ket{\Psi}  \\
+	\var{E} & = \bra{\var{\Psi}} \hat{H} \ket{\Psi} 	+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
+\end{align}
+$\var{E}$ is the first order differential of the functional \eqref{eq:hamFunctional} \footnote{$\var{E}$ is not a real function differential, but a functional differential. Namely the part of the increment linear in $\var{\Psi}$.}.
 
 We are looking for the set $\{\chi_i\}$ for which $\var{E} = 0$ \footnote{note that $\Psi$ is a Slater determinant $\mid \chi_1 \cdots \chi_i \cdots \chi_N \mid$}, but we want them to be orthonormal.
 
-To satisfy these two requirements we minimize the following functional \footnote{$\delta_{ij}$ is the Kronecker delta} 
+To satisfy both requirements we minimize the following functional \footnote{$\delta_{ij}$ is the Kronecker delta} 
 \begin{align}
 	\mathcal{L}[\{\chi_{i}\}] & = E[\{\chi_i\}] - \sum_{ij}^{N} \varepsilon_{ij} (\bra{\chi_{i}}\ket{\chi_{j}} - \delta_{ij})
 \\
@@ -577,6 +578,8 @@ To satisfy these two requirements we minimize the following functional \footnote
 \end{align}
 
 If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ will have the minimum in the same \textit{``point"}. The elements $\varepsilon_{ij}$ are called the \textit{Lagrange multipliers}, and they form an Hermitian matrix $\{ \varepsilon \}_{ij}$.
+
+Using the notation introduced in \eqref{eq:squareNotation}:
 
 \begin{align}
 	\var{E} 	& = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \bra{i} \hat{h}  \ket{\var{i}} \\
@@ -586,17 +589,22 @@ If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ 
 
 by splitting the sum and inverting the indexes we have \cite[p.117-119]{Attila}:
 \begin{align}
+	\begin{split}
 	\var{E} = &  \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ]  \label{eq:trick} \\
 	& +  cc
+	\end{split}
 \end{align}
 where $cc$ is the complex conjugate of \eqref{eq:trick}.
 
 Also
 \begin{align}
-	\sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{i}\ket{j})} = \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j} \label{eq:trick2}
+\begin{split}
+	\sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{i}\ket{j})}  = & \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j}  \label{eq:trick2}
+	\\ & + cc
+\end{split}
 \end{align}
 
-Putting together \eqref{eq:trick} and \eqref{eq:trick2}:
+Putting together \eqref{eq:trick} and \eqref{eq:trick2} \footnote{ we are considering the complex conjugate.}:
 \begin{align}
 	\var{\mathcal{L}} & = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ] + \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j}\\
 	& = \sum_{i}^{N} \bra{\var{i}} \left( 
@@ -606,7 +614,7 @@ Putting together \eqref{eq:trick} and \eqref{eq:trick2}:
 	& = 0
 \end{align}
 
-since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero.
+since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero
 
 \begin{equation}
 	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0
@@ -621,7 +629,7 @@ We define respectively the \textit{Coulomb operator} and the \textit{Exchange op
 
 where ``$(1)$" is the index of the integration variable of the function.
 
-We finally have that for every $i$:
+For every $i$, we finally have that :
 \begin{align}
 	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} \label{eq:HartreeNonCan}
 \end{align}
@@ -653,7 +661,7 @@ By picking this set $\{\chi'_j\}$ as our base\footnote{We just need to know that
 
 Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canonical equation} and reduces our problem of finding the ground state of a given quantum system to a set of $K$ eigenvalue equations, with $K$ being the number of spin-orbitals selected to describe the system. 
 
-$K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}". But the number of elements to compute in Fock matrix will go as $\frac{K^2}{2}$, seriously impacting the complexity of the problem, especially from a computational standpoint.
+$K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}".
 
 \subsubsection{Closed shell HF and the Roothaan equations}
 
@@ -682,7 +690,7 @@ And the closed shell restricted ground state is :
 
 We can say that every spatial orbital $\psi(\mathbf{r})$ is occupied by both spin-up and spin-down electrons (there is no ``odd" electron alone in a spatial orbital).
 
-Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator became :
+Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator become :
 
 \begin{equation}
 \hat{f}(1) = \hat{h}(1) +\sum_{j=1}^{N/2}[2\hat J_j(1)-\hat K_j(1)]
@@ -690,7 +698,7 @@ Separating the integration of the spin function (which are orthonormal) and taki
 
 Where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi_i\}$.
 
-Thus the Hartree-Fock equation became:
+Thus the Hartree-Fock equation become:
 \begin{equation}\label{eq:hfSpatial}
 	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \varepsilon_i \ket{\psi(\mathbf{r_1})}
 \end{equation}
@@ -756,9 +764,9 @@ Rewriting the Hartree-Fock equation for the $i$-th electron we have:
 
 $\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
 
-$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin.
+$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin. \footnote{Electron exchange has not to be confused with electron correlation}
 
-In the case of closed-shell Hartree-Fock we have restricted our problem to only spatial orbitals, and in a more handy matrix form expressed in equation \eqref{eq:RoothaanEquation}.
+In the case of closed-shell Hartree-Fock we have restricted our problem only to spatial orbitals, and in a more handy matrix form expressed by equation \eqref{eq:RoothaanEquation}.
 
 We still need to consider a very important property of the Fock operator.
 
@@ -776,16 +784,17 @@ Because the spin-orbitals $\{\psi_{j}\}$ are expressed in terms of expansion coe
 \end{equation}
 
 
-This forbids the possibility to solve the problem with a direct approach. 
-The equations appears to be non-linear so it is necessary to use an iterative approach.
+This forbids the possibility to solve the problem with a direct calculation. 
+Because the equations appears to be non-linear, an iterative approach must be followed.
 
-The following iterative method will be explained in term of Roothaan equations, since they are much more relevant in computational implementations of the Hartree-Fock method.
+The iterative method outlined below will be explained in terms of Roothaan equation \eqref{eq:RoothaanEquation}, since it is  of greater interest from a computational point of view.
 
 \begin{enumerate}
-	\item We define the position of every nucleus that won't change until the electronic problem is solved \footnote{Remember that we are under Bohr-Oppenheimer approximation}
+	\item We define the position of every nucleus that won't change until the electronic problem is solved \footnote{Remember that we are under Born-Oppenheimer approximation}
 	\item We start by picking a basis set $\{\phi_{\mu}\}$ and guessing the matrix of expansion coefficients $\mathbf{C}$.
-	\item We calculate all required molecular integrals in $\mathbf{S}$ and $\mathbf{F}$. Which implies the calculation of every coulomb and exchange integral, and the elements of the $\mathbf{H}^{core}$ matrix.
-	\item We solve equation \eqref{eq:secular} to obtain matrices $\mathbf{C'}$ and $\varepsilon$ 
+	\item We calculate all required molecular integrals in $\mathbf{S}$ and $\mathbf{F}$. Which implies the calculation of every coulomb and exchange integral, and the elements of the $\mathbf{H}^{core} = \{\bra{\phi_{\mu}}\hat{h}\ket{\phi_{\nu}}\}$ matrix.
+	\item Equation \eqref{eq:secular} is solved to obtain matrix $\varepsilon$.
+	\item A new coefficients matrix $\mathbf{C'}$ is obtained thanks to equation \eqref{eq:RoothaanEquation}.
 	\item If the difference between $\mathbf{C'}$ and $\mathbf{C} $ is under our consistency threshold, we reached self-consistency and the computation is concluded. Otherwise the iteration is repeated from step 3 with $\mathbf{C'}$ as the new matrix of the expansion coefficients. Alternatively it is possible to check that the total energy has reached a minimum (even though usually only the lowest $\varepsilon_i$ is used in the confrontation).
 \end{enumerate}
 
@@ -793,7 +802,7 @@ The following iterative method will be explained in term of Roothaan equations, 
 
 The iteration proceeds until the expansion coefficients are stable withing multiple iterations. In reality the matrix $\mathbf{C'}$ is not used ``\textit{as is}"" to start the next iteration, it's usually combined with a subset of the previously obtained coefficients matrices. This is done to speed up the convergence towards self consistency.
 
-When the iteration is concluded, an Hartree-Fock ground state functions is obtained. Coming back to the nuclear problem, the ground geometry of the molecule is obtained following the guidelines of the Bohr-Oppenheimer approximation.
+When the iteration is concluded, an Hartree-Fock ground state functions is obtained. Coming back to the nuclear problem, the ground geometry of the molecule is obtained following the guidelines of the Born-Oppenheimer approximation.
 A set of \textit{post Hartree-Fock} methods can be applied to obtain the excited electronic states, but this won't be covered in this work.
 
 \subsubsection{The Fock matrix and the Density Matrix}
@@ -831,21 +840,24 @@ F_{\mu \nu} = H_{\mu \nu}^{core} +
 		\sum_{j} \sum_{\lambda \sigma} P_{\mu \nu} \left[ (\mu \nu | \sigma \lambda) - \frac{1}{2} (\mu \lambda | \sigma \nu)   \right]
 \end{equation}
 
-The matrix $\mathbf{P}$ is called the \textit{density matrix}, because 
+The matrix $\mathbf{P}$ is called the \textit{density matrix}, because the total electronic density as a function of the position $\mathbf{r}$ can be expressed as follows:
 \begin{equation}
 \rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
 \end{equation}
 
 the element $P_{\mu \nu}$ are referred to as density matrix elements, and are interpreted as the total electron density in the overlap region of $\phi_{\mu}$ and $\phi_{\nu}$.
+%<<<<< unica parte palesemente copiata da Atkins
+Because the number of integrals in \eqref{eq:fockElement} that has to be evaluated is of the order of $K^4$, where K is the size of our basis set $\{\phi_{\mu}\}$, even small basis sets for moderately-sized molecules can rapidly approach millions of two-electron integrals. 
+%unica parte palesemente copiata da Atkins >>>>>
+Even tough some of of them would result null because of their mutual distance, or the calculation isn't needed because of molecular symmetries, their efficient calculation poses the greatest challenge in HF-SCF.
 
-Because the number of integrals in \eqref{eq:fockElement} that has to be evaluated is of the order of $K^4$, where K is the size of our basis set $\{\phi_{\mu}\}$, even small basis sets for moderately-sized molecules can rapidly approach millions of two-electron integrals. Even tough some of of them would result null because of their mutual distance, or the calculation isn't needed because of molecular symmetries, their efficient calculation poses the greatest challenge in an HF-SCF calculation.
 
 In equation \eqref{eq:FockOperator} we have re-expressed the Fock operator in terms of electron density, instead of the expansion coefficient matrix. 
 
 When starting the HF-SCF method, instead of guessing the expansion coefficients $\mathbf{C}$, one could guess the electronic density and perform all the calculation accordingly.
 
 
-This idea of shifting the problem towards the electron density is the starting point of the so called \textit{Density Functional Theory}.
+This idea of shifting the problem towards the electron density is the main theme of the \textit{Density Functional Theory}.
 
 
 
