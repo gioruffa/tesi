@@ -60,7 +60,8 @@ A long time ago in a galaxy far, far away...
 \parbox[t]{7cm}
 {
 Advisor: {\it Prof. Dario Tamascelli}\\
-Co-Advisor: {\it Prof. Michele Ceotto}
+Co-Advisor: {\it Prof. Michele Ceotto}\\
+External Advisor: {\it Dott. Davide Ceresoli}\\
 }
 \end{abstract}
 %--------------------------------------------------------
@@ -69,14 +70,10 @@ Co-Advisor: {\it Prof. Michele Ceotto}
 \tableofcontents
 \newpage
 
-%----------------------------------------------------------------------------
-\section{Quantum Espresso}
-%----------------------------------------------------------------------------
 
-Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electronic-structure calculations and materials modeling at the nanoscale.
-It is based on density-functional theory, plane waves, and pseudopotentials.
+\section{Ab Initio calculations in modern Solid State Physic}
+\mynotes{importanza dei conti nel calcula delle strutture elettroniche}
 
-\mynotes{Scritto per girare su un gazilione di architetture}
 
 \section{Theoretical Introduction}\label{model:sec}
 
@@ -92,14 +89,14 @@ By starting with a very general approach we can say that the Hamiltonian associa
 Where:
 
 \begin{equation}
-\hat{T}_{N} = \frac{\hbar}{2} \sum_{\alpha}^{N_N} \frac{\nabla_{\alpha}^2}{M_{\alpha}}
+\hat{T}_{N} = - \frac{\hbar}{2} \sum_{\alpha}^{N_N} \frac{\nabla_{\alpha}^2}{M_{\alpha}}
 \end{equation}
-Is the kinetic energy of the nuclei
+is the kinetic energy of the nuclei
 
 \begin{equation}
-\hat{T}_{e} = \frac{\hbar}{2m_{e}} \sum_{i}^{N_e} \nabla_{i}^2
+\hat{T}_{e} = - \frac{\hbar}{2m_{e}} \sum_{i}^{N_e} \nabla_{i}^2
 \end{equation}
-Is the kinetic energy of the electrons
+is the kinetic energy of the electrons
 
 \begin{equation}
 \hat{V}_{Ne} = -\frac{e^2}{4\pi\varepsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid }
@@ -121,8 +118,12 @@ A state function $\ket{\psi}$ describing all the particles involved in the syste
 	i\hbar\dv{t}\ket{\psi(t)} = \hat{H}_{tot}\ket{\psi(t)}
 \end{equation}
 
-If not explicitly specified, from now on we will use atomic units \cite[p.42]{Attila} to express any equation.
-We shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant form:
+From now on, if not explicitly specified, we will use atomic units \footnote{see \cite[p.42]{Attila} for further details}
+\begin{equation}
+	m_{e} = \hbar = e =\frac{1}{4 \pi \epsilon_{0}} = 1
+\end{equation}
+
+we shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant form:
 
 
 \begin{equation}\label{eq:theHamiltonian}
@@ -173,7 +174,7 @@ Rewriting $\hat{H}_{e}$  using atomic units:
 					+ \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}
 \end{equation}
 
-The associate Schroedinger equation is,
+Then equation \eqref{eq:eq_sch} then become:
 \begin{equation}
 	\hat{H}_{e} \ket{\Phi_{e}} = \varepsilon_{e} \ket{\Phi_{e}}
 \end{equation}
@@ -207,7 +208,7 @@ The nuclear Hamiltonian will be :
 
 We can see that $\varepsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
 
-Thus the nuclei in the Born-Oppenheimer move on a potential energy surface obtained by solving the electronic problem.
+Thus the nuclei in the Born-Oppenheimer approximation move on a potential energy surface obtained by solving the electronic problem.
 
 The nuclear Schrodinger equation  
 \begin{equation}
@@ -229,16 +230,18 @@ The complete approximate solution to \eqref{eq:theHamiltonian} will be  \cite[p.
 											~ \ket{ \Phi_{N}(\{R_{\alpha}\})}
 \end{equation}
 
-Since \textit{``electronic problem"} is of much more interest in this work, from now on we will drop the suffix ``$e$" for the Hamiltonian $H_{e}$.
+Since this work will mainly focus on the \textit{``electronic problem"}, from now on we will drop the suffix ``$e$" for the Hamiltonian $H_{e}$.
 
 \subsection{The Hartree Product}
 \subsubsection{Spin-Orbit}
-We introduce two spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
-The only conditions we impose is that these two functions are orthonormal and a complete set of auto-functions for the spin operator $\hat{S}_z$ .
+We introduce two single particle spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
+The only conditions we impose is that these two functions are orthonormal and a complete set of auto-functions for the spin operator $\hat{S}_z$ \footnote{Even if it isn't necessary to specify the eigenvalues of the spin operator (as stated in \cite{Attila}), we prefer to specify them since we'll deal only with fermions. }.
 
 \begin{align*}
-	\bra{\alpha}\ket{\alpha} = \bra{\beta}\ket{\beta} = 1 \\
-	\bra{\alpha}\ket{\beta} = \bra{\beta}\ket{\alpha} = 0
+	\bra{\alpha}\ket{\alpha} & = \bra{\beta}\ket{\beta} = 1 \\
+	\bra{\alpha}\ket{\beta} & = \bra{\beta}\ket{\alpha} = 0 \\
+	\hat{S}_{z} \ket{\alpha} & = + \frac{1}{2} \ket{\alpha} \\
+	\hat{S}_{z} \ket{\beta} & = - \frac{1}{2} \ket{\beta} \\
 \end{align*}
 
 An electron is described by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$.
@@ -283,7 +286,7 @@ The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
 
 In this form $\hat{H}$ is composed by a sum of $N_e$ independent single electron Hamiltonians of the form \eqref{eq:singleEl}.
 
-Each operator $\hat{h}_i$ will have his spin orbital eigenfunction with eigenvalue given by
+Each operator $\hat{h}_i$ will have its spin orbital eigenfunction with eigenvalue given by
 \begin{equation}
 	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \varepsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }
 \end{equation}
@@ -314,7 +317,7 @@ Meaning that the probability of finding simultaneously (with an unique measure) 
 For this reason $\Psi^{HP}$ is called an uncorrelated or electron-independent wave function. 
 Namely, the position of one electron has no effect on the position of the others. 
 
-This is, of course, a strong assumption but we will see how the Hartree-Foch method will correct the approximation.
+This is, of course, a strong assumption, but we will see how the Hartree-Fock method will correct this approximation.
 
 
 
@@ -446,7 +449,7 @@ It is immediate to verify that by exchanging two electrons in \eqref{eq:SlaterDe
 Another interesting property is that if two different electrons occupy completely the same spin-orbitals, the matrix will have two identical rows (because the electrons are identical the electron index is to be considered mute) and the determinant will be null. So the Slater determinant respect the Pauli principle, two identical fermions cannot occupy the same spacial orbital having both the same spin (i.e. cannot be described by the same quantum numbers) \footnote{A different formulation of the Pauli principle is that a wave function of identical fermions must be an eigenfunction of a transposition operator with its parity as eigenvalue}.
 
 
-To see the effects of the anti-simmetrisation requirement we now consider a system made of two particles. We pick a starting Hartree product of the type: 
+To see the effects of the anti-simmetrisation requirement we now consider a system made of two particles. We pick a starting Hartree product of the types: 
 \begin{align*}
 	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \alpha(\omega_{1})\\
 	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2})
@@ -620,7 +623,7 @@ since \eqref{eq:toNull} must be zero for every $i$ and for every possible variat
 	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0
 \end{equation}
 
-We define respectively the \textit{Coulomb operator} and the \textit{Exchange operator} by:
+We define respectively the \textit{Coulomb operator} and the \textit{Exchanges operator} by:
 \begin{align}
 	J_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{j}(2) \right] \chi_i(1) \label{eq:coulombOperator} \\
 	K_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{i}(2) \right] \chi_j(1)	
@@ -764,7 +767,7 @@ Rewriting the Hartree-Fock equation for the $i$-th electron we have:
 
 $\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
 
-$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin. \footnote{Electron exchange has not to be confused with electron correlation}
+$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchanges operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin. \footnote{Electron exchange has not to be confused with electron correlation}
 
 In the case of closed-shell Hartree-Fock we have restricted our problem only to spatial orbitals, and in a more handy matrix form expressed by equation \eqref{eq:RoothaanEquation}.
 
@@ -842,7 +845,7 @@ F_{\mu \nu} = H_{\mu \nu}^{core} +
 
 The matrix $\mathbf{P}$ is called the \textit{density matrix}, because the total electronic density as a function of the position $\mathbf{r}$ can be expressed as follows:
 \begin{equation}
-\rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
+\rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi_{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
 \end{equation}
 
 the element $P_{\mu \nu}$ are referred to as density matrix elements, and are interpreted as the total electron density in the overlap region of $\phi_{\mu}$ and $\phi_{\nu}$.
@@ -863,7 +866,14 @@ This idea of shifting the problem towards the electron density is the main theme
 
 
 
+%----------------------------------------------------------------------------
+\section{Quantum Espresso}
+%----------------------------------------------------------------------------
 
+Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electronic-structure calculations and materials modeling at the nanoscale.
+It is based on density-functional theory, plane waves, and pseudopotentials.
+
+\mynotes{Scritto per girare su un gazilione di architetture}
 
 
 
