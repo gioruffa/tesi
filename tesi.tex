@@ -888,7 +888,7 @@ We know that each energy levels is expressed as:
 	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
 \end{equation}
 Where $n_{x},n_{y},n_{z}$ are the quantum numbers associated with each level.
-\footnote{Although their suffix one should not think of them as a "real" spacial representation. What we are about to do is to model the space of possible energies as a vector space. This will bring may simplifications.}
+\footnote{Although their suffix one should not think of them as a ``real" spacial representation. What we are about to do is to model the space of possible energies as a vector space. This will bring many simplifications.}
 
 By defining 
 \begin{equation}
@@ -896,16 +896,67 @@ By defining
 \end{equation}
 
 we rewrite equations \eqref{eq:squareWellLevels} as:
-\begin{equation}
+\begin{equation}\label{eq:epsilon_R}
 	\varepsilon(R) = \frac{h}{8ml^{2}} R^2
 \end{equation}
 
 We want to have an estimate of the total number of energy levels below a certain threshold. 
-If R is large enough we can approximate the total number of levels with energy lower then $\varepsilon(R)$ as the volume contained in an octet of a sphere:
+If R is large enough we can approximate this number with the volume contained in an octet of a sphere:
 \begin{equation}
 	\Phi(R) = \frac{1}{8} \left( \frac{4}{3} \pi R^{3} \right)
 \end{equation}
 
+Using equation \eqref{eq:epsilon_R} we can express $\Phi$ as $\Phi(\varepsilon)$ 
+\begin{equation}\label{eq:phi_varepsilon}
+	\Phi(\varepsilon) = \frac{\pi}{6} \left( \frac{8 m l^2 \varepsilon}{h} \right)^{\frac{3}{2	}}
+\end{equation}
+
+We are interested in the variation of $\Phi(\varepsilon)$ around a fixed $\varepsilon$, this will give us the finest expression of the \textit{energy density} around $\varepsilon$. 
+We expand \eqref{eq:phi_varepsilon} in series:
+
+\begin{equation}
+	\Phi(\varepsilon + \var{\varepsilon}) - \Phi(\varepsilon) = \left[ \frac{\pi}{4} \left( \frac{8 m l^2}{h} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}  \right] ~ \var{\varepsilon} + \mathcal{O}((\var{\varepsilon})^2)
+\end{equation}
+
+The quantity between square braces represents the density of energy states around $\varepsilon$. 
+It gives us an estimate of how many energy levels can be occupied by an electron at a certain energy.
+\begin{equation}\label{eq:energyDensity}
+	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}
+\end{equation}
+
+By integrating \eqref{eq:energyDensity} over a certain energy interval one obtains the number of energy levels contained in that interval:
+
+\begin{equation}
+	\Delta N_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}
+\end{equation}
+
+To calculate to total energy of the box (which is our final goal), we need to know what is the probability that a given energy level is occupied by an electron, namely the partition function of the system. Since we are dealing with fermions, we use the Fermi-Dirac statistic:
+
+\begin{equation} \label{eq:fermiDiracPartitionFunction}
+	f(\varepsilon) = \frac{1}{e^{\beta (\varepsilon - \varepsilon_{F})}}
+\end{equation}
+
+Where $\varepsilon_F$ is the Fermi energy\footnote{ The fermi energy is the energy difference between the highest and lowest occupied single-particle states in a quantum system of non-interacting fermions at absolute zero temperature}. 
+For our system in his ground state we have that the number of occupied energy level around $\varepsilon$ is :
+\begin{equation}
+	2 f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
+\end{equation}
+Because the electrons are non-interacting, every energy level can be occupied by two electrons with opposite spin, hence the factor $2$.
+
+Finally to obtain the total energy of the box system we multiply by $\varepsilon$ and integrate:
+\begin{equation}\label{eq:deltaE}
+	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
+\end{equation}
+
+The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (K_b T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} became:
+\begin{equation}
+	metti la roba con la graffa lunga e gli arrai che e' pesante da scrivere
+\end{equation}
+
+Thus \eqref{eq:deltaE} become :
+\begin{equation}
+	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon}
+\end{equation}
 
 %----------------------------------------------------------------------------
 \section{Quantum Espresso}
