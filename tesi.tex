@@ -864,6 +864,47 @@ This idea of shifting the problem towards the electron density is the main theme
 
 
 
+\subsection{Density Functional Theory}
+
+\mynotes{Cerca descrizione wikipedia per DFT}
+
+In order to better understand the foundations of the DFT it is convenient to introduce the atomic model developed by Thomas and Fermi in the late 20s. The model was later refined by Dirac including the exchanges and correlations effects.
+
+\subsubsection{The Thomas-Fermi Atomic Model}
+
+The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$. 
+Each box contains $\Delta N$ electrons, the number can vary from box to box. 
+The electrons will always behave like independent fermions and there is no interaction between each other boxes.
+Finally, as we will later justify, the temperature of the system is 0 Kelvin.
+\mynotes{cita l'amico Parr pg.47-50}
+
+What we aim to do is to find an estimate of the energy of the system, and, hopefully, a more convenient method to calculate it.
+
+Since the electrons, and the boxes, are completely independent, we can model each box as an infinite square well potential.
+We know that each energy levels is expressed as:
+\mynotes{cita Basdevant} 
+
+\begin{equation}\label{eq:squareWellLevels}
+	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
+\end{equation}
+Where $n_{x},n_{y},n_{z}$ are the quantum numbers associated with each level.
+\footnote{Although their suffix one should not think of them as a "real" spacial representation. What we are about to do is to model the space of possible energies as a vector space. This will bring may simplifications.}
+
+By defining 
+\begin{equation}
+	R^2 = n_{x}^2+n_{y}^2+n_{z}^2
+\end{equation}
+
+we rewrite equations \eqref{eq:squareWellLevels} as:
+\begin{equation}
+	\varepsilon(R) = \frac{h}{8ml^{2}} R^2
+\end{equation}
+
+We want to have an estimate of the total number of energy levels below a certain threshold. 
+If R is large enough we can approximate the total number of levels with energy lower then $\varepsilon(R)$ as the volume contained in an octet of a sphere:
+\begin{equation}
+	\Phi(R) = \frac{1}{8} \left( \frac{4}{3} \pi R^{3} \right)
+\end{equation}
 
 
 %----------------------------------------------------------------------------
