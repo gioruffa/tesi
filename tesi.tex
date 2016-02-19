@@ -883,8 +883,7 @@ In order to better understand the foundations of the DFT it is convenient to int
 The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$. 
 Each box contains $\Delta N$ electrons, the number can vary from box to box. 
 The electrons will always behave like independent fermions and there is no interaction between boxes.
-Finally, as we will later justify, the temperature of the system is 0 Kelvin.
-\mynotes{cita l'amico Parr pg.47-50}
+Finally, as we will later justify, the temperature of the system is 0 Kelvin \cite[p.47-51]{Parr}.
 
 What we aim to do is to find an estimate of the energy of the system, and, hopefully, a more convenient method to calculate it.
 
@@ -934,12 +933,14 @@ It gives us an estimate of how many energy levels can be occupied by an electron
 \end{equation}
 
 By integrating \eqref{eq:energyDensity} over an energy interval, we obtain the number of energy levels contained in that interval:
-\mynotes{N e' davvero un pessimo numero perche' e' uguale al numero di elettroni}
+
 \begin{equation}
-	\Delta N_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}
+	\Delta \xi_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-To calculate to total energy of the box (which is our final goal), we need to know what is the probability that a given energy level is occupied by an electron, namely the partition function of the system. Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
+To calculate to total energy of the box (which is our final goal), we need to know how many levels are occupied by electrons. 
+More precisely, we need the probability that a given energy level is occupied by an electron, namely the partition function of the system. 
+Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 
 \begin{equation} \label{eq:fermiDiracPartitionFunction}
 	f(\varepsilon) = \frac{1}{e^{\beta (\varepsilon - \varepsilon_{f})}}
@@ -958,9 +959,8 @@ Finally to obtain the total energy of the box system we multiply by $\varepsilon
 \end{equation}
 
 The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (K_b T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} became:
-\begin{equation}
-	metti la roba con la graffa lunga e gli arrai che e' pesante da scrivere
-\end{equation}
+\mynotes{	metti la roba con la graffa lunga e gli arrai che e' pesante da scrivere}
+
 
 Thus \eqref{eq:deltaE} become :
 \begin{equation}
@@ -977,7 +977,7 @@ We can express $\varepsilon_f$ as a function of the number of electrons in the c
 	\Delta N = \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}
 \end{equation}
 
-Then 
+Then \cite{Parr}
 \begin{equation}
 	\Delta E  = \frac{3}{5} \Delta N \varepsilon_{f}
 \end{equation}
@@ -985,10 +985,9 @@ Then
 			  \Delta E = \frac{3}{10} \frac{h^2}{m} \left( \frac{3}{8\pi} \right)^{\frac{2}{3}} l^{3} \left( \frac{\Delta N}{l^{3}} \right)^{\frac{5}{3}}
 \end{equation}
 
-Since we neglected any possible interaction between each electron, the quantity $\Delta E$ represents the kinetic energy of the electrons inside each box.
+Since we neglected any possible interaction between electrons, the quantity $\Delta E$ represents the kinetic energy of the electrons inside each box.
 If we lower the dimensions of each box and sum the contributes for all the boxes, we obtain:
 
-\mynotes{sistema sto box va...}
 \begin{equation}
 	\frac{\Delta N}{l^{3}} \xrightarrow[l\rightarrow0]{} \rho(\mathbf{r})
 \end{equation}
@@ -1009,7 +1008,7 @@ We can now add the nuclear potential and the electron-electron Coulombic repulsi
 \end{equation}
 
 Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchanges and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
-As a constraint we have that the integration of the electronic density must yield to total number of electrons.
+As a constraint we have that the integration of the electronic density must yield the total number of electrons.
 \begin{equation}\label{eq:TFDensityConstraint}
 	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} 
 \end{equation}
@@ -1018,8 +1017,7 @@ Then the equation for Lagrange multipliers become:
 	\var{} \lbrace  E_{tf}[\rho] - \mu_{tf} \left( \int \rho(\mathbf{r}) \dd{\mathbf{r}} - N \right) \rbrace
 \end{equation}
 
-By differentiating we have 
-\mynotes{cita Parr, dovrebbe essere pag 246-254}
+By differentiating we have \cite[246-254]{Parr}
 \begin{align}
 	\mu_{tf} & = \frac{\var{E_{tf}}}{\var{\rho}}  \\
 	\mu_{tf} & = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}} \label{eq:TFEq}
@@ -1033,6 +1031,35 @@ The correction to this approximation was made by Dirac in the Thomas-Fermi-Dirac
 
 
 \subsubsection{Thomas-Fermi-Dirac Atomic Model}
+
+The contribute of P.A.M. Dirac was to model the exchange term \footnote{correlation effects are still neglected by the system} in the following way.\footnote{We are considering only closed-shell systems.}
+\begin{equation}\label{eq:diracExc}
+	K[\rho] = \frac{1}{4} \iint \frac{\mid \rho(\mathbf{r_1},\mathbf{r_2})\mid^2 }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
+\end{equation}
+
+with
+
+\begin{equation} \label{eq:excDensity}
+	\rho(\mathbf{r_1},\mathbf{r_2}) 
+	= 2 \sum_i 
+	\psi_{i}^{*}
+	(\mathbf{r_1}) 
+	\psi_{i}
+	(\mathbf{r_2})
+\end{equation}
+
+The square module in \eqref{eq:diracExc} is needed because \eqref{eq:excDensity} can be imaginary.
+
+Note that expression \eqref{eq:excDensity} do not depends only on a single spatial coordinate, but on two of them.
+This non-local nature of \eqref{eq:excDensity} poses a great challenge in the solution of equation \eqref{eq:TFEq}.
+The reduction of the dependency of $K$ only to a single spatial coordinate is called a \textit{local density approximation} or LDA.
+
+By 
+
+
+
+
+
 
 
 The model is the springboard for DFT
