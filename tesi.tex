@@ -874,14 +874,16 @@ This idea of shifting the problem towards the electron density is the main theme
 \clearpage
 \subsection{Density Functional Theory}
 
-\mynotes{Cerca descrizione wikipedia per DFT}
+Density Functional Theory is among the most popular and versatile methods available in condensed-matter physics, computational physics, and computational chemistry.
+
+Using this theory, the properties of a many-electron system can be determined by using functionals depending solely on the spatially dependent electron density.
 
 In order to better understand the foundations of the DFT it is convenient to introduce the atomic model developed by Thomas and Fermi in the late 20s. The model was later refined by Dirac including the exchanges and correlations effects.
 
 \subsubsection{The Thomas-Fermi Atomic Model}
 
-The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$. 
-Each box contains $\Delta N$ electrons, the number can vary from box to box. 
+The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$, each box containing $\Delta N$ electrons (the number can vary from box to box). 
+
 The electrons will always behave like independent fermions and there is no interaction between boxes.
 Finally, as we will later justify, the temperature of the system is 0 Kelvin \cite[p.47-51]{Parr}.
 
@@ -889,8 +891,7 @@ What we aim to do is to find an estimate of the energy of the system, and, hopef
 
 Since the electrons, and the boxes, are completely independent, we can model each box as an infinite square well potential.
 
-We know that each energy levels in the well is expressed as:
-\mynotes{cita Basdevant} 
+We know that each energy levels in the well is expressed as \cite[p.74]{Basdevant}:
 
 \begin{equation}\label{eq:squareWellLevels}
 	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
@@ -932,13 +933,13 @@ It gives us an estimate of how many energy levels can be occupied by an electron
 	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}
 \end{equation}
 
-By integrating \eqref{eq:energyDensity} over an energy interval, we obtain the number of energy levels contained in that interval:
+To obtain the number of energy levels contained in an energy interval, we integrate \eqref{eq:energyDensity}:
 
 \begin{equation}
 	\Delta \xi_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-To calculate to total energy of the box (which is our final goal), we need to know how many levels are occupied by electrons. 
+To calculate to total energy of the box, we need to know how many levels are occupied by electrons. 
 More precisely, we need the probability that a given energy level is occupied by an electron, namely the partition function of the system. 
 Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 
@@ -984,7 +985,7 @@ We can express $\varepsilon_f$ as a function of the number of electrons in the c
 	\Delta N = \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}
 \end{equation}
 
-Then \cite{Parr}
+Then \cite{Parr}:
 \begin{equation}
 	\Delta E  = \frac{3}{5} \Delta N \varepsilon_{f}
 \end{equation}
@@ -1003,9 +1004,10 @@ If we lower the dimensions of each box and sum the contributes for all the boxes
 	& C_{F} = \frac{3}{10}(3 \pi^{2})^{\frac{2}{3}}
 \end{align}
 
-$T[\rho]$ is the total kinetic energy of our system and it's a functional of the electron density $\rho(\mathbf{r})$.
+$\rho(\mathbf{r})$ is the spatial dependent electron density. $T[\rho]$ is the total kinetic energy of the system and it's a functional of the electron density $\rho(\mathbf{r})$.
 
 We can now add the nuclear potential and the electron-electron Coulombic repulsion.
+\mynotes{non ho capito come si ovvia al fatto che l'intergrale Coulombiano diverge per $r_1 = r_2$. E' implicito che l'integrazione va effettuata per $r_1 \neq r_2$?}
 
 
 \begin{equation}\label{eq:ThomasFermiEnergy}
@@ -1015,7 +1017,8 @@ We can now add the nuclear potential and the electron-electron Coulombic repulsi
 \end{equation}
 
 Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchanges and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
-As a constraint we have that the integration of the electronic density must yield the total number of electrons.
+
+Our unique constraint is that integrating the electronic density we must obtain the total number of electrons.
 \begin{equation}\label{eq:TFDensityConstraint}
 	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} 
 \end{equation}
@@ -1049,7 +1052,7 @@ The correction to this approximation was made by Dirac in the Thomas-Fermi-Dirac
 
 \subsubsection{Thomas-Fermi-Dirac Atomic Model}
 
-The contribute of P.A.M. Dirac was to model the exchange term \footnote{correlation effects are still neglected by the system} in the following way.\footnote{We are considering only closed-shell systems.}
+The contribute of P.A.M. Dirac was to model the exchange term \footnote{Correlation effects are still neglected} in the following way.\footnote{We are considering only closed-shell systems.} \cite[p.106]{Parr}
 \begin{equation}\label{eq:diracExc}
 	K[\rho] = \frac{1}{4} \iint \frac{\mid \rho(\mathbf{r_1},\mathbf{r_2})\mid^2 }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
 \end{equation}
@@ -1069,7 +1072,32 @@ The square module in \eqref{eq:diracExc} is needed because \eqref{eq:excDensity}
 
 Note that expression \eqref{eq:excDensity} depends on two spatial coordinates.
 This non-local nature of \eqref{eq:excDensity} poses a great challenge in the solution of equation \eqref{eq:TFEq}.
-By using plane waves as spatial orbitals \footnote{remeber that the single particle is contained in a box} and introducing the condition that the solution must be periodic in $l$ and it must be null on the edges of the box, we can re-express \eqref{eq:diracExc} as :
+
+By using plane waves as spatial orbitals \footnote{remeber that the single particle is contained in a box} 
+\begin{align}
+	\Psi(k_x,k_y,k_z) = \frac{1}{l^{\frac{3}{2}}} e^{i(k_x x + k_y y + k_z z)}
+\end{align}
+\begin{align}
+		k_x & =\frac{2\pi}{l} n_x & k_y & =\frac{2\pi}{l} n_y & k_z & =\frac{2\pi}{l} n_z
+\end{align}
+
+
+
+and introducing the following periodic boundaries conditions:
+
+\begin{equation}
+\left\lbrace \begin{array}{ll}
+		\Psi(0) = 0 \\
+		\Psi(l) = 0 
+	\end{array}
+	\right.
+\end{equation}
+\begin{equation}
+	\Psi(x+l) = \Psi(x)
+\end{equation}
+
+
+We can re-express \eqref{eq:diracExc} as \cite[p.105-109]{Parr} :
 
 \begin{align}
 	& K[\rho] = C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}} & C_{X} = \frac{3}{4} \left(\frac{3}{\pi} \right)^{\frac{1}{3}}
@@ -1098,7 +1126,7 @@ Equation \eqref{eq:TFEq} become:
 
 
 
-Unfortunately the results obtained by this model are not satisfying, but the TFD model is the springboard for DFT development.
+Because the models completely neglects correlation effects, the results obtained are not satisfying, but the TFD model is the springboard for DFT development.
 
 
 
@@ -1215,6 +1243,12 @@ R. G. Parr, W. Yang,
 Density Functional Theory of Atoms and Molecules,
 Oxford University Press,
 1989.
+
+\bibitem{Basdevant}
+J. L. Basdevant, J. Dalibard,
+Quantum Mechanics,
+Springer,
+2005.
 
 \end{thebibliography}
 
