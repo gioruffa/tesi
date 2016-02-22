@@ -917,20 +917,20 @@ If R is large enough we can approximate this number with the volume contained in
 
 Using equation \eqref{eq:epsilon_R} we can express $\Phi$ as $\Phi(\varepsilon)$ 
 \begin{equation}\label{eq:phi_varepsilon}
-	\Phi(\varepsilon) = \frac{\pi}{6} \left( \frac{8 m l^2 \varepsilon}{h} \right)^{\frac{3}{2	}}
+	\Phi(\varepsilon) = \frac{\pi}{6} \left( \frac{8 m l^2 \varepsilon}{h^2} \right)^{\frac{3}{2	}}
 \end{equation}
 
 We are interested in the variation of $\Phi(\varepsilon)$ around a fixed $\varepsilon$, this will give us the finest expression of the \textit{energy density} around $\varepsilon$. 
 We expand \eqref{eq:phi_varepsilon} in series:
 
 \begin{equation}
-	\Phi(\varepsilon + \var{\varepsilon}) - \Phi(\varepsilon) = \left[ \frac{\pi}{4} \left( \frac{8 m l^2}{h} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}  \right] ~ \var{\varepsilon} + \mathcal{O}((\var{\varepsilon})^2)
+	\Phi(\varepsilon + \var{\varepsilon}) - \Phi(\varepsilon) = \left[ \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}  \right] ~ \var{\varepsilon} + \mathcal{O}((\var{\varepsilon})^2)
 \end{equation}
 
 The quantity between square braces represents the density of energy states around $\varepsilon$. 
 It gives us an estimate of how many energy levels can be occupied by an electron at a certain energy.
 \begin{equation}\label{eq:energyDensity}
-	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}
+	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}
 \end{equation}
 
 To obtain the number of energy levels contained in an energy interval, we integrate \eqref{eq:energyDensity}:
@@ -984,7 +984,7 @@ Substituting \eqref{eq:energyDensity} in \eqref{eq:deltaE} and performing the in
 
 We can express $\varepsilon_f$ as a function of the number of electrons in the cell :
 \begin{equation}
-	\Delta N = \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}
+	\Delta N = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}
 \end{equation}
 
 Then \cite{Parr}:
