@@ -878,11 +878,11 @@ Density Functional Theory is among the most popular and versatile methods availa
 
 Using this theory, the properties of a many-electron system can be determined by using functionals depending solely on the spatially dependent electron density.
 
-In order to better understand the foundations of the DFT it is convenient to introduce the atomic model developed by Thomas and Fermi in the late 20s. The model was later refined by Dirac including the exchanges and correlations effects.
+In order to better understand DFT's foundations, it is convenient to introduce the atomic model developed by Thomas and Fermi in the late 20s. The model was later refined by Dirac including exchanges effects.
 
 \subsubsection{The Thomas-Fermi Atomic Model}
 
-The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$, each box containing $\Delta N$ electrons (the number can vary from box to box). 
+The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$, each box containing $\Delta N$ electrons which number can vary from box to box. 
 
 The electrons will always behave like independent fermions and there is no interaction between boxes.
 Finally, as we will later justify, the temperature of the system is 0 Kelvin \cite[p.47-51]{Parr}.
@@ -940,7 +940,8 @@ To obtain the number of energy levels contained in an energy interval, we integr
 \end{equation}
 
 To calculate to total energy of the box, we need to know how many levels are occupied by electrons. 
-More precisely, we need the probability that a given energy level is occupied by an electron, namely the partition function of the system. 
+More precisely, we need the probability that a given energy level is occupied by an electron, namely the \textit{partition function} of the system. 
+
 Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 
 \begin{equation} \label{eq:fermiDiracPartitionFunction}
@@ -948,18 +949,19 @@ Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 \end{equation}
 
 Where $\varepsilon_f$ is the Fermi energy\footnote{ The fermi energy is the energy difference between the highest and lowest occupied single-particle states in a quantum system of non-interacting fermions at absolute zero temperature}. 
-For our system in his ground state we have that the number of occupied energy level around $\varepsilon$ is :
+
+If the system is in its ground state we have that the number of occupied energy level around $\varepsilon$ is :
 \begin{equation}
 	2 f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 Because the electrons are non-interacting, every energy level can be occupied by two electrons with opposite spin, hence the factor $2$.
 
-Finally to obtain the total energy of the box system we multiply by $\varepsilon$ and integrate:
+Finally to obtain the total energy of the box we multiply by $\varepsilon$ and integrate:
 \begin{equation}\label{eq:deltaE}
 	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (K_b T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} became:
+The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (K_b T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} become:
 
 \begin{equation}
 	f(\varepsilon) = \left\lbrace \begin{array}{ll}
@@ -975,9 +977,9 @@ Thus \eqref{eq:deltaE} become :
 	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-Substituting \eqref{eq:energyDensity} and performing the integration we obtain the total energy of the box at 0K.
+Substituting \eqref{eq:energyDensity} in \eqref{eq:deltaE} and performing the integration we obtain the total energy of the box at 0K.
 \begin{equation}
-	\Delta E = \frac{8\pi}{5} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} l^3 \varepsilon_{f}^{\frac{5}{2}}
+	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{5} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} l^3 \varepsilon_{f}^{\frac{5}{2}}
 \end{equation}
 
 We can express $\varepsilon_f$ as a function of the number of electrons in the cell :
@@ -1018,11 +1020,11 @@ We can now add the nuclear potential and the electron-electron Coulombic repulsi
 
 Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchanges and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
 
-Our unique constraint is that integrating the electronic density we must obtain the total number of electrons.
+Our unique constraint is that the integral of the electronic density must be equal to the total number of electrons in the system.
 \begin{equation}\label{eq:TFDensityConstraint}
 	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} 
 \end{equation}
-Then the equation for Lagrange multipliers become:
+Then the equation for Lagrange multipliers has the form:
 \begin{equation}
 	\var{} \lbrace  E_{tf}[\rho] - \mu_{tf} \left( \int \rho(\mathbf{r}) \dd{\mathbf{r}} - N \right) \rbrace
 \end{equation}
@@ -1035,7 +1037,7 @@ By differentiating we have \cite[246-254]{Parr}
 
 We can define the \textit{electrostatic potential} due to the nucleus and the entire electron distribution as :
 \begin{equation}
-	\phi(\mathbf{r}) = \frac{Z}{r} - \int \frac{\rho(\mathbf{r_2})}{\mid \mathbf{r} - \mathbf{r_2} \mid}
+	\phi(\mathbf{r}) = \frac{Z}{r} - \int \frac{\rho(\mathbf{r_2})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}}
 \end{equation}
 and write :
 \begin{equation}
@@ -1046,13 +1048,14 @@ and write :
 By solving equation \eqref{eq:TFEq} and \eqref{eq:TFDensityConstraint} the final $\rho(\mathbf{r})$ and $\mu_{tf}$ are obtained.
 
 As in the case of the pure Hartree method we are simplifying the model by neglecting any exchange and correlation effect. 
-The correction to this approximation was made by Dirac in the Thomas-Fermi-Dirac atomic model.
+
+The correction to this approximation was introduced by Dirac in the Thomas-Fermi-Dirac atomic model.
 
 
 
 \subsubsection{Thomas-Fermi-Dirac Atomic Model}
 
-The contribute of P.A.M. Dirac was to model the exchange term \footnote{Correlation effects are still neglected} in the following way.\footnote{We are considering only closed-shell systems.} \cite[p.106]{Parr}
+The contribute of P.A.M. Dirac was to model the exchange term \footnote{Correlation effects are still neglected.} in the following way.\footnote{We are considering only closed-shell systems.} \cite[p.106]{Parr}
 \begin{equation}\label{eq:diracExc}
 	K[\rho] = \frac{1}{4} \iint \frac{\mid \rho(\mathbf{r_1},\mathbf{r_2})\mid^2 }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
 \end{equation}
@@ -1071,9 +1074,9 @@ with
 The square module in \eqref{eq:diracExc} is needed because \eqref{eq:excDensity} can be imaginary.
 
 Note that expression \eqref{eq:excDensity} depends on two spatial coordinates.
-This non-local nature of \eqref{eq:excDensity} poses a great challenge in the solution of equation \eqref{eq:TFEq}.
+This non-local nature of \eqref{eq:diracExc} poses a great challenge in the solution of equation \eqref{eq:TFEq}.
 
-By using plane waves as spatial orbitals \footnote{remeber that the single particle is contained in a box} 
+By using plane waves as spatial orbitals \footnote{Remeber that the single particle is contained in an infinite square well potential.} 
 \begin{align}
 	\Psi(k_x,k_y,k_z) = \frac{1}{l^{\frac{3}{2}}} e^{i(k_x x + k_y y + k_z z)}
 \end{align}
@@ -1115,7 +1118,7 @@ We can write the energy functional as :
 			- C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}}
 \end{equation}
 
-Equation \eqref{eq:TFEq} become:
+Then equation \eqref{eq:TFEq} become:
 \begin{equation}
 \mu_{tf}  = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}} - \frac{4}{3	} C_{X} \rho(\mathbf{r})^{\frac{1}{3}}
 \end{equation}
@@ -1130,7 +1133,7 @@ Because the models completely neglects correlation effects, the results obtained
 
 
 
-
+\mynotes{metti le citazioni ad articoli originali di fermi e thomas. Quello di Dirac, boh???}
 
 
 
