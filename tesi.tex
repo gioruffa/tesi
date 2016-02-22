@@ -878,7 +878,7 @@ Density Functional Theory is among the most popular and versatile methods availa
 
 Using this theory, the properties of a many-electron system can be determined by using functionals depending solely on the spatially dependent electron density.
 
-In order to better understand DFT's foundations, it is convenient to introduce the atomic model developed by Thomas and Fermi in the late 20s. The model was later refined by Dirac including exchanges effects.
+In order to better understand DFT's foundations, it is convenient to introduce the atomic model developed by Thomas\cite{Thomas27} and Fermi\cite{Fermi27} in the late 20s. The model was later refined by Dirac including exchanges effects.
 
 \subsubsection{The Thomas-Fermi Atomic Model}
 
@@ -945,7 +945,7 @@ More precisely, we need the probability that a given energy level is occupied by
 Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 
 \begin{equation} \label{eq:fermiDiracPartitionFunction}
-	f(\varepsilon) = \frac{1}{e^{\beta (\varepsilon - \varepsilon_{f})}}
+	f(\varepsilon) = \frac{1}{1 - e^{\beta (\varepsilon - \varepsilon_{f})}}
 \end{equation}
 
 Where $\varepsilon_f$ is the Fermi energy\footnote{ The fermi energy is the energy difference between the highest and lowest occupied single-particle states in a quantum system of non-interacting fermions at absolute zero temperature}. 
@@ -965,7 +965,7 @@ The calculation is greatly simplified if we consider the system to be at 0K. In 
 
 \begin{equation}
 	f(\varepsilon) = \left\lbrace \begin{array}{ll}
-		1 & \mbox{if $\varepsilon \leq \varepsilon_{f} $}  \\
+		1 & \mbox{if $\varepsilon < \varepsilon_{f} $}  \\
 		0 & \mbox{if $\varepsilon > \varepsilon_{f} $}
 	\end{array}
 	\right.
@@ -1024,7 +1024,7 @@ Our unique constraint is that the integral of the electronic density must be equ
 \begin{equation}\label{eq:TFDensityConstraint}
 	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} 
 \end{equation}
-Then the equation for Lagrange multipliers has the form:
+Then the equation for Lagrange multipliers takes the form:
 \begin{equation}
 	\var{} \lbrace  E_{tf}[\rho] - \mu_{tf} \left( \int \rho(\mathbf{r}) \dd{\mathbf{r}} - N \right) \rbrace
 \end{equation}
@@ -1045,7 +1045,7 @@ and write :
 \end{equation}
 
 
-By solving equation \eqref{eq:TFEq} and \eqref{eq:TFDensityConstraint} the final $\rho(\mathbf{r})$ and $\mu_{tf}$ are obtained.
+Equation \eqref{eq:TFEq} can be solved in conjunction with \eqref{eq:TFDensityConstraint}, and the resulting $\rho(\mathbf{r})$ then inserted in \eqref{eq:ThomasFermiEnergy} to give the total atomic energy.
 
 As in the case of the pure Hartree method we are simplifying the model by neglecting any exchange and correlation effect. 
 
@@ -1055,7 +1055,7 @@ The correction to this approximation was introduced by Dirac in the Thomas-Fermi
 
 \subsubsection{Thomas-Fermi-Dirac Atomic Model}
 
-The contribute of P.A.M. Dirac was to model the exchange term \footnote{Correlation effects are still neglected.} in the following way.\footnote{We are considering only closed-shell systems.} \cite[p.106]{Parr}
+The contribute of P.A.M. Dirac was to model the exchanges term\footnote{Correlation effects are still neglected.} for a closed shell system as follows:
 \begin{equation}\label{eq:diracExc}
 	K[\rho] = \frac{1}{4} \iint \frac{\mid \rho(\mathbf{r_1},\mathbf{r_2})\mid^2 }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
 \end{equation}
@@ -1078,7 +1078,7 @@ This non-local nature of \eqref{eq:diracExc} poses a great challenge in the solu
 
 By using plane waves as spatial orbitals \footnote{Remeber that the single particle is contained in an infinite square well potential.} 
 \begin{align}
-	\Psi(k_x,k_y,k_z) = \frac{1}{l^{\frac{3}{2}}} e^{i(k_x x + k_y y + k_z z)}
+	\psi(k_x,k_y,k_z) = \frac{1}{l^{\frac{3}{2}}} e^{i(k_x x + k_y y + k_z z)}
 \end{align}
 \begin{align}
 		k_x & =\frac{2\pi}{l} n_x & k_y & =\frac{2\pi}{l} n_y & k_z & =\frac{2\pi}{l} n_z
@@ -1090,13 +1090,13 @@ and introducing the following periodic boundaries conditions:
 
 \begin{equation}
 \left\lbrace \begin{array}{ll}
-		\Psi(0) = 0 \\
-		\Psi(l) = 0 
+		\psi(0) = 0 \\
+		\psi(l) = 0 
 	\end{array}
 	\right.
 \end{equation}
 \begin{equation}
-	\Psi(x+l) = \Psi(x)
+	\psi(x+l) = \psi(x)
 \end{equation}
 
 
@@ -1107,7 +1107,7 @@ We can re-express \eqref{eq:diracExc} as \cite[p.105-109]{Parr} :
 \end{align}
 
 
-This process is an example of \textit{local density approximation} or LDA, consisting in the reduction of the dependency of $K$ only to a single spatial coordinate.
+This process is an example of \textit{local density approximation} or LDA, consisting in the reduction of the dependency of $K$ to a single spatial coordinate.
 
 We can write the energy functional as :
 
@@ -1131,9 +1131,6 @@ Then equation \eqref{eq:TFEq} become:
 
 Because the models completely neglects correlation effects, the results obtained are not satisfying, but the TFD model is the springboard for DFT development.
 
-
-
-\mynotes{metti le citazioni ad articoli originali di fermi e thomas. Quello di Dirac, boh???}
 
 
 
@@ -1252,6 +1249,15 @@ J. L. Basdevant, J. Dalibard,
 Quantum Mechanics,
 Springer,
 2005.
+
+
+\bibitem{Thomas27}
+L. H. Thomas, "The calculation of atomic fields", Proc. Cambridge Phil. Soc. \textbf{23},542 (1927)
+
+\bibitem{Fermi27}
+E. Fermi,"Un Metodo Statistico per la Determinazione di alcune Priopriet\'a dell'Atomo", Rend. Lincei \textbf{6}, 602 (1927)
+
+
 
 \end{thebibliography}
 
