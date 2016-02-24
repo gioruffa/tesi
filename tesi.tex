@@ -37,6 +37,8 @@
 \textcolor{red}{TODO: #1}\end{flushright}}
 \newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
+\newcommand\dens{\rho(\mathbf{r})}
+\newcommand\erre{\mathbf{r}}
 
 \begin{document}
 
@@ -876,9 +878,6 @@ This idea of shifting the problem towards the electron density is the main theme
 
 
 
-
-
-
 \clearpage
 \subsection{Density Functional Theory}
 
@@ -902,9 +901,9 @@ Since the electrons, and the boxes, are completely independent, we can model eac
 We know that each energy levels in the well is expressed as \cite[p.74]{Basdevant}:
 
 \begin{equation}\label{eq:squareWellLevels}
-	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
+	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h^2}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
 \end{equation}
-Where $n_{x},n_{y},n_{z}$ are the quantum numbers associated with each level.
+where $n_{x},n_{y},n_{z}$ are the quantum numbers associated with each level.
 \footnote{Although their suffix one should not think of them as a ``real" spacial representation. What we are about to do is to model the space of possible energies as a vector space. This will bring many simplifications.}
 
 By defining 
@@ -914,7 +913,7 @@ By defining
 
 we rewrite equations \eqref{eq:squareWellLevels} as:
 \begin{equation}\label{eq:epsilon_R}
-	\varepsilon(R) = \frac{h}{8ml^{2}} R^2
+	\varepsilon(R) = \frac{h^2}{8ml^{2}} R^2.
 \end{equation}
 
 We want to have an estimate of the total number of energy levels below a certain threshold. 
@@ -969,7 +968,7 @@ Finally to obtain the total energy of the box we multiply by $\varepsilon$ and i
 	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (K_b T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} become:
+The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (k_B T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} become:
 
 \begin{equation}
 	f(\varepsilon) = \left\lbrace \begin{array}{ll}
@@ -1016,21 +1015,20 @@ If we lower the dimensions of each box and sum the contributes for all the boxes
 
 $\rho(\mathbf{r})$ is the spatial dependent electron density. $T[\rho]$ is the total kinetic energy of the system and it's a functional of the electron density $\rho(\mathbf{r})$.
 
-We can now add the nuclear potential and the electron-electron Coulombic repulsion.
-\mynotes{non ho capito come si ovvia al fatto che l'intergrale Coulombiano diverge per $r_1 = r_2$. E' implicito che l'integrazione va effettuata per $r_1 \neq r_2$?}
+We can now add the nuclear potential and the electron-electron Coulombic repulsion
 
 
 \begin{equation}\label{eq:ThomasFermiEnergy}
 	E_{tf}[\rho] = C_{F} \int \rho(\mathbf{r})^{\frac{5}{3}} \dd{\mathbf{r}} 
 			- Z \int \frac{\rho(\mathbf{r})}{r} \dd{r} 
-			+ \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
+			+ \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} .
 \end{equation}
 
 Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchanges and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
 
-Our unique constraint is that the integral of the electronic density must be equal to the total number of electrons in the system.
+Our unique constraint is that the integral of the electronic density must be equal to the total number of electrons in the system
 \begin{equation}\label{eq:TFDensityConstraint}
-	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} 
+	N = \int \rho(\mathbf{r}) \dd{\mathbf{r}} .
 \end{equation}
 Then the equation for Lagrange multipliers takes the form:
 \begin{equation}
@@ -1131,13 +1129,69 @@ Then equation \eqref{eq:TFEq} become:
 \mu_{tf}  = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}} - \frac{4}{3	} C_{X} \rho(\mathbf{r})^{\frac{1}{3}}
 \end{equation}
 
-
-
-
-
-
-
 Because the models completely neglects correlation effects, the results obtained are not satisfying, but the TFD model is the springboard for DFT development.
+
+
+
+\subsubsection{Hohenberg and Kohn Theorems}
+
+The TFD model lead the way in a different kind of approach to the electronic problem. 
+The importance of the electronic density became central and extending the TFD model to molecular systems was the next step.
+
+If it was certain that an external potential $v(\mathbf{r})$\footnote{Which nature is to be considered as general as possible.} acting on electrons describes an unique electronic density $\rho(\mathbf{r})$, there was no formal proof that the contrary was true.
+
+Can an electronic density function $\rho(\mathbf{r})$ be associated with an unique external potential $v(\mathbf{r})$?
+
+The nature of the question is not just formal. 
+Every physical and chemical property of the molecule is determined by it's geometry, which is shaped by the external potential.
+If the external potential is univocally associated with a single electronic density, by finding $\rho(\mathbf{r})$ one wold determine all the properties of the system, including the total energy expressed as a functional $E =E[\rho(\mathbf{r})]$.
+
+The question remained open until 1964, when Hohenberg and Kohn published their milestone paper \cite{HK} containing two fundamental theorems.
+
+The fist theorem states that an external potential ``\textit{$v(\mathbf{r})$ is an unique functional of $\rho(\mathbf{r})$ }".
+The proof outlined in \cite{HK} proceeds by \textit{reductio ab absurdum} and, despite its simplicity, its rather powerful.
+
+The second theorem states that the variational principle can be applied to system described by the electronic density.
+It can be formulated as : 
+
+\textit{Given a trial density function $\rho'(\mathbf{r})$ for which: }
+
+\begin{itemize}
+	\item $\mid \rho'(\mathbf{r}) \mid^2$ 
+	\item $N = \int \rho'(\mathbf{r}) \dd{\mathbf{r}}$
+\end{itemize}
+
+\textit{Then}
+\begin{equation}
+	E_0 \leq E[\rho'(\mathbf{r})]
+\end{equation}
+
+\textit{where $E_0$ is the ground state energy.}
+
+We can now express more explicitly the energy of the system, in analogy with the TFD model.
+
+\begin{align}
+	&E[\rho(\mathbf{r})] = E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} \\
+	&v(\mathbf{r}) = \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid} \\
+	&E_{HK}[\dens] = T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})]
+\end{align}
+
+$E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulombian and the excahnges-correlation terms.
+
+By applying the variational principle with the usual constraint \eqref{eq:TFDensityConstraint} the fundamental equation of DFT is obtained:
+
+\begin{equation}\label{eq:FoundamentalDFT}
+\boxed{
+	\mu_{HK} = v(\erre) + \frac{\var{E_{HK}[\dens]}}{\var{\dens}}
+}
+\end{equation}
+
+
+\subsubsection{Kohn and Shan Model}
+
+Kohn and Shan \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
+
+
 
 
 
@@ -1260,11 +1314,16 @@ Springer,
 
 
 \bibitem{Thomas27}
-L. H. Thomas, "The calculation of atomic fields", Proc. Cambridge Phil. Soc. \textbf{23},542 (1927)
+L. H. Thomas, ``The calculation of atomic fields", Proc. Cambridge Phil. Soc. \textbf{23},542 (1927)
 
 \bibitem{Fermi27}
-E. Fermi,"Un Metodo Statistico per la Determinazione di alcune Priopriet\'a dell'Atomo", Rend. Lincei \textbf{6}, 602 (1927)
+E. Fermi,``Un Metodo Statistico per la Determinazione di alcune Priopriet\'a dell'Atomo", Rend. Lincei \textbf{6}, 602 (1927)
 
+\bibitem{HK}
+P. Hohenberg and W. Kohn, ``Inhomogeneous Electron Gas",  Physical Review \textbf{136} (3B): B864 (1964)
+
+\bibitem{KS}
+W. Kohn and L. J. Sham, ``Self-Consistent Equations Including Exchange and Correlation Effects". Physical Review \textbf{140} (4A): A1133 (1965)
 
 
 \end{thebibliography}
