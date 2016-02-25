@@ -854,7 +854,7 @@ F_{\mu \nu} = H_{\mu \nu}^{core} +
 \end{equation}
 
 The matrix $\mathbf{P}$ is called the \textit{density matrix}, because the total electronic density as a function of the position $\mathbf{r}$ can be expressed as follows:
-\begin{equation}
+\begin{equation}\label{eq:densityDef}
 \rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi_{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
 \end{equation}
 
@@ -1109,7 +1109,7 @@ and introducing the following periodic boundaries conditions:
 We can re-express \eqref{eq:diracExc} as \cite[p.105-109]{Parr} :
 
 \begin{align}
-	& K[\rho] = C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}} & C_{X} = \frac{3}{4} \left(\frac{3}{\pi} \right)^{\frac{1}{3}}
+	& K[\rho] = C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}} & C_{X} = \frac{3}{4} \left(\frac{3}{\pi} \right)^{\frac{1}{3}} \label{eq:DiracK}
 \end{align}
 
 
@@ -1171,9 +1171,9 @@ It can be formulated as :
 We can now express more explicitly the energy of the system, in analogy with the TFD model.
 
 \begin{align}
-	&E[\rho(\mathbf{r})] = E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} \\
-	&v(\mathbf{r}) = \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid} \\
-	&E_{HK}[\dens] = T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})]
+	E[\rho(\mathbf{r})] &= E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} \\
+	E_{HK}[\dens] &= T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})] \\
+	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid}
 \end{align}
 
 $E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulombian and the excahnges-correlation terms.
@@ -1187,9 +1187,104 @@ By applying the variational principle with the usual constraint \eqref{eq:TFDens
 \end{equation}
 
 
-\subsubsection{Kohn and Shan Model}
+\subsubsection{Kohn and Shan Equations}
 
 Kohn and Shan \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
+
+Given a \textit{real} system one could associate a \textit{reference} system in which all electrons are not correlated, but with the same electronic density $\dens$.
+
+In the reference system, all electrons are subject to an external potential $v_{ref}(\erre)$ depending only on the spatial coordinate $\erre$.\footnotemark
+
+\footnotetext{As in the HF model, the external potential can be considered an average potential acting on each electron independently.}
+
+In analogy with the HF method \mynotes{metti reference a section} the Hamiltonian of the system is completely separable
+
+\begin{align}
+\hat{H}_{ref} &= \sum_{i} \hat{h}_i^{KS} \\
+\hat{h}_i^{KS} &= - \frac{\nabla^{2}_{i}}{2} + v(\erre)_{ref} .
+\end{align}
+
+The solutions to the Schr\"odinger equations for spatial orbitals are
+\begin{equation} \label{eq:RawKSeq}
+	\hat{h}_i^{KS} \ket{\psi_{i}^{KS}} = \varepsilon_{i}^{KS} \ket{\psi_{i}^{KS}} ,
+\end{equation}
+and the properly anti-symmetric ket state of the system is \footnote{We consider only closed shell systems.}
+\begin{equation}
+	\ket{\Psi^{KS}} = \mid \chi_{1}^{KS} \cdots \chi_{2N}^{KS} \mid .
+\end{equation}
+
+
+To ``\textit{link}" the reference system and the real system together, one could write the energy functional of the real system and add and subtract the contribution from the reference system.
+
+\begin{align}
+	E[\dens] &= T[\dens] + V_{ee}[\dens] + \int \dens v(\erre) \dd{\erre} \\
+			 &= T_{ref}[\dens] + J_{ref}[\dens] + \int \dens v(\erre) \dd{\erre} \nonumber \\ 
+			 &+ \lbrace
+			 	T[\dens] + V_{ee}[\dens] - 
+			 	\left( 
+			 		T_{ref}[\dens] + J_{ref}[\dens] 
+			 	\right)
+			 \rbrace \\
+			 &= T_{ref}[\dens] + J[\dens] + \int \dens v(\erre) \dd{\erre} \nonumber \\ 
+			 &+ \lbrace
+			 	T[\dens] + V_{ee}[\dens] - 
+			 	\left( 
+			 		T_{ref}[\dens] + J[\dens] 
+			 	\right)
+			 \rbrace \label{eq:KSEnergy}
+\end{align}
+
+where in the last passage we have dropped the $ref$ suffix from $J_{ref}$ because $J$ is a universal functional of $\dens$ and has the same form in both the systems \footnote{Remember that the the reference system has the same $\dens$.}.
+
+We define the \textit{exchanges energy functional} as 
+\begin{equation}\label{eq:KSExchangeEnergy}
+E_{xc}[\dens] = T[\dens] + V_{ee}[\dens] - 
+			 	\left( 
+			 		T_{ref}[\dens] + J[\dens] 
+			 	\right)
+.
+\end{equation}
+
+Substituting \eqref{eq:KSExchangeEnergy} in \eqref{eq:KSEnergy}, equation \eqref{eq:FoundamentalDFT} become 
+
+\begin{align}
+\mu_{KS} &= \frac{\var{T_{ref}[\dens]}}{\var{\dens}}  + v_{eff}(\erre) \label{eq:KSChemPot} \\
+ v_{eff}(\erre) &= v(\erre)  + \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}
+ + v_{xc}(\erre) \\
+ v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}} 
+\end{align}
+$v_{eff}$ is the \textit{effective potential} and it's not a functional of $\dens$, but a real function of $\erre$
+\footnote{Note that in the definition of $v_{eff}$ we have already performed $\frac{\var{J}}{\var{\rho}}$.}.
+
+This observation is fundamental because equation \eqref{eq:KSChemPot} \footnote{Which is valid for the real system.} is the same equation that we would have obtained with a system in which all electrons are independently subjected to a potential $v_{eff}$.
+
+Then the electronic density satisfying equation \eqref{eq:KSChemPot} is the same obtained by solving equations \eqref{eq:RawKSeq} with $v_{eff}$ instead of $v_{ref}$.
+
+\begin{equation} \label{eq:KSeq}
+\boxed{
+	\lbrace h_{1} + \int \frac{ \rho(\mathbf{r'}) } {\mid \erre - \mathbf{r'}  \mid} \dd{\mathbf{r'}}  + v_{xc}(\erre) \rbrace 
+		\psi_{j}^{KS}(\erre) 
+	= \varepsilon_{j}^{KS} \psi_{j}^{KS}(\erre)
+},
+\end{equation}
+where 
+\begin{align}
+	h_{1} &= - \frac{\nabla_{1}^2}{2} + v(r)\\
+	v(r) &= \sum_{\alpha} \frac{Z_{\alpha}}{r} .
+\end{align}
+
+Equations \eqref{eq:KSeq} are called the \textit{Kone-Shan equations}, once solved one could calculate the electronic density with the definition \eqref{eq:densityDef}, hence $E[\dens]$ and all the properties of the system.
+
+However, to solve them, one must choose a proper form of $E_{xc}[\dens]$ (hence $v_{xc}(\erre)$), which is far from being an easy task. The search for more accurate functionals is an active area of current research efforts.
+
+The main problem arises from the approximate nature of $E_{xc}$, which is usually split in an exchanges part $E_{x}$ and a correlation part $E_c$.
+
+In the most primitive local density approximation (LDA), we use Dirac expression for the exchange energy, whereby the exchanges contribution is given by $E_{x}[\dens] = -\frac{1}{2} K[\dens]$ and $K[\dens]$ is the one in \eqref{eq:DiracK} with an adjustable parameter $\alpha$:
+\begin{align}
+	&E_{xc} = A \int \dens^{\frac{4}{3}} \dd{\erre} &A= -\frac{9}{8}\alpha \left( \frac{3}{\pi} \right)^{\frac{1}{3}}
+\end{align}
+
+
 
 
 
