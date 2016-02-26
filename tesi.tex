@@ -1178,7 +1178,7 @@ We can now express more explicitly the $E[\dens]$, in analogy with the TFD model
 
 $E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulombian and the excahnges-correlation terms.
 
-By applying the variational principle with the usual constraint \eqref{eq:TFDensityConstraint} the fundamental equation of DFT is obtained:
+By applying the variational principle with the usual constraint \eqref{eq:TFDensityConstraint}, the fundamental equation of DFT is obtained:
 
 \begin{equation}\label{eq:FoundamentalDFT}
 \boxed{
@@ -1290,22 +1290,53 @@ As show in \eqref{eq:DiracK} the exchanges potential has the form:
 \end{align}
 It is now possible to proceed with the solution of equations \eqref{eq:KSeq}. 
 
-Because the Culombic term in \eqref{eq:KSeq} implicitly depends on the orbitals set trough $\dens$ (see eq. \eqref{eq:densityDef}) an interative SCF approach must be used. 
+Because the Culombic term and $v_{xc}$ in \eqref{eq:KSeq} implicitly depend on the orbitals set trough $\dens$ (see eq. \eqref{eq:densityDef}) an interative SCF approach must be used. 
 
 
-\mynotes{SEI QUI !}
+\mynotes{Non sono molto sicuro della parte che segue, ho bisogno di chiarimenti sull'implementazione SCF usata nell'espresso. Concludero' il paragrafo quando mi sara' piu' chiaro.}
 
-One $\dens$ is obtained, the final evaluation of $E[\dens]$ follows from the equation
+\subsection{Vari dubbi}
+Allora, le equazioni di KS \eqref{eq:KSeq} dipendono implicitamente dalla densita' eletronica, sia il termine Culombiano che il termine di scambio (almeno se uso l'LDA, ma ho visto che altri metodi usano anche i contributi del gradiente e del laplaciano della densita'). Da questo deriva il fatto che e' necessario utilizzare un approccio SCF.
+
+Ora gli step SCF sono probabilmente i seguenti: 
+\begin{itemize}
+	\item scelta degli orbitali spaziali da cui partire : $\{\psi_j^{KS}\}$ ( o equivalentemente scelta del basis set e scelta dei coefficienti di espansione)
+	\item calcolo di $\dens$ tramite la definizione \eqref{eq:densityDef}
+	\item avendo $\dens$ si calcolano tutti i potenziali che la contengono: culombiano e $v_{xc}$. La "forma" di $v_{xc}$ e' stata decisa prima di cominciare l'iterazione e resta costante per tutta l'iterazione.
+	\item a questo punto ho tutto il necessario per risolvere le eq di KS \eqref{eq:KSeq}(come e' da vedere). Quindi le risolvo e ottengo i nuovi orbitali spaziali.
+\end{itemize}
+Domanda: Come viene stabilita la convergenza?
+L'Atkins sostiene che il procedimento e' iterato fino a quando gli orbitali ( e quindi la densita' )  e il contributo di $E_{xc}$ sono ragionevolmente stabili. Ho visto che l'espresso pero' si calcola l'energia ad ogni step di iterazione SCF.
+Da qui la seconda domanda:
+
+Domanda: quando ho ottenuto gli orbitali spaziali risolvendo le eq di KS \eqref{eq:KSeq} (alla fine di ogni iterazione, o alla fine di tutto il conto SCF), come calcolo l'energia?
+Basta sommare i vari $\varepsilon_i$? (come con HF)
+
+Non devo usare la seguente formula con la nuova densita' elettronica?
 \begin{equation}
 E[\dens] = T_{ref}[\dens] + \iint \frac{ \rho(\mathbf{r_1}) \rho(\mathbf{r_2}) }{\mid \mathbf{r_1} - \mathbf{r_2} \mid} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} + \int \dens v(\erre) \dd{\erre} + E_{xc}[\dens] .
 \end{equation}
 
-One must decide in which form the Kinetic energy $T_{ref}[\dens]$ is expressed. Usually the electrons are modeled as a gas of independent fermions, exactly as done in the TF model, then the kinetic functional takes the form expressed in \eqref{eq:TFKinetic}.
-
-We shall now proceed with an in-depth analysis of the methods used by one of the most popular and reliable software for DFT calculations.
+Domanda: Il contributo di $T_{ref}$ dipendera' da come modello il sistema, si usa Thomas-Fermi?
 
 
-\mynotes{Mettero' una spiegazione del metodo SCF usato nella DFT con le onde piane nella parte di espresso, dove tratto anche la complessita'.Non mi sembra il caso di metterla qui.}
+Mi e' chiaro che l'espresso usa dei metodi decisamente piu' raffinati, almeno  leggendo l'appendice di questo articolo J. Phys.: Condens. Matter 21 (2009) 395502 (19pp) http://dx.doi.org/10.1088/0953-8984/21/39/395502 , pero' mi interessa capire il procedimento, almeno a grandi linee.
+
+Grazie mille,
+G.R.
+
+
+
+
+%Once $\dens$ is obtained, the final evaluation of $E[\dens]$ follows from the equation
+
+
+%One must also decide in which form the Kinetic energy $T_{ref}[\dens]$ is expressed. Usually the electrons are modeled as a gas of independent fermions, exactly as done in the TF model, then the kinetic functional takes the form expressed in \eqref{eq:TFKinetic}.
+
+%We shall now proceed with an in-depth analysis of the methods used by one of the most popular and reliable software for DFT calculations.
+
+
+%\mynotes{Mettero' una spiegazione del metodo SCF usato nella DFT con le onde piane nella parte di espresso, dove tratto anche la complessita'.}
 
 
 
