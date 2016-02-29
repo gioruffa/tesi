@@ -11,6 +11,7 @@
 \usepackage[width=125mm]{caption}
 
 \usepackage[document]{ragged2e}
+\usepackage{verbatim}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -1375,10 +1376,36 @@ It is based on density-functional theory, plane waves, and pseudopotentials.
 
 \section{Computational Architectures} \label{comparch:sec}
 
-\include{comp_arch}
+Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
 
-\subsection{NetXScale Cluster Architecture}\label{galileoarch:sec}
-\subsection{NUMA-CC Architecture}\label{numaarch:sec}
+In any parallel computer system, CPUs working on different parts of the same job must communicate to exchange information. Precisely how they should do this is the subject of much debate in the architectural community. 
+Two distinct designs, multiprocessors and multicomputers, have been proposed and implemented.
+
+The key difference between the two is the presence or absence of shared memory. 
+This difference permeates how they are designed, built, and programmed, as well as their scale and price\cite[p.586]{Tanenbaum}.
+
+\subsection{Multiprocessor Architectures}
+A parallel computer in which all the CPUs share a common memory is called a multiprocessor. 
+All processes working together on a multiprocessor can share a single virtual address space mapped onto the common memory. 
+Any process can read or write a word of memory by just executing a LOAD or STORE instruction.
+Two processes can communicate by simply having one of them write data to memory and having the other one read them back.
+
+Because all CPUs in a multiprocessor see the same memory image, there is only one copy of the operating system. 
+Consequently, there is only one page map and one process table. 
+It is this single-system image that distinguishes a multiprocessor from a multicomputer, in which each computer has its own copy of the operating system.
+
+\begin{comment}
+A multiprocessor, like all computers, must have I/O devices, such as disks, network adapters, and other equipment. In some multiprocessor systems, only certain
+CPUs have access to the I/O devices, and thus have a special I/O function. In other
+ones, every CPU has equal access to every I/O device. When every CPU has equal
+access to all the memory modules and all the I/O devices, and is treated as interchangeable with the others by the operating system, the system is called an SMP
+(Symmetric MultiProcessor).
+\end{comment}
+
+\subsection{Multicomputer Architectures}
+
+\subsection{IBM NetXScale ``Galileo" Cluster Architecture}\label{galileoarch:sec}
+\subsection{SGI ALTIX UV-2000 NUMA-CC}\label{numaarch:sec}
 
 
 \section{Discussion and Conclusion}
@@ -1469,6 +1496,13 @@ P. Hohenberg and W. Kohn, ``Inhomogeneous Electron Gas",  Physical Review \textb
 
 \bibitem{KS}
 W. Kohn and L. J. Sham, ``Self-Consistent Equations Including Exchange and Correlation Effects". Physical Review \textbf{140} (4A): A1133 (1965)
+
+\bibitem{Tanenbaum}
+A. S. Tanenbaum, T. Austin,
+Structured Computer Organization,
+Sixth edition,
+Pearson,
+2012
 
 
 \end{thebibliography}
