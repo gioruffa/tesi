@@ -1314,11 +1314,11 @@ where
 \begin{equation}\label{eq:DFTH}
 	\mathbf{H}_{ij} = \int \psi^{*}_{i}(\erre) \lbrace h_{1} + \int \frac{ \rho(\mathbf{r'}) } {\mid \erre - \mathbf{r'}  \mid} \dd{\mathbf{r'}}  + v_{xc}(\erre) \rbrace \psi_{j}(\erre) \dd{\erre},
 \end{equation}
-$\mathbf{C}$ is matrix of the expansion coefficients \eqref{eq:coeffMatrix} and $\mathbf{S}$ is the overlap matrix.
+$\mathbf{C}$ is the matrix of expansion coefficients \eqref{eq:coeffMatrix} and $\mathbf{S}$ is the overlap matrix.
 
-We can see that from a computational standpoint there is a deep difference between the $\mathbf{H}$ matrix and the Fock matrix $\mathbf{F}$: evaluation of $\mathbf{H}_{ij}$ is much easier than $\mathbf{F}_{ij}$ because there is no need to evaluate the onerous exchange integrals $(\mu \lambda | \sigma \nu)$. Al the exchange-correlation contribution is reduced to a multiplicative potential $v_{xc}(\erre)$
+We can see that from a computational standpoint there is a deep difference between the $\mathbf{H}$ matrix and the Fock matrix $\mathbf{F}$: evaluation of $\mathbf{H}_{ij}$ is much easier than $\mathbf{F}_{ij}$ because there is no need to evaluate the onerous exchange integrals $(\mu \lambda | \sigma \nu)$. All the exchange-correlation contribution is reduced to a multiplicative potential $v_{xc}(\erre)$
 
-In fact the complexity associated to DFT calculation is lower than a standard HF calculation, but it depends strongly on the choice of basis set. Please refer to section \ref{sec:QE} for further details.
+In fact the complexity associated to DFT calculation is lower than a standard HF calculation, but it depends strongly on the choice of basis set. Please refer to section \ref{sec:QE} for a more in-depth analysis.
 
 Before proceeding further it is convenient to reformulate the total energy functional $E[\dens]$.
 
@@ -1332,11 +1332,12 @@ and substituting \eqref{eq:HartreeEnergy} in equation \eqref{eq:KSEnergy}, the e
 \end{equation}
 
 Once $\dens$ is obtained by solving \eqref{eq:KSeq}, one still have to provide an expression of $T_{ref}[\dens]$. 
-Although the Thomas-Fermi model can seem a good approximation we can use equations \eqref{eq:KSeq} in our favor.
-For a diagonal set of $\{\psi^{KS}_{j}\}$\footnote{Guaranteed to exist after the diagonalization of \eqref{eq:DFTH}} equations \eqref{eq:DFTH} has the form :
+Although the Thomas-Fermi model can seem a good approximation, we can use equations \eqref{eq:KSeq} in our favor.
+
+For a diagonal set of $\{\psi^{KS}_{j}\}$\footnote{Guaranteed to exist after the diagonalization of \eqref{eq:DFTH}} equations the expectation value of the total Energy has the form :
 \begin{align}
-	&\sum_{j} \bra{\psi^{KS}_{j}}\mathbf{H}\ket{\psi^{KS}_{j}} = \\
-	&T_{ref} + \sum_{j} \bra{\psi^{KS}_{j}}v\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{h}\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{xc}\ket{\psi^{KS}_{j}} = 
+	& \langle E \rangle = \sum_{j} \bra{\psi^{KS}_{j}}\mathbf{H}\ket{\psi^{KS}_{j}} \\
+	&= T_{ref} + \sum_{j} \bra{\psi^{KS}_{j}}v\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{h}\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{xc}\ket{\psi^{KS}_{j}} = 
 	\sum_{j} \varepsilon^{KS}_{j} .
 \end{align}
 
@@ -1381,7 +1382,8 @@ We will call the initial density $\rho^{in}(\erre)$ and $\rho^{out}(\erre)$ will
 As one can imagine, the main computational complexity is contained in step \ref{en:SCFDiag}.
 The choice of the basis has great impact on the implementation of this step, both for the evaluation of $H \ket{\psi}$ and the diagonalization strategy. 
 
-As a final consideration of this theoretical section we must say that from a physical sandpoin the Kone-Shan eigenvalues $\varepsilon^{KS}_j$ do not really represents energies. Also the orbitals  $\{\psi^{ks}_j\}$ are not \textit{real} electronic orbitals, instead they are a useful tool to build the \textit{real} electronic density $\dens$ or other derived physical quantities.
+As a final consideration of this theoretical section we must say that from a physical standpoint the Kone-Shan eigenvalues $\varepsilon^{KS}_j$ do not really represents energies. 
+Also the orbitals  $\{\psi^{ks}_j\}$ are not \textit{real} electronic orbitals, instead they are a useful tool to build the \textit{real} electronic density $\dens$ and other derived physical quantities.
 
 
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods inside the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
