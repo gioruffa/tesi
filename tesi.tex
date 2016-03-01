@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{physics}
+\usepackage{enumitem}
 \usepackage[width=125mm]{caption}
 
 \usepackage[document]{ragged2e}
@@ -676,7 +677,7 @@ Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canon
 
 $K$ must be at least equal to $N$, the number of electrons in the system, to respect the Pauli principle. The greater is $K$, the finer is our approximation, reaching what is called the ``\textit{Hartree-Fock limit}".
 
-\subsubsection{Closed shell HF and the Roothaan equations}
+\subsubsection{Closed shell HF and the Roothaan equations} \label{sec:Roothan}
 
 A set of spin orbitals is said to be \textit{restricted} if :
 
@@ -720,7 +721,7 @@ Instead of using a numerical approach to solve the integro-differential equation
 
 We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{Not orthogonal basis set are common. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$.
 
-\begin{equation}
+\begin{equation}\label{eq:coeffMatrix}
 	\ket{\psi_i} = \sum_{\mu}^{K} C_{\mu i} \ket{\phi_{\mu}}
 \end{equation}
 
@@ -1230,7 +1231,7 @@ To ``\textit{link}" the reference system and the real system together, one could
 			 	\left( 
 			 		T_{ref}[\dens] + J[\dens] 
 			 	\right)
-			 \rbrace \label{eq:KSEnergy}
+			 \rbrace, \label{eq:KSEnergy}
 \end{align}
 
 where in the last step we have dropped the $ref$ suffix from $J_{ref}$ because $J$ is a universal functional of $\dens$ and has the same form in both the systems \footnote{Remember that the the reference system has the same $\dens$.}.
@@ -1245,14 +1246,24 @@ E_{xc}[\dens] = T[\dens] + V_{ee}[\dens] -
 \end{equation}
 
 Substituting \eqref{eq:KSExchangeEnergy} in \eqref{eq:KSEnergy}, equation \eqref{eq:FoundamentalDFT} become 
-
+\begin{equation}\label{eq:KSChemPot} 
+	\mu_{KS} = \frac{\var{T_{ref}[\dens]}}{\var{\dens}}  + v_{eff}(\erre),
+\end{equation}
+with 
 \begin{align}
-\mu_{KS} &= \frac{\var{T_{ref}[\dens]}}{\var{\dens}}  + v_{eff}(\erre) \label{eq:KSChemPot} \\
- v_{eff}(\erre) &= v(\erre)  + \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}
+ v_{eff}(\erre) &= v(\erre)  + v_{H}
  + v_{xc}(\erre) \\
- v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}},
+ v_{h}(\erre) &= \frac{1}{2} \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}\\
+ v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}}.
 \end{align}
-$v_{eff}$ is the \textit{effective potential} and it's not a functional of $\dens$, but a real function of $\erre$
+$v_{h}$ is called the \textit{Hartree potential} and the associated energy 
+\begin{equation}\label{eq:HartreeEnergy}
+E_{h}[\dens] = \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} = J[\dens]
+\end{equation}
+ is called the \textit{Hartree energy}.
+
+
+As one can see, $v_{eff}$, the \textit{effective potential}, is not a functional of $\dens$, but a real function of $\erre$
 \footnote{Note that in the definition of $v_{eff}$ we have already performed $\frac{\var{J}}{\var{\rho}}$.}.
 
 This observation is fundamental because equation \eqref{eq:KSChemPot} \footnote{Which is valid for the real system.} is the same equation that we would have obtained with a system composed by electrons subjected only to an external potential $v_{eff}(\erre)$.
@@ -1261,7 +1272,7 @@ Then the electronic density satisfying equation \eqref{eq:KSChemPot} is the same
 
 \begin{equation} \label{eq:KSeq}
 \boxed{
-	\lbrace h_{1} + \int \frac{ \rho(\mathbf{r'}) } {\mid \erre - \mathbf{r'}  \mid} \dd{\mathbf{r'}}  + v_{xc}(\erre) \rbrace 
+	\lbrace h_{1} + \frac{1}{2} \int \frac{ \rho(\mathbf{r'}) } {\mid \erre - \mathbf{r'}  \mid} \dd{\mathbf{r'}}  + v_{xc}(\erre) \rbrace 
 		\psi_{j}^{KS}(\erre) 
 	= \varepsilon_{j}^{KS} \psi_{j}^{KS}(\erre)
 },
@@ -1288,68 +1299,92 @@ As show in \eqref{eq:DiracK} the exchanges potential has the form:
 	v_{xc}(\erre) &=	\frac{\var{E_{xc}[\dens]}}{\var{\dens}}\\
 	&= \frac{4}{3} A \dens^{\frac{1}{3}} .
 \end{align}
-It is now possible to proceed with the solution of equations \eqref{eq:KSeq}. 
-
-Because the Culombic term and $v_{xc}$ in \eqref{eq:KSeq} implicitly depend on the orbitals set trough $\dens$ (see eq. \eqref{eq:densityDef}) an interative SCF approach must be used. 
 
 
-\mynotes{Non sono molto sicuro della parte che segue, ho bisogno di chiarimenti sull'implementazione SCF usata nell'espresso. Concludero' il paragrafo quando mi sara' piu' chiaro.}
 
-\subsection{Vari dubbi}
-Allora, le equazioni di KS \eqref{eq:KSeq} dipendono implicitamente dalla densita' eletronica, sia il termine Culombiano che il termine di scambio (almeno se uso l'LDA, ma ho visto che altri metodi usano anche i contributi del gradiente e del laplaciano della densita'). Da questo deriva il fatto che e' necessario utilizzare un approccio SCF.
+To proceed with the solution of equations \eqref{eq:KSeq} it is convenient to rewrite it in matrix form. 
 
-Ora gli step SCF sono probabilmente i seguenti: 
-\begin{itemize}
-	\item scelta degli orbitali spaziali da cui partire : $\{\psi_j^{KS}\}$ ( o equivalentemente scelta del basis set e scelta dei coefficienti di espansione)
-	\item calcolo di $\dens$ tramite la definizione \eqref{eq:densityDef}
-	\item avendo $\dens$ si calcolano tutti i potenziali che la contengono: culombiano e $v_{xc}$. La "forma" di $v_{xc}$ e' stata decisa prima di cominciare l'iterazione e resta costante per tutta l'iterazione.
-	\item a questo punto ho tutto il necessario per risolvere le eq di KS \eqref{eq:KSeq}(come e' da vedere). Quindi le risolvo e ottengo i nuovi orbitali spaziali.
-\end{itemize}
-Domanda: Come viene stabilita la convergenza?
-L'Atkins sostiene che il procedimento e' iterato fino a quando gli orbitali ( e quindi la densita' )  e il contributo di $E_{xc}$ sono ragionevolmente stabili. Ho visto che l'espresso pero' si calcola l'energia ad ogni step di iterazione SCF.
-Da qui la seconda domanda:
+Following the same steps explained in section \ref{sec:Roothan} we obtain:
 
-Domanda: quando ho ottenuto gli orbitali spaziali risolvendo le eq di KS \eqref{eq:KSeq} (alla fine di ogni iterazione, o alla fine di tutto il conto SCF), come calcolo l'energia?
-Basta sommare i vari $\varepsilon_i$? (come con HF)
-
-Non devo usare la seguente formula con la nuova densita' elettronica?
-\begin{equation}
-E[\dens] = T_{ref}[\dens] + \iint \frac{ \rho(\mathbf{r_1}) \rho(\mathbf{r_2}) }{\mid \mathbf{r_1} - \mathbf{r_2} \mid} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} + \int \dens v(\erre) \dd{\erre} + E_{xc}[\dens] .
+\begin{equation}\label{eq:DFTMatrix}
+	\mathbf{H} \mathbf{C} = \mathbf{S C} \varepsilon,
 \end{equation}
 
-Domanda: Il contributo di $T_{ref}$ dipendera' da come modello il sistema, si usa Thomas-Fermi?
+where 
+\begin{equation}\label{eq:DFTH}
+	\mathbf{H}_{ij} = \int \psi^{*}_{i}(\erre) \lbrace h_{1} + \int \frac{ \rho(\mathbf{r'}) } {\mid \erre - \mathbf{r'}  \mid} \dd{\mathbf{r'}}  + v_{xc}(\erre) \rbrace \psi_{j}(\erre) \dd{\erre},
+\end{equation}
+$\mathbf{C}$ is matrix of the expansion coefficients \eqref{eq:coeffMatrix} and $\mathbf{S}$ is the overlap matrix.
+
+We can see that from a computational standpoint there is a deep difference between the $\mathbf{H}$ matrix and the Fock matrix $\mathbf{F}$: evaluation of $\mathbf{H}_{ij}$ is much easier than $\mathbf{F}_{ij}$ because there is no need to evaluate the onerous exchange integrals $(\mu \lambda | \sigma \nu)$. Al the exchange-correlation contribution is reduced to a multiplicative potential $v_{xc}(\erre)$
+
+In fact the complexity associated to DFT calculation is lower than a standard HF calculation, but it depends strongly on the choice of basis set. Please refer to section \ref{sec:QE} for further details.
+
+Before proceeding further it is convenient to reformulate the total energy functional $E[\dens]$.
+
+By defining 
+\begin{equation}
+	V = \int \dens v(\erre) \dd{\erre}
+\end{equation}
+and substituting \eqref{eq:HartreeEnergy} in equation \eqref{eq:KSEnergy}, the energy functional become:
+\begin{equation}\label{eq:EnergyFuntional}
+	E[\dens] = T_{ref}[\dens] + E_{h}[\dens] + V[\dens] + E_{xc}[\dens]
+\end{equation}
+
+Once $\dens$ is obtained by solving \eqref{eq:KSeq}, one still have to provide an expression of $T_{ref}[\dens]$. 
+Although the Thomas-Fermi model can seem a good approximation we can use equations \eqref{eq:KSeq} in our favor.
+For a diagonal set of $\{\psi^{KS}_{j}\}$\footnote{Guaranteed to exist after the diagonalization of \eqref{eq:DFTH}} equations \eqref{eq:DFTH} has the form :
+\begin{align}
+	&\sum_{j} \bra{\psi^{KS}_{j}}\mathbf{H}\ket{\psi^{KS}_{j}} = \\
+	&T_{ref} + \sum_{j} \bra{\psi^{KS}_{j}}v\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{h}\ket{\psi^{KS}_{j}} + \sum_{j} \bra{\psi^{KS}_{j}}v_{xc}\ket{\psi^{KS}_{j}} = 
+	\sum_{j} \varepsilon^{KS}_{j} .
+\end{align}
+
+Then 
+\begin{equation}\label{eq:Tref}
+T_{ref} = - \sum_{j} \bra{\psi^{KS}_{j}}v\ket{\psi^{KS}_{j}} - \sum_{j} \bra{\psi^{KS}_{j}}v_{h}\ket{\psi^{KS}_{j}} - \sum_{j} \bra{\psi^{KS}_{j}}v_{xc}\ket{\psi^{KS}_{j}} + \sum_{j} \varepsilon^{KS}_{j} .
+\end{equation}
+
+Re-expressing \eqref{eq:EnergyFuntional} in the $\{\psi^{KS}_{j}\}$ base and substituting \eqref{eq:Tref} in \eqref{eq:EnergyFuntional}, we finally obtain :
+\begin{align}\label{eq:DFTEnergy}
+	E[\dens] = \sum_{j}\varepsilon^{KS}_{j} - E_{h}[\dens] - \int \dens v(\erre) \dd{\erre}+ E_{xc}[\dens].
+\end{align}
+Equation \eqref{eq:DFTEnergy} is the one used by the majority of \textit{ab initio} calculations softwares.
 
 
-Mi e' chiaro che l'espresso usa dei metodi decisamente piu' raffinati, almeno  leggendo l'appendice di questo articolo J. Phys.: Condens. Matter 21 (2009) 395502 (19pp) http://dx.doi.org/10.1088/0953-8984/21/39/395502 , pero' mi interessa capire il procedimento, almeno a grandi linee.
-
-Grazie mille,
-G.R.
 
 
 
+\subsubsection{Self Consistent DFT}
+Because the Culombic term and $v_{xc}$ in \eqref{eq:KSeq} implicitly depend on the orbitals set trough $\dens$ (see eq. \eqref{eq:densityDef}) an interative SCF approach must be used. 
 
-%Once $\dens$ is obtained, the final evaluation of $E[\dens]$ follows from the equation
+We briefly outline the general Self Consistent approach used in DFT calculations.
 
+To begin the calculation we need to pick the correct approximation of $E_{xc}[\dens]$ from which we calculate $v_{xc}(\erre)$. $E_{xc}[\dens]$ will remain always constant trough the whole calculation.
 
-%One must also decide in which form the Kinetic energy $T_{ref}[\dens]$ is expressed. Usually the electrons are modeled as a gas of independent fermions, exactly as done in the TF model, then the kinetic functional takes the form expressed in \eqref{eq:TFKinetic}.
+In contrast to the HF-SCF method, instead of guessing the orbitals (or their expansion coefficients), we guess the electronic density $\dens$. Usually, as a first rough approximation, the atomic electronic densities of each atom are used.\footnote{Note that any initial guess is equally valid, but a more reasonable one will make the iteration converge faster.}
 
-%We shall now proceed with an in-depth analysis of the methods used by one of the most popular and reliable software for DFT calculations.
-
-
-%\mynotes{Mettero' una spiegazione del metodo SCF usato nella DFT con le onde piane nella parte di espresso, dove tratto anche la complessita'.}
-
-
-
+The SCF iteration can now begin. 
+We will call the initial density $\rho^{in}(\erre)$ and $\rho^{out}(\erre)$ will be the density obtained at the end of each iteration step.
 
 
+\begin{enumerate}
+	\item $\rho^{in}(\erre)$ is used to evaluate $v_{eff}(\erre)$;
+	\item the eigenvalue problem \eqref{eq:DFTMatrix} is solved and the set of $\frac{N_{e}}{2}$ orbitals $\{ \psi^{KS}_i \}$  (the ones with the lowest eigenvalues $\varepsilon^{KS}_i$) is obtained; \label{en:SCFDiag}
+	\item $\{ \psi^{KS}_i \}$ is used to calculate the new electronic density $\rho^{out}(\erre)$ trough definition \eqref{eq:densityDef};
+	\item self consistency is tested. A wide range of methods can be used depending on the implementation. Usually the value $\int \mid \rho^{out}(\erre) - \rho^{in}(\erre)\mid \dd{\erre} $ is evaluated in conjunction with the difference between energies $E^{in}[\dens] - E^{out}[\dens]$, but more refined methods are available;
+	\item if self-consistency is achieved the computation is completed and the final electronic density is the solution of equation \eqref{eq:FoundamentalDFT}. Otherwise $\rho^{out}(\erre)$ is used to determine the next $\rho^{in}(\erre)$. Usually $\rho^{out}(\erre)$ is mixed with the electronic densities obtained in the previous iterations (if any). This process guarantees a faster SCF convergence.
+\end{enumerate}
 
 
 
+As one can imagine, the main computational complexity is contained in step \ref{en:SCFDiag}.
+The choice of the basis has great impact on the implementation of this step, both for the evaluation of $H \ket{\psi}$ and the diagonalization strategy. 
+
+As a final consideration of this theoretical section we must say that from a physical sandpoin the Kone-Shan eigenvalues $\varepsilon^{KS}_j$ do not really represents energies. Also the orbitals  $\{\psi^{ks}_j\}$ are not \textit{real} electronic orbitals, instead they are a useful tool to build the \textit{real} electronic density $\dens$ or other derived physical quantities.
 
 
-
-
-
+We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods inside the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
 
 
 
@@ -1358,7 +1393,7 @@ G.R.
 
 
 %----------------------------------------------------------------------------
-\section{Quantum Espresso}
+\section{Quantum Espresso}\label{sec:QE}
 %----------------------------------------------------------------------------
 
 Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electronic-structure calculations and materials modeling at the nanoscale.
