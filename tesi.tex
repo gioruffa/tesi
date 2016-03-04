@@ -1399,6 +1399,77 @@ As a final consideration of this section we must say that the Kohn-Sham eigenval
 The same can be said about the spatial orbitals  $\{\psi^{ks}_j\}$, which are not \textit{real} electronic orbitals. 
 Nevertheless they constitute a set of useful tools to build other meaningful physical quantities, first and foremost the electronic density $\dens$.
 
+\subsection{Lattice Structures}
+It is convenient to introduce the concept of \textit{Bravais lattice} and \textit{reciprocal lattice} for their central role in solid state physic. 
+
+
+\subsubsection{Bravais Lattice}
+The \textit{Bravais lattice} is a set of points in real space that can be identified by the following relation :
+\begin{equation}\label{eq:BravaisLattice}
+	\mathbf{R}_n = \sum_{i}^{D} n_{i} \mathbf{a}_{i},
+\end{equation}
+where $D$ is the number dimensions, $\{\mathbf{a}_{i}\}$ is as a set of $D$ linear independent vectors and $n_{i}$ is always an integer number.
+The definition appears clear looking at figure \ref{fig:BravaisLattice}
+
+\begin{figure}[h]
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{Bravais_2D.png}
+	\caption{Bi-dimensional Bravais lattice}
+	\label{fig:BravaisLattice}
+\end{center}
+\end{figure}
+
+\subsubsection{Primitive Cell}
+The \textit{primitive cell} is the single smallest portion of lattice that can generate the whole lattice by applying translation and symmetry operations.
+
+\subsubsection{Wigner-Seitz Cell}
+
+The \textit{Wigner-Seitz} cell around a lattice point is defined as the locus of points in space that are closer to that lattice point than to any of the other lattice points (see figure \ref{fig:WSCell}).
+
+\begin{figure}[h]
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{Wigner.pdf}
+	\caption{Bi-dimensional Wigner-Seitz cell}
+	\label{fig:WSCell}
+\end{center}
+\end{figure}
+
+\subsubsection{The Reciprocal Lattice}
+Considering a set of $\mathbf{R}$ points constituting a Bravais lattice and a plane wave $\psi(\erre) = e^{i\mathbf{k}\cdot\mathbf{r}}$, for a generic $\mathbf{k} \in \mathbb{R}$ the plane wave $\psi(\erre)$ will be periodic on the lattice only for certain values of $\mathbf{k}$.
+
+
+We call the ``\textit{reciprocal lattice}" the set $\{\mathbf{K}\}$ of points $\mathbf{k}$ for which the associated plane wave $\psi(\erre)$ is periodic in the Bravais lattice.
+
+One can show \cite{Martin} that the reciprocal lattice is a Bravais lattice and that the following relationship (in matrix form) between the reciprocal primitive vectors $\{\mathbf{b}_i\}$ and the original primitive vectors $\{\mathbf{a}_i\}$ held:
+\begin{equation}
+\left[\mathbf{b_{1}b_{2}b_{3}}\right]^{T} = (2\pi^3) \left[\mathbf{a_{1}a_{2}a_{3}}\right]^{-1}
+.
+\end{equation}
+
+A generic point in the reciprocal lattice is identified by the $\mathbf{G_m}$ vector 
+\begin{equation}
+	\mathbf{G_m} = m_1\mathbf{b_1} + m_2\mathbf{b_2} + m_3\mathbf{b_3}.
+\end{equation}
+
+Given the periodic condition, every plane wave must satisfy 
+\begin{equation}
+	e^{i \mathbf{G}\cdot (\mathbf{r} + \mathbf{R})} =  	e^{i \mathbf{G}\cdot \mathbf{r}},
+\end{equation}
+hence 
+\begin{equation}
+	e^{i \mathbf{G}\cdot \mathbf{R}} =  	1,
+\end{equation}
+equivalently 
+\begin{align}
+	&\mathbf{G}\cdot \mathbf{R} = 2\pi N, &N\in\mathbb{Z},
+\end{align}
+for every $\mathbf{R}$ in the Bravais lattice.
+
+Usually the original Bravais lattice $\{ \mathbf{R} \}$ is called the ``\textit{direct}" lattice.
+
+Finally, the Wigner-Seitz cell of the reciprocal lattice is called the ``\textit{first Brillouin zone}".
+
+We will see that the duality between the direct lattice and the reciprocal lattice is one of the greatest strength of theories based on plane waves basis sets.
 
 \subsection{Plane Waves}
 \mynotes{mancano onde piane}
