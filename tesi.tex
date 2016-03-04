@@ -1190,9 +1190,9 @@ By applying the variational principle with the usual constraint \eqref{eq:TFDens
 \end{equation}
 
 
-\subsubsection{Kohn and Shan Equations}
+\subsubsection{Kohn and Sham Equations}
 
-Kohn and Shan \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
+Kohn and Sham \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
 
 Given a \textit{real} system one could associate a \textit{reference} system in which all electrons are not correlated, but with the same electronic density $\dens$.
 
@@ -1285,7 +1285,7 @@ where
 	v(r) &= \sum_{\alpha} \frac{Z_{\alpha}}{r} .
 \end{align}
 
-Equations \eqref{eq:KSeq} are called the \textit{Kone-Shan equations}, once solved it's possible to calculate the electronic density using definition \eqref{eq:densityDef}.
+Equations \eqref{eq:KSeq} are called the \textit{Kohn-Sham equations}, once solved it's possible to calculate the electronic density using definition \eqref{eq:densityDef}.
 
 However, in order to proceed, it is necessary to choose a proper form of $E_{xc}[\dens]$ (consequently of $v_{xc}(\erre)$), which is far from being an easy task. The search for more accurate functionals is an active area of current research efforts.
 
@@ -1395,7 +1395,7 @@ We will call the initial density $\rho^{in}(\erre)$ and  the density obtained at
 As one can imagine, the main computational complexity is contained in step \ref{en:SCFDiag}.
 The choice of the basis set has great impact on the implementation of this procedure, both for the evaluation of $H \ket{\psi}$ and the diagonalization strategy. 
 
-As a final consideration of this section we must say that the Kone-Shan eigenvalues $\varepsilon^{KS}_j$ don't posses a physical meaning \cite[p.144]{Martin}, they cannot be associated with \textit{real} energies \footnote{With the exception of the highest $\varepsilon_{i}$ \cite[p.144]{Martin}}. 
+As a final consideration of this section we must say that the Kohn-Sham eigenvalues $\varepsilon^{KS}_j$ don't posses a physical meaning \cite[p.144]{Martin}, they cannot be associated with \textit{real} energies \footnote{With the exception of the highest $\varepsilon_{i}$ \cite[p.144]{Martin}}. 
 The same can be said about the spatial orbitals  $\{\psi^{ks}_j\}$, which are not \textit{real} electronic orbitals. 
 Nevertheless they constitute a set of useful tools to build other meaningful physical quantities, first and foremost the electronic density $\dens$.
 
