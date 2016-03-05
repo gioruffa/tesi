@@ -9,6 +9,7 @@
 \usepackage{amssymb}
 \usepackage{physics}
 \usepackage{enumitem}
+\usepackage{framed}
 \usepackage[width=125mm]{caption}
 
 \graphicspath{{./media/images/}}
@@ -40,6 +41,7 @@
 \textcolor{red}{TODO: #1}\end{flushright}}
 \newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
+\newcommand\mf[1]{\mathbf{#1}}
 \newcommand\dens{\rho(\mathbf{r})}
 \newcommand\erre{\mathbf{r}}
 
@@ -1408,13 +1410,13 @@ The \textit{Bravais lattice} is a set of points in real space that can be identi
 \begin{equation}\label{eq:BravaisLattice}
 	\mathbf{R}_n = \sum_{i}^{D} n_{i} \mathbf{a}_{i},
 \end{equation}
-where $D$ is the number dimensions, $\{\mathbf{a}_{i}\}$ is as a set of $D$ linear independent vectors and $n_{i}$ is always an integer number.
+where $D$ is the number of dimensions, $\{\mathbf{a}_{i}\}$ is as a set of $D$ linear independent vectors called the \textit{primitive vectors} and $n_{i}$ is always an integer number.
 The definition appears clear looking at figure \ref{fig:BravaisLattice}
 
 \begin{figure}[h]
 \begin{center}
 	\includegraphics[width=0.4\linewidth]{Bravais_2D.png}
-	\caption{Bi-dimensional Bravais lattice}
+	\caption{Bi-dimensional Bravais lattice, with two of the possible primitive vectors.}
 	\label{fig:BravaisLattice}
 \end{center}
 \end{figure}
@@ -1424,7 +1426,7 @@ The \textit{primitive cell} is the single smallest portion of lattice that can g
 
 \subsubsection{Wigner-Seitz Cell}
 
-The \textit{Wigner-Seitz} cell around a lattice point is defined as the locus of points in space that are closer to that lattice point than to any of the other lattice points (see figure \ref{fig:WSCell}).
+The \textit{Wigner-Seitz} cell around a lattice point $\mathbf{R}$ is defined as the locus of points in space that are closer to that lattice point than to any of the other lattice points (see figure \ref{fig:WSCell}).
 
 \begin{figure}[h]
 \begin{center}
@@ -1469,10 +1471,114 @@ Usually the original Bravais lattice $\{ \mathbf{R} \}$ is called the ``\textit{
 
 Finally, the Wigner-Seitz cell of the reciprocal lattice is called the ``\textit{first Brillouin zone}".
 
-We will see that the duality between the direct lattice and the reciprocal lattice is one of the greatest strength of theories based on plane waves basis sets.
+As explained in \cite[p.121]{Manini} the reciprocal lattice is the (discrete) Fourier transform of the direct lattice.
 
-\subsection{Plane Waves}
-\mynotes{da fogli di Davide + dispense Davide su plane waves + Martins}
+We will see that the duality between the direct lattice and the reciprocal lattice is one of the greatest computational strength of theories based on plane waves basis sets.
+
+\subsection{Electrons in Lattice}
+
+The vast majority of solid state Physic studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
+Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole lattice structure.
+\subsubsection{The Bloch Theorem}
+Since, as we have seen before, the potential the electrons are subjected to is mainly defined by ions' positions \footnote{Remember that the Born-Oppenheimer approximations stands firmly.} we must expect a periodic $v_{eff}$ potential.
+
+Namely, we have that in equation \eqref{eq:KSeq} 
+\begin{equation}
+	v_{eff}(\erre) = 	v_{eff}(\erre + \mf{R}).
+\end{equation}
+But what are the implications of this condition on the solutions of \eqref{eq:KSeq}?
+
+The well celebrated \textit{Bloch's theorem} \cite[p.136]{Manini} answers the question:
+
+\begin{center}
+\begin{framed}
+
+\textit{All Schr\"odinger eigenstates in a periodic potential $v_{eff}(\erre) = 	v_{eff}(\erre + \mf{R})$ can be chosen in the factorized form:}
+\begin{equation}\label{eq:Bloch}
+		\psi_{j}(\erre) = e^{i \mf{k} \cdot \erre } ~ u_{\mf{k}j}(\erre), 
+\end{equation}
+\textit{where the function $u_{\mf{k}j}(\erre)$ has the same periodicity of the lattice $u_{\mf{k}j}(\erre) = u_{\mf{k}j}(\erre + \mf{R}) $, and $\mf{k}$ is a suitable wave vector (depending on $\psi_j$, but otherwise subject to no restriction).}
+\end{framed}
+\end{center}
+
+Which implies two equivalent considerations.
+\begin{itemize}
+	\item In a periodic context all electronic eigenfunctions have non-trivial spatial  dependence only within one primitive unit cell: in any other cell the wave function is equal to that in the original cell, apart from a constant phase factor $e^{i \mf{k} \cdot \mf{R}}$ (which leaves the probability distribution unaffected).
+	\item In a periodic potential, the Schr\"odinger eigenstates are essentially plane-wave-like states, except for a periodic amplitude modulation.
+\end{itemize}
+
+If we substitute \eqref{eq:Bloch} in the Kone-Sham equations \eqref{eq:KSeq} we obtain \cite[p.137]{Manini}
+\begin{framed}
+\begin{equation}\label{eq:BlochEq}
+	\left\lbrace -\frac{1}{2}  \left( \nabla + i\mf{k} \right)^2 + v_{eff}(\erre) \right\rbrace u_{\mf{k}j}(\erre) = \varepsilon_{\mf{k}j}  u_{\mf{k}j}(\erre),
+\end{equation}
+\end{framed}
+which is the basic equation for stationary states of an electron characterized by a given $\mf{k}$.\footnote{Note that this result is the same for every ``\textit{mean field}" approximation (i.e. HF equations)}
+
+The consequence of the Bloch's theorem is that, thanks to the periodicity of $u_{\mf{k}j}(\erre)$, equation \eqref{eq:BlochEq} must be solved within a single cell of the direct lattice\footnote{With applied boundaries conditions}.
+This is to be compared with the solution of equations \eqref{eq:KSeq} that must be solved in the \textit{whole} crystal lattice; this is the reason why non-periodic solids are much harder to deal with.
+
+Once $u_{\mf{k}j}(\erre)$ is found, the true electronic wave function $\psi_j(\erre)$ is extended to the whole lattice trough \eqref{eq:Bloch}.
+
+Apart for the $\mf{k}$ shift of wave vector, equation \eqref{eq:BlochEq} is equivalent to a stationary Schr\"oendiger equation. Then, for a fixed $\mf{k}$, its solutions must be qualitatively similar to those of standard Schr\"oendiger equations in a finite volume, namely : a ladder of discrete eigenenergies $\varepsilon_{\mf{k}j}$ associated with eigenfunctions $u_{\mf{k}j}(\erre)$ with larger and larger number of nodes for increasing energies, labeled precisely by the index $j$.\footnote{With a noticeable parallelism to atomic orbitals.}
+
+It is absolutely fundamental to note that $\mf{k}$ can vary freely within the first Brillouin zone; 
+then for a fixed $j$ the eigenenergies $\varepsilon_{\mf{k}j}$ depends on $\mf{k}$ as \textbf{continuous} functions!
+
+These function are called ``\textit{energy bands}" or simply ``\textit{bands}", because they varies with $\mf{k}$ within a certain energy interval. 
+In general, in solids, bands of contiguous $j$ can either overlap or not; 
+thus the main consequence of the Bloch's theorem is that the allowed energies forms a spectrum of bands, separated by ranges of forbidden energies (\textit{band gaps}).
+
+\subsubsection{Plane Waves}
+In a crystals, electrons are characterized by an energy spectrum somewhat intermediate between that of a free particle (plane waves with all positive energies) and that of an atom (isolated eigenvalues separated by gaps).
+
+One possible approach to model this kind of behavior is to use plane waves as basis set for the expansion of $\psi_{j}$.
+\begin{equation}\label{eq:PWExpansion}
+	\ket{\psi_j}  = \sum_{\mf{k}'} c_{j\mf{k}'} \ket{\mf{k}'},
+\end{equation}
+where $\{\ket{\mf{k}'}\}$ is a set of ortho-normalized plane wave states $\mathbf{k'}(\erre) = \sqrt{V}^{-1} e^{i\mf{k'}\cdot\erre}$ and $c_{j\mf{k}'}$ are the Fourier expansion coefficients.\footnote{Note that in general the sum extends over all possible $\mf{k}'$, leading to an integration:
+\begin{equation}
+	\psi_j(\erre) = \int \varphi_j(\mf{k}) e^{i\mf{k} \cdot \erre} \dd{\mf{k}}
+\end{equation}
+}
+
+Replacing \eqref{eq:PWExpansion} in \eqref{eq:KSeq} and multiplying on the left for $\bra{\mf{k}}$ we obtain \cite{Martin} 
+\begin{align}
+	\bra{\mf{k}} -\frac{1}{2}\nabla^2 + v_{eff} \ket{\psi_j} &= \varepsilon_j \bra{\mf{k}}\ket{\psi_j}  \\
+	\sum_{\mf{k'}} \left( \frac{1}{2}\mid\mf{k}\mid^2  \delta_{\mf{k},\mf{k'}} + \bra{\mf{k}}v_{eff}\ket{\mf{k'}} \right) c_{\mathbf{jk'}} &= \varepsilon_j \sum_{\mf{k'}} \delta_{\mf{k},\mf{k'}} c_{\mathbf{jk'}} \label{eq:SCHFourier}
+\end{align}
+
+where we have used $\bra{\mf{k}}\ket{\mf{k'}} = \delta_{\mf{k},\mf{k'}}$ and the fact that $\ket{\mf{k}}$ are eigenstates of the momentum operator.
+
+This is exactly equation \eqref{eq:DFTMatrix} with plane waves as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
+
+Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cite{Martin} 
+\begin{equation}
+	\bra{\mf{k}} v_{eff} \ket{\mf{k'}} = \mathcal{N} \int e^{i\left(\mf{k} - \mf{k'} \right)} v_{eff}(\erre) \dd{\erre} = \tilde{v}_{eff}(\mf{k} - \mf{k'}),
+\end{equation}
+
+that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
+
+So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
+
+If we introduce the condition of a lattice system (then of a periodic potential), as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice.
+
+This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because to have a non-null element the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
+
+Then the general matrix became a diagonal block matrix, meaning that one can diagonalize only the blocks on non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
+
+
+
+figate onde piane : problema continuo e' diventato discreto, la matrice e' diagonale a blocchi, la derivazione e' una moltiplicazione in spazio reciproco!
+
+\newpage
+
+
+
+
+
+
+
 
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
 
@@ -1603,6 +1709,11 @@ Electronic Structure,
 Cambridge Press,
 2008.
 
+\bibitem{Manini}
+N. Manini, 
+Introduction to the Physics of Matter,
+2006,
+\url{http://materia.fisica.unimi.it/manini/dida/Struttura_della_Materia_1.html}.
 
 \end{thebibliography}
 
