@@ -1516,7 +1516,7 @@ If we substitute \eqref{eq:Bloch} in the Kone-Sham equations \eqref{eq:KSeq} we 
 which is the basic equation for stationary states of an electron characterized by a given $\mf{k}$.\footnote{Note that this result is the same for every ``\textit{mean field}" approximation (i.e. HF equations)}
 
 The consequence of the Bloch's theorem is that, thanks to the periodicity of $u_{\mf{k}j}(\erre)$, equation \eqref{eq:BlochEq} must be solved within a single cell of the direct lattice\footnote{With applied boundaries conditions}.
-This is to be compared with the solution of equations \eqref{eq:KSeq} that must be solved in the \textit{whole} crystal lattice; this is the reason why non-periodic solids are much harder to deal with.
+This is to be compared with the solution of equations \eqref{eq:KSeq} that must be solved in the \textit{whole} crystal lattice.
 
 Once $u_{\mf{k}j}(\erre)$ is found, the true electronic wave function $\psi_j(\erre)$ is extended to the whole lattice trough \eqref{eq:Bloch}.
 
@@ -1550,7 +1550,7 @@ Replacing \eqref{eq:PWExpansion} in \eqref{eq:KSeq} and multiplying on the left 
 
 where we have used $\bra{\mf{k}}\ket{\mf{k'}} = \delta_{\mf{k},\mf{k'}}$ and the fact that $\ket{\mf{k}}$ are eigenstates of the momentum operator.
 
-This is exactly equation \eqref{eq:DFTMatrix} with plane waves as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
+This the form equation \eqref{eq:DFTMatrix} takes when plane waves are used as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
 
 Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cite{Martin} 
 \begin{equation}
@@ -1560,7 +1560,7 @@ Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cit
 that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
 
 So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
-This means that by using plane waves we can perform a set of calculation in the reciprocal space, and then transpose the results in the direct space trough Fourier transformations.
+This means that by using plane waves we can perform a set of calculations in the reciprocal space, and then transpose the results in the direct space trough inverse Fourier transformations.
 
 If we introduce the condition of a periodic potential, as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice \cite{Martin}.
 
@@ -1580,7 +1580,7 @@ In order to pick the correct cutoff energy a series of tests can be performed wi
 We can now summarize the advantages of plane waves basis sets in periodic potentials:
 \begin{enumerate}
 	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
-	\item The continuous indexed matrix $\mf{H}^{KS}$ become a finite discrete-indexed matrix.
+	\item The continuous indexed matrix $\mf{H}^{KS}$ becomes a finite discrete-indexed matrix.
 	\item The $\mf{H}^{KS}$ matrix become diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
 \end{enumerate}
 
