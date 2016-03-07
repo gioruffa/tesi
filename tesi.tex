@@ -1477,8 +1477,8 @@ We will see that the duality between the direct lattice and the reciprocal latti
 
 \subsection{Electrons in Lattice}
 
-The vast majority of solid state Physic studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
-Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole lattice structure.
+Solid state physics studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
+Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole lattice.
 \subsubsection{The Bloch Theorem}
 Since, as we have seen before, the potential the electrons are subjected to is mainly defined by ions' positions \footnote{Remember that the Born-Oppenheimer approximations stands firmly.} we must expect a periodic $v_{eff}$ potential.
 
@@ -1559,35 +1559,36 @@ Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cit
 
 that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
 
+So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
 This means that by using plane waves we can perform a set of calculation in the reciprocal space, and then transpose the results in the direct space trough Fourier transformations.
 
-So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
-
-If we introduce the condition of a lattice system (then of a periodic potential), as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice.
+If we introduce the condition of a periodic potential, as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice \cite{Martin}.
 
 This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
 
-Then the general matrix became a diagonal block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
+Then the continuous-indexed $\mf{H}^{KS}$ matrix become a diagonal discrete-indexed block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
 
-For computational purposes the discrete index is obviously a great advantage, but we still have to address the fact that we will need an infinite number of $G$ to completely describe the system.
-As did for the Hartree-Fock method we select only a subset of all the possible plane waves by imposing a so-called \textit{cutoff energy}:
+For computational purposes the discrete index is obviously a great advantage, but we still have to address the problem that we need an infinite number of $G$ to completely describe the system.
+Following the same process of the Hartree-Fock method, we select only a subset of all the possible plane waves by imposing a condition on the energy of the plane wave, the so-called \textit{cutoff energy}:
 \begin{align}
 	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre}\\
-	\mid \mf{k + G} \mid < E_{cut}.
+	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}.
 \end{align}
-To pick the correct cutoff energy a series of system specif tests can be performed with little computational effort.
+
+In order to pick the correct cutoff energy a series of tests can be performed with little (and constant) computational effort.
 
 We can now summarize the advantages of plane waves basis sets in periodic potentials:
 \begin{enumerate}
-	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms.
+	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
 	\item The continuous indexed matrix $\mf{H}^{KS}$ become a finite discrete-indexed matrix.
-	\item The $\mf{H}^{KS}$ matrix became diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
+	\item The $\mf{H}^{KS}$ matrix become diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
 \end{enumerate}
 
-Point \ref{en:Kpoints} is the so-called \textit{K points parallelization}, and, as one can image, have great impact on the calculation of big symmetric crystal systems.
+Point \ref{en:Kpoints} is the so-called \textit{K-points parallelization}, and, as one can image, it has a great impact on the resolution of the electronic problem in symmetric crystals.
 
-In this work we focused on the study of system having little symmetries\footnote{Non-periodic systems usually has peculiar physical properties, this is why they are of great research interest and why we focused on them.}, this implies the enlargement of the elementary cell to accommodate all antisymmetric factors. 
-As a result the $\mf{H}^{KS}$ matrix become occupied mostly by a single block and no parallelization can be performed.
+In this work we mainly focused on the study of systems having little symmetries\footnote{Non-periodic systems usually has peculiar physical properties, this is why they are of great research interest and why we focused on them.}, this implies the enlargement of the elementary cell to accommodate all asymmetric factors. 
+As a result the $\mf{H}^{KS}$ matrix become occupied mostly by a single block and no k-points parallelization can be performed.
+This configuration is usually referred as \textit{Lambda point}.
 
 
 \newpage
