@@ -48,7 +48,7 @@
 
 \begin{document}
 
-\title{\bf \Huge Titolazzo della tesi, if seems long\\go to newline }
+\title{\bf \Huge Tuning the computational architecture for Quantum Espresso ab initio calculation of nanostructures }
 
 
 \author{Giorgio Ruffa\\
@@ -69,7 +69,7 @@ Via Celoria 16, 20133 Milano, Italia
 %---------------------------------------------------------
 \begin{abstract}
 
-A long time ago in a galaxy far, far away...
+Quantum Espresso (QE) is one of the most reliable and widespread  suite of codes for quantum chemistry calculations of nanostructures. Given the relevance of QE for the condensed matter physics community, we perform a detailed analysis of the information flow within the QE codes. We undertake several nanostructure systems to highlight how the computational data flow is related to the geometry and to the dimensionality of the nanostructures. These tests are performed on different computer architectures as to determine how the memory access type impacts the overall performance of the code.
 
 \vskip0.75cm
 \hskip5cm
@@ -99,47 +99,47 @@ By starting with a very general approach we can say that the Hamiltonian associa
 
 
 \begin{equation}\label{eq:theHamiltonianLong}
-\hat{H}_{tot} = \hat{T}_{N} + \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{NN} + \hat{V}_{ee}
+\hat{H}_{tot} = \hat{T}_{N} + \hat{T}_{e} + \hat{V}_{Ne} + \hat{V}_{NN} + \hat{V}_{ee}.
 \end{equation}
 
 Where:
 
 \begin{equation}
-\hat{T}_{N} = - \frac{\hbar}{2} \sum_{\alpha}^{N_N} \frac{\nabla_{\alpha}^2}{M_{\alpha}}
+\hat{T}_{N} = - \frac{\hbar}{2} \sum_{\alpha}^{N_N} \frac{\nabla_{\alpha}^2}{M_{\alpha}},
 \end{equation}
-is the kinetic energy of the nuclei
+is the kinetic energy of the nuclei.
 
 \begin{equation}
-\hat{T}_{e} = - \frac{\hbar}{2m_{e}} \sum_{i}^{N_e} \nabla_{i}^2
+\hat{T}_{e} = - \frac{\hbar}{2m_{e}} \sum_{i}^{N_e} \nabla_{i}^2,
 \end{equation}
-is the kinetic energy of the electrons
+is the kinetic energy of the electrons.
 
 \begin{equation}
-\hat{V}_{Ne} = -\frac{e^2}{4\pi\varepsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid }
+\hat{V}_{Ne} = -\frac{e^2}{4\pi\varepsilon_{0}} \sum_{i}^{N_e}\sum_{\alpha}^{N_N} \frac{Z_{\alpha}}{\mid R_{\alpha} - r_{i} \mid },
 \end{equation}
-is the electron-ion attraction potential energy
+is the electron-ion attraction potential energy.
 
 \begin{equation}
-\hat{V}_{NN} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}}{\mid R_{\alpha} - R_{\beta} \mid }
+\hat{V}_{NN} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta}}{\mid R_{\alpha} - R_{\beta} \mid },
 \end{equation}
-is the nucleus-nucleus repulsion potential energy
+is the nucleus-nucleus repulsion potential energy.
 
 \begin{equation}
-\hat{V}_{ee} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{\mid r_{i} - r_{j} \mid }
+\hat{V}_{ee} = \frac{e^2}{4\pi\varepsilon_{0}} \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{\mid r_{i} - r_{j} \mid },
 \end{equation}
-is the electron-electron repulsion potential energy
+is the electron-electron repulsion potential energy.
 
-A state function $\ket{\psi}$ describing all the particles involved in the system will evolve following the Schr\"odinger equation.
+A state function $\ket{\psi}$ describing all the particles involved in the system will evolve following the Schr\"odinger equation
 \begin{equation}\label{eq:eq_sch}
-	i\hbar\dv{t}\ket{\psi(t)} = \hat{H}_{tot}\ket{\psi(t)}
+	i\hbar\dv{t}\ket{\psi(t)} = \hat{H}_{tot}\ket{\psi(t)}.
 \end{equation}
 
 From now on, if not explicitly specified, we will use atomic units \footnote{see \cite[p.42]{Attila} for further details}
 \begin{equation}
-	m_{e} = \hbar = e =\frac{1}{4 \pi \epsilon_{0}} = 1
+	m_{e} = \hbar = e =\frac{1}{4 \pi \epsilon_{0}} = 1.
 \end{equation}
 
-we shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant form:
+We shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant form:
 
 
 \begin{equation}\label{eq:theHamiltonian}
@@ -149,15 +149,15 @@ we shall rewrite equation \eqref{eq:theHamiltonianLong} in a much more elegant f
 					- \sum_{i}^{N_e} \frac{\nabla_{i}^2}{2}
 					- \sum_{i}^{N_e} \sum_{\alpha}^{N_N} \frac{ Z_{\alpha} }{r_{i \alpha}}				
 					+ \frac{1}{2} \sum_{i \neq j}^{N_e} \frac{1}{r_{ij}}
-}
+,}
 \end{equation}
-With:
+with:
 \begin{align*}
-	r_{ij} & = \mid r_{i} - r_{j} \mid 
+	r_{ij} & = \mid r_{i} - r_{j} \mid ;
 \\
-	r_{i \alpha} & = \mid r_{i} - R_{\alpha} \mid 
+	r_{i \alpha} & = \mid r_{i} - R_{\alpha} \mid ;
 \\
-	R_{\alpha \beta} & = \mid R_{\alpha} - R_{\beta} \mid 
+	R_{\alpha \beta} & = \mid R_{\alpha} - R_{\beta} \mid .
 \end{align*}
 
 Although the universality of this equation\footnote{It must be noted that we are neglecting any relativistic effect.}, we know very well that even a simple molecule like $H_2^{+}$ has no analytical solution.
@@ -187,30 +187,30 @@ Rewriting $\hat{H}_{e}$  using atomic units:
 \begin{equation}\label{eq:H_elec}
 	\hat{H}_{e} = 	- \sum_{i}^{N_{e}} \frac{1}{2} \nabla_{i}^2  
 					- \sum_{i}^{N_{e}} \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}}  
-					+ \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}
+					+ \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}.
 \end{equation}
 
 Then equation \eqref{eq:eq_sch} then becomes:
 \begin{equation}
-	\hat{H}_{e} \ket{\Phi_{e}} = \varepsilon_{e} \ket{\Phi_{e}}
+	\hat{H}_{e} \ket{\Phi_{e}} = \varepsilon_{e} \ket{\Phi_{e}},
 \end{equation}
 
-With solution
+with solution
 \begin{equation}
-	\ket{\Phi_{e}} = \ket{\Phi_{e}( \{r_{i}\};\{R_{\alpha}\} )}
+	\ket{\Phi_{e}} = \ket{\Phi_{e}( \{r_{i}\};\{R_{\alpha}\} )}.
 \end{equation}
 
 Where the dependency from the electronic coordinates $\{r_i\}$ is explicit, but the dependency from nuclear coordinates $\{R_{\alpha}\}$ is parametric.
 This implies that also the electronic energy depends parametrically on $\{R_{\alpha}\}$
 
 \begin{equation}
-	\varepsilon_{e} = \varepsilon_{e}(\{R_{\alpha}\})
+	\varepsilon_{e} = \varepsilon_{e}(\{R_{\alpha}\}).
 \end{equation}
 
 To obtain the total energy (with fixed nuclei) we have to add the constant ion-ion Coulomb potential energy
 
 \begin{equation}\label{eq:totEn1}
-	\varepsilon_{tot} = \varepsilon_{e} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}
+	\varepsilon_{tot} = \varepsilon_{e} + \frac{1}{2} \sum_{\alpha \neq \beta}^{N_N} \frac{Z_{\alpha} Z_{\beta} }{R_{\alpha \beta}}.
 \end{equation}
 
 Equation from \eqref{eq:H_elec} to \eqref{eq:totEn1} constitutes the so called \textit{``Electronic Problem"} \cite[p.44]{Attila}.
@@ -219,7 +219,7 @@ Once solved one could then apply the same principle to the nuclear problem.
 Since the electrons moves much faster then the nuclei, it is reasonable to approximate \eqref{eq:theHamiltonian} by replacing electronic coordinates by their average value, averaged over $\Phi_{e}$.
 The nuclear Hamiltonian will be :
 \begin{equation}
-	H_{N} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \varepsilon_{tot}(\{ R_{\alpha}\})
+	H_{N} = - \sum_{\alpha}^{N_{\alpha}} \frac{1}{2M_{\alpha}} \nabla_{\alpha}^2 + \varepsilon_{tot}(\{ R_{\alpha}\}).
 \end{equation}
 
 We can see that $\varepsilon_{tot}(\{ R_{\alpha}\})$ is a potential energy surface for nuclear motion.
@@ -228,13 +228,13 @@ Thus the nuclei in the Born-Oppenheimer approximation move on a potential energy
 
 The nuclear Schr\"odinger equation  
 \begin{equation}
-	\hat{H}_{N} \ket{\Phi_{N}} = \varepsilon \ket{\Phi_{N} }
+	\hat{H}_{N} \ket{\Phi_{N}} = \varepsilon \ket{\Phi_{N} },
 \end{equation}
 
 with solution 
 
 \begin{equation}
-	\ket{\Phi_{N}}=\ket{\Phi_{N}(\{R_{\alpha}\})}
+	\ket{\Phi_{N}}=\ket{\Phi_{N}(\{R_{\alpha}\})},
 \end{equation}
 
 will describe vibration, rotation, and translation of the molecule.
@@ -243,7 +243,7 @@ The complete approximate solution to \eqref{eq:theHamiltonian} will be  \cite[p.
 
 \begin{equation}
 	\ket{ \Phi(\{r_i\};\{R_{\alpha}\}) } 	= \ket{ \Phi_{e}(\{r_i\};\{R_{\alpha}\})} 
-											~ \ket{ \Phi_{N}(\{R_{\alpha}\})}
+											~ \ket{ \Phi_{N}(\{R_{\alpha}\})}.
 \end{equation}
 
 Since this work will mainly focus on the \textit{``electronic problem"}, from now on we will drop the suffix ``$e$" for the Hamiltonian $H_{e}$.
@@ -251,18 +251,18 @@ Since this work will mainly focus on the \textit{``electronic problem"}, from no
 \subsection{The Hartree Product}
 \subsubsection{Spin-Orbit}
 We introduce two single particle spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
-The only conditions we impose is that these two functions are orthonormal and form a complete set of auto-functions for the spin operator $\hat{S}_z$ \footnote{Even if it isn't necessary to specify the eigenvalues of the spin operator (as stated in \cite{Attila}), we prefer to specify them since we'll deal only with fermions. }.
+The only conditions we impose is that these two functions are orthonormal and form a complete set of auto-functions for the spin operator $\hat{S}_z$ \footnote{Even if it isn't necessary to specify the eigenvalues of the spin operator (as stated in \cite{Attila}), we prefer to specify them since we'll deal only with fermions. }:
 
 \begin{align*}
-	\bra{\alpha}\ket{\alpha} & = \bra{\beta}\ket{\beta} = 1 \\
-	\bra{\alpha}\ket{\beta} & = \bra{\beta}\ket{\alpha} = 0 \\
-	\hat{S}_{z} \ket{\alpha} & = + \frac{1}{2} \ket{\alpha} \\
-	\hat{S}_{z} \ket{\beta} & = - \frac{1}{2} \ket{\beta} \\
+	\bra{\alpha}\ket{\alpha} & = \bra{\beta}\ket{\beta} = 1; \\
+	\bra{\alpha}\ket{\beta} & = \bra{\beta}\ket{\alpha} = 0; \\
+	\hat{S}_{z} \ket{\alpha} & = + \frac{1}{2} \ket{\alpha}; \\
+	\hat{S}_{z} \ket{\beta} & = - \frac{1}{2} \ket{\beta}. \\
 \end{align*}
 
-An electron is described by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$.
+An electron is described by three spacial coordinates $\mathbf{r}$ and one spin coordinate $\omega$
 \begin{equation}
-	\mathbf{x} = \{\mathbf{r},\omega\}
+	\mathbf{x} = \{\mathbf{r},\omega\}.
 \end{equation}
 
 We define $\psi_i(\mathbf{r})$ a spacial orbital as a function of the position vector $\mathbf{r}$ describing the spacial distribution of an electron, so that $\mid\psi_i(\mathbf{r})\mid^2 {dr}^3$ is the probability of finding the electron in a small volume ${dr}^3$ centered at position $\mathbf{r}$.
@@ -271,19 +271,19 @@ Given a set of spatial orbitals we will assume them to be orthonormal, thus if t
 
 In general, for the set to be complete, one should consider it as infinite. As one can imagine, in practice, an infinite orbitals' set is not available and we will consider only a finite set composed of $K$ such orbitals. The finite set will only cover a certain region of the complete space, but we will consider the results to be ``exact" within the subspace generated by the finite set of spatial orbitals.
 
-The combination of a spatial orbital and a spin function is called a spin orbital and completely describes the electron. 
+The combination of a spatial orbital and a spin function is called a spin orbital and completely describes the electron
 \begin{equation}
-	\chi_{i}(\mathbf{x}) = \psi_i(\mathbf{r}) \alpha(\omega)
+	\chi_{i}(\mathbf{x}) = \psi_i(\mathbf{r}) \alpha(\omega).
 \end{equation}
 
 
 For a set of K spatial orbital will have a corresponding set of $2K$ spin orbitals, each pair sharing the same spatial orbital but with different spin function:
 
 \begin{equation}
-	\chi_{2i} = \psi_i(\mathbf{r}) \alpha(\omega)
+	\chi_{2i} = \psi_i(\mathbf{r}) \alpha(\omega);
 \end{equation}
 \begin{equation}
-	\chi_{2i-1} = \psi_i(\mathbf{r}) \beta(\omega)
+	\chi_{2i-1} = \psi_i(\mathbf{r}) \beta(\omega).
 \end{equation}
 
 Being the spatial orbital and spin orbitals orthonormal, so are the spin orbitals.
@@ -294,9 +294,9 @@ It is evident that the term $V_{ee}$ in \eqref{eq:H_elec} is the more complicate
 To simplify the system we start by neglecting $V_{ee}$, considering the electrons as non interacting.
 The Hamiltonian \eqref{eq:H_elec} can be rewritten in the following form:
 \begin{align}
-	\hat{H} & = \sum_{i}^{N_{e}} \hat{h}_{i} \label{eq:HartreeHamiltonian} 
+	\hat{H} & = \sum_{i}^{N_{e}} \hat{h}_{i}; \label{eq:HartreeHamiltonian} 
 	\\
-	\hat{h}_{i} & = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}}  \label{eq:singleElHam}
+	\hat{h}_{i} & = \frac{1}{2} \nabla_{i}^2 - \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}}.  \label{eq:singleElHam}
 \end{align}
 
 
@@ -304,20 +304,20 @@ In this form $\hat{H}$ is composed by a sum of $N_e$ independent single electron
 
 Each operator $\hat{h}_i$ will have its spin orbital eigenfunction with eigenvalue given by
 \begin{equation}
-	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \varepsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }
+	\hat{h}_{i} \ket{\chi_{i}(\mathbf{x}_i) } = \varepsilon_{i} \ket{\chi_{i}(\mathbf{x}_i) }.
 \end{equation}
 
 Since \eqref{eq:HartreeHamiltonian} is a sum of independent Hamiltonians his eigenfunctions will be the tensor product of $\hat{h}_i$ eigenfunctions
 \begin{align}\label{eq:HartreeProduct}
 	\ket{\Psi^{HP}(\mathbf{x}_{1},...,\mathbf{x}_{N_e})} = & \ket{\chi_1(\mathbf{x}_{1})} \otimes \cdots  \otimes \ket{\chi_N(\mathbf{x}_{N})} \\
-	:= & \ket{ \chi_{1}(\mathbf{x}_{1}) \cdots \chi_{N}(\mathbf{x}_{N}) }
+	:= & \ket{ \chi_{1}(\mathbf{x}_{1}) \cdots \chi_{N}(\mathbf{x}_{N}) },
 \end{align}
 with eigenvalue
 \begin{equation}
 	\hat{H}\ket{\Psi^{HP}} = E\ket{\Psi^{HP}}
 \end{equation}
 \begin{equation}
-	E = \varepsilon_i + \varepsilon_j + ... + \varepsilon_k
+	E = \varepsilon_i + \varepsilon_j + ... + \varepsilon_k.
 \end{equation}
 
 It must be noted that in equation \eqref{eq:HartreeProduct} there is no correlation between the index of the spin-orbital $\chi_{i}$ to the index of the electron's coordinates $\mathbf{x}_i$. It is absolutely and completely reasonable to have the $j$-th electron in the $i$-th spin-orbital e.g : $\chi_{j}(\mathbf{x}_{i})$.
@@ -326,10 +326,10 @@ One should also consider that the number of spin-orbitals that describes our sys
 
 Equation \eqref{eq:HartreeProduct} is called an \textit{Hartree Product} and has the following straightforward property: 
 \begin{equation}\label{eq:uncorrelated}
-	\mid\Psi^{HP}(\mathbf{x}_1,\cdots,\mathbf{x}_{N_e}) \mid^2 dx_1^3 \cdots dx_{N_e}^3 = \mid\chi_i(\mathbf{x}_1)\mid^2 dx_1^3 \cdots \mid \chi_k(\mathbf{x}_{N_e})\mid^2 dx_{N_e}^2
+	\mid\Psi^{HP}(\mathbf{x}_1,\cdots,\mathbf{x}_{N_e}) \mid^2 dx_1^3 \cdots dx_{N_e}^3 = \mid\chi_i(\mathbf{x}_1)\mid^2 dx_1^3 \cdots \mid \chi_k(\mathbf{x}_{N_e})\mid^2 dx_{N_e}^2,
 \end{equation}
 
-Meaning that the probability of finding simultaneously (with an unique measure) each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (by independent measurements).
+meaning that the probability of finding simultaneously (with an unique measure) each electron in a fixed position (within a small volume) is equal to the uncorrelated probability of finding electron 1 in position $x_1$ times the probability of electron 2 in position $x_2$ and so on (by independent measurements).
 For this reason $\Psi^{HP}$ is called an uncorrelated or electron-independent wave function. 
 Namely, the position of one electron has no effect on the position of the others. 
 
@@ -340,34 +340,34 @@ This is, of course, a strong assumption, but we will see how the Hartree-Fock me
 \subsubsection{Identical Particles and Slater Determinant}
 
 $\Psi^{HP}$ is the simplest representation of a multi-electron state function, but it does not respect the invariance by exchange of identical particles.
-Since elementary particles like electrons are identical or indistinguishable, the probability distribution associated to the state function describing the entire system should remain the same if the coordinates of two or more particles are exchanged.
+Since elementary particles like electrons are identical or indistinguishable, the probability distribution associated to the state function describing the entire system should remain the same if the coordinates of two or more particles are exchanged
 
 \begin{equation}
-	\mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) \mid^2 = \mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) \mid^2
+	\mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) \mid^2 = \mid \Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) \mid^2.
 \end{equation}
 
 This implies one of the following conditions:
 \begin{align}
 	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = 
-		+\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e})\\
+		+\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e});\\
 	\Psi(\mathbf{x}_1,\dots,\mathbf{x}_i,\dots,\mathbf{x}_j,\dots,\mathbf{x}_{N_e}) = 
-		-\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}) 
+		-\Psi(\mathbf{x}_1,\dots,\mathbf{x}_j,\dots,\mathbf{x}_i,\dots,\mathbf{x}_{N_e}).
 \end{align}
 
 Namely that the state function is respectively symmetric or antisymmetric.
 Particles with integer spin, like protons, are called bosons and are always represented by symmetric wave functions.
 Particles with half integer spin, like electrons, are called fermions and are always represented by antisymmetric wave functions.
 
-We can immediately verify that even the simplest Hartree product composed by only two spin orbit does not respect the antisymmetry principle.
+We can immediately verify that even the simplest Hartree product composed by only two spin orbit does not respect the antisymmetry principle
 
 \begin{equation*}
-	\ket{\Psi^{HP}(\mathbf{x}_1,\mathbf{x}_2)} = \ket{\chi_1(\mathbf{x}_1)} \ket{\chi_2(\mathbf{x}_2)} \neq \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)}
+	\ket{\Psi^{HP}(\mathbf{x}_1,\mathbf{x}_2)} = \ket{\chi_1(\mathbf{x}_1)} \ket{\chi_2(\mathbf{x}_2)} \neq \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)}.
 \end{equation*}
 
-The easiest way to make $\Psi^{HP}$ antisymmetric is to introduce what is called an \textit{exchange term}.
+The easiest way to make $\Psi^{HP}$ antisymmetric is to introduce what is called an \textit{exchange term}
 
 \begin{equation}\label{eq:slater2}
-	\ket{\Psi(\mathbf{x}_1,\mathbf{x}_2)} = \frac{1}{\sqrt{2}} (\ket{\chi_1(\mathbf{x}_1)} \ket{ \chi_2(\mathbf{x}_2)} - \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)} )
+	\ket{\Psi(\mathbf{x}_1,\mathbf{x}_2)} = \frac{1}{\sqrt{2}} (\ket{\chi_1(\mathbf{x}_1)} \ket{ \chi_2(\mathbf{x}_2)} - \ket{\chi_1(\mathbf{x}_2)} \ket{\chi_2(\mathbf{x}_1)} ).
 \end{equation}
 
 We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
@@ -376,7 +376,7 @@ We can rewrite \eqref{eq:slater2} as the determinant of the matrix :
 \begin{vmatrix}
 \chi_1(\mathbf{x}_1) & \chi_2(\mathbf{x}_1) \\
 \chi_1(\mathbf{x}_2) & \chi_2(\mathbf{x}_2) 
-\end{vmatrix}
+\end{vmatrix}.
 \end{equation}
 
 The generalization to $N_e$ electrons held to:
@@ -395,7 +395,7 @@ The generalization to $N_e$ electrons held to:
 	\begin{matrix}
 		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
 	\end{matrix}
-   \right|,
+   \right|.
 \end{equation}
 
 Equation \eqref{eq:SlaterDet} is called the \textit{Slater Determinant} and is the simplest asymmetrical representation of a multi-electron state function.
@@ -404,18 +404,18 @@ Using a more formal approach outlined in \cite[p.357-362]{Sakurai} we can expres
 \begin{align} \label{eq:transpositionOp}
 	\begin{split}
 		\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_j(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =   \\ 
-		& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_j(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} 
+		& \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_j(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} ;
 	\end{split}
 \end{align}
 \begin{equation*}
 	\hat{P}_{ij} = \hat{P}_{ji} ~;~
-	\hat{P}_{ij}^2 = \mathbf{1}
+	\hat{P}_{ij}^2 = \mathbf{1}.
 \end{equation*}
 
 Note that in equation \eqref{eq:transpositionOp} we maintained the position of the electron index and switched the spin-orbital index. In this way it is possible to rewrite \eqref{eq:transpositionOp} in a more compact way :
 \begin{equation}
 	\hat{P_{ij}}  \ket{\chi_1  \cdots  \chi_j  \cdots  \chi_i  \cdots   \chi_N} =  
-		 \ket{\chi_1   \cdots  \chi_j  \cdots  \chi_i \cdots  \chi_N} 
+		 \ket{\chi_1   \cdots  \chi_j  \cdots  \chi_i \cdots  \chi_N} .
 \end{equation}
 The sequential position of the spin-orbitals indicates coincides with the index of the electron represented \cite{Sakurai}.
 
@@ -423,7 +423,7 @@ The sequential position of the spin-orbitals indicates coincides with the index 
 For the ket state to be antisymmetric it must be an eigenfunction of $\hat{P}_{ij}$ with eigenvalue $-1$.
 \begin{align*}
 	\hat{P_{ij}} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} =  \\
-	-1 & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} 
+	-1 & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j) \cdots  \chi_N(\mathbf{x}_N)} .
 \end{align*}
 
 It can be shown that an arbitrary permutation of N objects can be written as a product of transpositions and that the number of transposition in this decomposition is of fixed parity. That is, either a permutation is always decomposed in an even number of transpositions (the permutation is called even and has the parity $+1$), or a permutation is always decomposed in an odd number of transpositions and then it is an odd permutation with parity  $ - 1$.
@@ -431,7 +431,7 @@ It can be shown that an arbitrary permutation of N objects can be written as a p
 Denoting the parity of the arbitrary permutation as $\sigma_P$ it follows that antisymmetric function must respect the following condition :
 \begin{align*}
 	\hat{P} & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)} = \\
-	(-1)^{\sigma_P}  & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)}
+	(-1)^{\sigma_P}  & \ket{\chi_1(\mathbf{x}_1)   \cdots  \chi_i(\mathbf{x}_i)  \cdots  \chi_i(\mathbf{x}_j)  \cdots   \chi_N(\mathbf{x}_N)}.
 \end{align*}
 
 If $S_N$ is the group of all possible $N!$ permutations we can define the \textit{antisymmetrizer} operator as :
@@ -445,7 +445,7 @@ We can now re-express the Slater determinant \eqref{eq:SlaterDet} in a more usef
 	\begin{matrix}
 		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
 	\end{matrix} 
-	\right| = \frac{1}{\sqrt{N!}} \sum_{\hat{P} \in S_n} (-1)^{\sigma_P} \hat{P} \ket{\chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N)}
+	\right| = \frac{1}{\sqrt{N!}} \sum_{\hat{P} \in S_n} (-1)^{\sigma_P} \hat{P} \ket{\chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N)}.
 \end{equation}
 Thus:
 \begin{equation}
@@ -453,7 +453,7 @@ Thus:
 	\begin{matrix}
 		   \chi _1 & \chi _2 & \cdots  & \chi _N  \\
 	\end{matrix} 
-	\right| =  (\sqrt{N!}) \mathcal{A} \ket{ \chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N) }
+	\right| =  (\sqrt{N!}) \mathcal{A} \ket{ \chi_1(\mathbf{x}_1) \cdots   \chi_N(\mathbf{x}_N) }.
 \end{equation}
 
 This formalism will be useful when dealing with one-electron and two-electrons operators.
@@ -467,8 +467,8 @@ Another interesting property is that if two different electrons occupy completel
 
 To see the effects of the anti-simmetrisation requirement we now consider a system made of two particles. We pick a starting Hartree product of the types: 
 \begin{align*}
-	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \alpha(\omega_{1})\\
-	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2})
+	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \alpha(\omega_{1});\\
+	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2}).
 \end{align*}
 where the two particles occupies two different orbitals each with different spin.
 
@@ -481,15 +481,15 @@ If we anti-symmetrize the product (using the associated Slater determinant), the
 				+
 			\mid \psi_{1}(\mathbf{r}_2) \mid ^2    
 			\mid \psi_{2}(\mathbf{r}_1) \mid ^2   
-			)
+			).
 \end{equation*}
 In this case the probability is the average of the two possible configuration: electron 1 in $\psi_1$ and electron 2 in $\psi_2$; electron 1 in $\psi_2$ and electron 2 in $\psi_1$.
 In this case the probabilities are said to be \textit{uncorrelated}.
 
 But what happens if we try to exchange two particles with the same spin but different orbitals?
 \begin{align*}
-	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \beta(\omega_{1})\\
-	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2})
+	\chi_{1}(\mathbf{x}_{1}) = \psi_{1}(\mathbf{r}_{1}) \beta(\omega_{1});\\
+	\chi_{2}(\mathbf{x}_{2}) = \psi_{2}(\mathbf{r}_{1}) \beta(\omega_{2}).
 \end{align*}
 
 What we obtain is \cite[p.53]{Attila}:
@@ -503,7 +503,7 @@ What we obtain is \cite[p.53]{Attila}:
 			\mid \psi_{2}(\mathbf{r}_1) \mid ^2   
 \\
 			& - ( \psi_{1}^*(\mathbf{r}_1) \psi_{2}(\mathbf{r}_1) \psi_{2}^*(\mathbf{r}_2) \psi_{1}(\mathbf{r}_2)
-			 + \psi_{1}(\mathbf{r}_1) \psi_{2}^*(\mathbf{r}_1) \psi_{2}(\mathbf{r}_2) \psi_{1}^*(\mathbf{r}_2))]
+			 + \psi_{1}(\mathbf{r}_1) \psi_{2}^*(\mathbf{r}_1) \psi_{2}(\mathbf{r}_2) \psi_{1}^*(\mathbf{r}_2))],
 \end{align*}
 where we obtained an extra cross term that makes the probabilities \textit{correlated}. Note that thanks to the extra term we have that $P(\mathbf{r}_{1},\mathbf{r}_{1}) = 0$, respecting the Pauli principle.
 
@@ -519,19 +519,19 @@ What the Hartree-Fock method aims to do is to take under consideration the inter
 
 Using  equation \eqref{eq:singleElHam} we rewrite equation \eqref{eq:H_elec} in his complete form \footnote{Where we have dropped the \textit{e} index}
 \begin{equation}
-	\hat{H} = \sum_{i}^{N} \hat{h}_{i} + \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
+	\hat{H} = \sum_{i}^{N} \hat{h}_{i} + \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}.
 \end{equation}
 
 The operator $\sum_{i}^{N} \hat{h}_{i}$ is called a \textit{one-electron operator} with the following formal definition:
 
 \begin{equation}\label{eq:singleEl}
-	\mathcal{O}_{1} := \sum_{i}^{N} \hat{h}_{i}
+	\mathcal{O}_{1} := \sum_{i}^{N} \hat{h}_{i}.
 \end{equation}
 
 Similarly, operator $\frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}$ is called a \textit{two-electron operator}:
 
 \begin{equation}
-	\mathcal{O}_{2} := \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}
+	\mathcal{O}_{2} := \frac{1}{2} \sum_{i \neq j}^{N} \frac{1}{r_{ij}}.
 \end{equation}
 
 We are interested in the effect these two operators have when applied on a single Slater determinant.
@@ -539,20 +539,20 @@ We are interested in the effect these two operators have when applied on a singl
 Using \eqref{eq:SlaterLeibniz}, the orthonormality of the spin-orbitals composing the Slater determinant \eqref{eq:SlaterDet} and the fact that $r_{ij} = r_{ji}$ one can show that \cite[p.74-81]{Attila}:
 
 \begin{align}
-	& \bra{\Psi} \mathcal{O}_{1} \ket{\Psi} = \sum_{i}^{N} \bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} \\
-	& \bra{\Psi} \mathcal{O}_{2} \ket{\Psi} = \frac{1}{2} \sum_{i \neq j}^{N} \bra{\chi_i \chi_i} \frac{1}{r_{ij}} \ket{ \chi_{i} \chi_{i}} - \bra{\chi_i \chi_j} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}}
+	& \bra{\Psi} \mathcal{O}_{1} \ket{\Psi} = \sum_{i}^{N} \bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} ;\\
+	& \bra{\Psi} \mathcal{O}_{2} \ket{\Psi} = \frac{1}{2} \sum_{i \neq j}^{N} \bra{\chi_i \chi_i} \frac{1}{r_{ij}} \ket{ \chi_{i} \chi_{i}} - \bra{\chi_i \chi_j} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}}.
 \end{align}
 
 Introducing the following notation:
 \begin{align}
 	\bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} = \bra{i} \hat{h} \ket{i}
 	\\
-	\bra{\chi_{i} \chi_{j}} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}} = \jsqrt{i}{j} \label{eq:squareNotation}
+	\bra{\chi_{i} \chi_{j}} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}} = \jsqrt{i}{j}, \label{eq:squareNotation}
 \end{align}
 
 we can express expectation energy for a single Slater determinant as :
 \begin{equation}
-	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{i} - \ksqrt{i}{j}
+	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{i} - \ksqrt{i}{j}.
 \end{equation}
 
 Still the equation is not separable and far from being reduced to an eigenvalue problem, but we have an handy expression for the expectation energy of the state of the system
@@ -564,7 +564,7 @@ But what if we want to pick the $\{ \chi_{i} \}$ that correspond to the ground s
 
 The variational principle comes in help stating that the exact ground state solution to the Schr\"odinger equation $\hat{H} \ket{\Psi} = E \ket{\Psi}$ is the one that minimizes the functional 
 \begin{equation} \label{eq:hamFunctional}
-	E_{0}[\{\chi_{i}\}] = \bra{\chi_1 \cdots \chi_N} \hat{H} \ket{\chi_1 \cdots \chi_N} = \bra{\Psi} \hat{H} \ket{\Psi}
+	E_{0}[\{\chi_{i}\}] = \bra{\chi_1 \cdots \chi_N} \hat{H} \ket{\chi_1 \cdots \chi_N} = \bra{\Psi} \hat{H} \ket{\Psi}.
 \end{equation}
 
 To find the minimum of the functional\eqref{eq:hamFunctional} we must consider his differential for a small variation $\var{\Psi}$ of the test solution $\Psi$  \cite[p.165]{Carati}.  
@@ -578,12 +578,12 @@ To find the minimum of the functional\eqref{eq:hamFunctional} we must consider h
 		+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
 		+ \cdots
 \\
-		 & = E_{0}[\{\chi_{i}\}] + \var{E} + \cdots
+		 & = E_{0}[\{\chi_{i}\}] + \var{E} + \cdots,
 \end{align}
-Where
+where
 \begin{align}
 	E_{0}[\{\chi_{i}\}] & = 	\bra{\Psi} \hat{H} \ket{\Psi}  \\
-	\var{E} & = \bra{\var{\Psi}} \hat{H} \ket{\Psi} 	+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} 
+	\var{E} & = \bra{\var{\Psi}} \hat{H} \ket{\Psi} 	+ \bra{\Psi} \hat{H} \ket{\var{\Psi}} .
 \end{align}
 $\var{E}$ is the first order differential of the functional \eqref{eq:hamFunctional} \footnote{$\var{E}$ is not a real function differential, but a functional differential. Namely the part of the increment linear in $\var{\Psi}$.}.
 
@@ -593,7 +593,7 @@ To satisfy both requirements we minimize the following functional \footnote{$\de
 \begin{align}
 	\mathcal{L}[\{\chi_{i}\}] & = E[\{\chi_i\}] - \sum_{ij}^{N} \varepsilon_{ij} (\bra{\chi_{i}}\ket{\chi_{j}} - \delta_{ij})
 \\
-	\var{\mathcal{L}} & = \var{E} - \sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{\chi_{i}}\ket{\chi_{j}})}	
+	\var{\mathcal{L}} & = \var{E} - \sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{\chi_{i}}\ket{\chi_{j}})}.
 \end{align}
 
 If $\{\chi_i\}$ are orthonormal $\mathcal{L}[\{\chi_{i}\}]$ and $E[\{\chi_i\}]$ will have the minimum in the same \textit{``point"}. The elements $\varepsilon_{ij}$ are called the \textit{Lagrange multipliers}, and they form an Hermitian matrix $\{ \varepsilon \}_{ij}$.
@@ -603,14 +603,14 @@ Using the notation introduced in \eqref{eq:squareNotation}:
 \begin{align}
 	\var{E} 	& = \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \bra{i} \hat{h}  \ket{\var{i}} \\
 			& + \frac{1}{2} \sum_{ij}^{N} [ (\var{i})i \mid j j ] + [ i(\var{i}) \mid j j ] + [ i i \mid (\var{j}) j ] + [ i i \mid j (\var{j}) ]\\
-			& - \frac{1}{2} \sum_{ij}^{N} [ (\var{i})j \mid j i ] + [ i(\var{j}) \mid j i ] + [ i j \mid (\var{i}) j ] + [ i j \mid j (\var{i}) ]
+			& - \frac{1}{2} \sum_{ij}^{N} [ (\var{i})j \mid j i ] + [ i(\var{j}) \mid j i ] + [ i j \mid (\var{i}) j ] + [ i j \mid j (\var{i}) ],
 \end{align}
 
 by splitting the sum and inverting the indexes we have \cite[p.117-119]{Attila}:
 \begin{align}
 	\begin{split}
 	\var{E} = &  \sum_{i}^{N} \bra{\var{i}} \hat{h}  \ket{i} + \sum_{ij}^{N}  [ (\var{i})i \mid j j ] - [ (\var{i}) j \mid j i ]  \label{eq:trick} \\
-	& +  cc
+	& +  cc,
 	\end{split}
 \end{align}
 where $cc$ is the complex conjugate of \eqref{eq:trick}.
@@ -619,7 +619,7 @@ Also
 \begin{align}
 \begin{split}
 	\sum_{ij}^{N} \varepsilon_{ij} \var{(\bra{i}\ket{j})}  = & \sum_{ij}^{N} \varepsilon_{ij} \bra{\var{i}}\ket{j}  \label{eq:trick2}
-	\\ & + cc
+	\\ & + cc.
 \end{split}
 \end{align}
 
@@ -630,19 +630,19 @@ Putting together \eqref{eq:trick} and \eqref{eq:trick2} \footnote{ we are consid
 		 \hat{h}  \ket{i} + \sum_{j}^{N}  [ i \mid j j ] - [  j \mid j i ] + \sum_{j}^{N} \varepsilon_{ij} \ket{j}
 	\right) \label{eq:toNull}
 	\\
-	& = 0
+	& = 0.
 \end{align}
 
-since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero
+Since \eqref{eq:toNull} must be zero for every $i$ and for every possible variation $\var{i}$, the value between braces must  always be zero:
 
 \begin{equation}
-	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0
+	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0.
 \end{equation}
 
 We define respectively the \textit{Coulomb operator} and the \textit{Exchanges operator} by:
 \begin{align}
-	J_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{j}(2) \right] \chi_i(1) \label{eq:coulombOperator} \\
-	K_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{i}(2) \right] \chi_j(1)	
+	J_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{j}(2) \right] \chi_i(1); \label{eq:coulombOperator} \\
+	K_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{i}(2) \right] \chi_j(1);
 \label{eq:exchangeOperator}
 \end{align}
 
@@ -650,16 +650,16 @@ where ``$(1)$" is the index of the integration variable of the function.
 
 For every $i$, we finally have that :
 \begin{align}
-	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} \label{eq:HartreeNonCan}
+	\left[ \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1) \right] \ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)}. \label{eq:HartreeNonCan}
 \end{align}
 
 We define the \textit{Fock operator}\footnote{note that for $i=j$ the term is null}
 \begin{equation}\label{eq:FockOperator}
-	\hat{f}(1) = \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1)
+	\hat{f}(1) = \hat{h}(1) + \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1),
 \end{equation}
 then :
 \begin{align}
-	\hat{f}(1)\ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} 
+	\hat{f}(1)\ket{\chi_i(1)} = \sum_{j}^{N} \varepsilon_{ij} \ket{\chi_{j}(1)} .
 \end{align}
 
 
@@ -667,15 +667,15 @@ Because under unitary transformations two Slater determinant can differ only by 
 
 Since :
 \begin{equation}
-	\bra{\chi_k}\hat{f}\ket{\chi_i} = \varepsilon_{ki}
+	\bra{\chi_k}\hat{f}\ket{\chi_i} = \varepsilon_{ki},
 \end{equation}
 
-The matrix of Lagrange multipliers is the matrix representation of the Fock operator.
+the matrix of Lagrange multipliers is the matrix representation of the Fock operator.
 Because it is hermitian, it exists a set of orthonormal $\{\chi'_j\}$ that diagonalizes it.
 By picking this set $\{\chi'_j\}$ as our base\footnote{We just need to know that they exists because their nature will be exposed by solving \eqref{eq:HartreeFockEquation}} we can rewrite equation \eqref{eq:HartreeNonCan} into:
 
 \begin{align}
-	\hat{f} \ket{\chi_i} = \varepsilon_{i} \ket{\chi_{i}} \label{eq:HartreeFockEquation}
+	\hat{f} \ket{\chi_i} = \varepsilon_{i} \ket{\chi_{i}}. \label{eq:HartreeFockEquation}
 \end{align}
 
 Equation \eqref{eq:HartreeFockEquation} is called the \textit{Hartree-Fock canonical equation} and reduces our problem of finding the ground state of a given quantum system to a set of $K$ eigenvalue equations, with $K$ being the number of spin-orbitals selected to describe the system. 
@@ -700,11 +700,11 @@ And the closed shell restricted ground state is :
 	\ket{\Psi_{0}} & = \ket{ \psi_{1} \overline{\psi}_{1} \cdots  
 	\psi_{j} \overline{\psi}_{j}
 	\cdots	
-	\psi_{\frac{N}{2}} \overline{\psi}_{\frac{N}{2}}}
+	\psi_{\frac{N}{2}} \overline{\psi}_{\frac{N}{2}}};
 	\\
-	\psi_{j} & = \psi_{j} \alpha
+	\psi_{j} & = \psi_{j} \alpha;
 	\\
-	\overline{\psi}_{j} & = \psi_{j} \beta
+	\overline{\psi}_{j} & = \psi_{j} \beta .
 \end{align}
 
 We can say that every spatial orbital $\psi(\mathbf{r})$ is occupied by both spin-up and spin-down electrons (there is no ``odd" electron alone in a spatial orbital).
@@ -712,55 +712,55 @@ We can say that every spatial orbital $\psi(\mathbf{r})$ is occupied by both spi
 Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator becomes :
 
 \begin{equation}
-\hat{f}(1) = \hat{h}(1) +\sum_{j=1}^{N/2}[2\hat J_j(1)-\hat K_j(1)]
+\hat{f}(1) = \hat{h}(1) +\sum_{j=1}^{N/2}[2\hat J_j(1)-\hat K_j(1)],
 \end{equation}
 
-Where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi_i\}$.
+where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi_i\}$.
 
 Thus the Hartree-Fock equation becomes:
 \begin{equation}\label{eq:hfSpatial}
-	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \varepsilon_i \ket{\psi(\mathbf{r_1})}
+	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \varepsilon_i \ket{\psi(\mathbf{r_1})}.
 \end{equation}
 
 Instead of using a numerical approach to solve the integro-differential equation \eqref{eq:hfSpatial}, Roothaan showed how to convert the problem to a set of algebraic equations, solvable using matrix techniques.
 
-We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{Not orthogonal basis set are common. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$.
+We therefore introduce a set of K functions $\{ \phi_{\mu}(\mathbf{r}) \mid \mu = 0,\cdots,K\}$ (in general not orthogonal \footnote{Not orthogonal basis set are common. For example in a simple molecule one can take all the idrogenoid orbitals centered in each atom, then some overlap in the distance between adjacent nuclei is likely to occur.}) called a \textit{Basis set} \footnote{ The choice of the correct basis set has great impact on the solution of the electronic problem. A discussion on the nature and the \textit{art} of basis set selection is far from the goals of this work.} , that can be used to express our spin-orbitals $\{\psi_j\}$
 
 \begin{equation}\label{eq:coeffMatrix}
-	\ket{\psi_i} = \sum_{\mu}^{K} C_{\mu i} \ket{\phi_{\mu}}
+	\ket{\psi_i} = \sum_{\mu}^{K} C_{\mu i} \ket{\phi_{\mu}}.
 \end{equation}
 
 Substituting inside \eqref{eq:hfSpatial} :
 \begin{equation}
-	\hat{f}(1) \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}  = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}
+	\hat{f}(1) \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)}  = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \ket{\phi_{\nu}(1)},
 \end{equation}
 
 multiplying by $\bra{\phi_{\mu}}$ we get :
 
 \begin{equation}
 	 \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\hat{f}(1)\ket{\phi_{\nu}(1)}  
-	 = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\ket{\phi_{\nu}(1)}
+	 = \varepsilon_i \sum_{\nu}^{K} C_{\nu i} \bra{\phi_{\mu}(1)}\ket{\phi_{\nu}(1)}.
 \end{equation}
 
 Taking under consideration every $\psi_i$ we can write the equation in matrix form:
 \begin{equation}\label{eq:RoothaanEquation}
 \boxed{
 \mathbf{FC} = \mathbf{SC\varepsilon}
-}
+}.
 \end{equation}
 
 Being :
 \begin{itemize}
-	\item $\mathbf{F}$ the Fock matrix expressed using our basis set
-	\item $\mathbf{C}$ the matrix of the expansion coefficients
-	\item $\mathbf{S}$ the overlap matrix between the orbitals of the basis set
-	\item $\mathbf{\varepsilon}$ is the diagonal matrix of the orbitals energies	
+	\item $\mathbf{F}$ the Fock matrix expressed using our basis set;
+	\item $\mathbf{C}$ the matrix of the expansion coefficients;
+	\item $\mathbf{S}$ the overlap matrix between the orbitals of the basis set;
+	\item $\mathbf{\varepsilon}$ is the diagonal matrix of the orbitals energies.
 \end{itemize}
 All these matrices have dimension $K\times K$.
 
 Equation \eqref{eq:RoothaanEquation} is called the \textit{Roothaan equation} and has a non-trivial solution only if the following  equation is satisfied \cite[p.309]{Atkins}:
 \begin{equation}\label{eq:secular}
-	\det \mid \mathbf{F - \varepsilon S} \mid =0
+	\det \mid \mathbf{F - \varepsilon S} \mid =0.
 \end{equation}
 
 
@@ -772,13 +772,13 @@ We have finally obtained an expression of $\hat{V}_{ee}$ that keeps the electron
 
 Each electron on the $i$-th spin-orbital is subject to the following external potential:
 \begin{align}
-	\hat{v}^{HF}(1) = \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1)
+	\hat{v}^{HF}(1) = \sum_{j}^{N} \hat{J}_{j}(1) - \hat{K}_{j}(1).
 \end{align}
 
 Rewriting the Hartree-Fock equation for the $i$-th electron we have:
 \begin{align}
-	\left[- \frac{\nabla_{i}^{2}}{2} + \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}} + \sum_{j}^{N} \hat{J}_{j} - \hat{K}_{j}  \right] \ket{\chi_i}  & = \varepsilon_i \ket{\chi_i} \\
-	\left[\hat{h} + \hat{v}^{HF}\right] \ket{\chi_i} & = \varepsilon_i \ket{\chi_i}
+	\left[- \frac{\nabla_{i}^{2}}{2} + \sum_{\alpha}^{N_{N}} \frac{Z_{\alpha}}{r_{i\alpha}} + \sum_{j}^{N} \hat{J}_{j} - \hat{K}_{j}  \right] \ket{\chi_i}  & = \varepsilon_i \ket{\chi_i}; \\
+	\left[\hat{h} + \hat{v}^{HF}\right] \ket{\chi_i} & = \varepsilon_i \ket{\chi_i}.
 \end{align}
 
 $\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
@@ -790,16 +790,16 @@ In the case of closed-shell Hartree-Fock we have restricted our problem only to 
 We still need to consider a very important property of the Fock operator.
 
 As shown in equations \eqref{eq:coulombOperator} and \eqref{eq:exchangeOperator},
-the Fock operator appears to be an implicit operator because it depends on the basis set we pick for the Slater determinant.
+the Fock operator appears to be an implicit operator because it depends on the basis set we pick for the Slater determinant
 \begin{equation}
-\hat{f} = \hat{f}[\{\psi_{j}\}]
+\hat{f} = \hat{f}[\{\psi_{j}\}].
 \end{equation}
 
 This is also true for the Fock matrix.
 
 Because the spin-orbitals $\{\psi_{j}\}$ are expressed in terms of expansion coefficients, the Roothaan equation \eqref{eq:RoothaanEquation} can be rewritten as :
 \begin{equation}
-	\mathbf{F(C)~C} = \mathbf{SC\varepsilon}
+	\mathbf{F(C)~C} = \mathbf{SC\varepsilon}.
 \end{equation}
 
 
@@ -832,39 +832,39 @@ Each Fock matrix element is calculated as :
 	F_{\mu \nu} & = \bra{\phi_{\mu}(1)}\hat{f}(1)\ket{\phi_{\nu}(1)}  \\
 	& = \int \phi_{\mu}^*(\mathbf{r}_1) h(1) \phi_{\nu}(\mathbf{r}_1) \dd\mathbf{r}_1 + \\
 	&  + 2 \sum_{j} \int \phi_{\mu}^*(1) \psi_{j}^*(2) \frac{1}{r_{12}} \psi_{j}(2) \phi_{\nu}(1) \dd\mathbf{r}_1  \dd\mathbf{r}_2  + \\
-	&  - ~~ \sum_{j} \int \phi_{\mu}^*(1) \psi_{j}^*(2) \frac{1}{r_{12}} \phi_{\nu}(2) \psi_{j}(1)  \dd\mathbf{r}_1 \dd\mathbf{r}_2
+	&  - ~~ \sum_{j} \int \phi_{\mu}^*(1) \psi_{j}^*(2) \frac{1}{r_{12}} \phi_{\nu}(2) \psi_{j}(1)  \dd\mathbf{r}_1 \dd\mathbf{r}_2.
 \end{align}
 
-by expanding $\psi_j$ and using the following definition \cite[p.295,296]{Atkins} \cite[p.141	]{Attila}
+By expanding $\psi_j$ and using the following definition \cite[p.295,296]{Atkins} \cite[p.141	]{Attila}
 \begin{equation}
-	(ab|cd) = \int \phi_a(1) \phi_b(1) \frac{1}{r_{12}}  \phi_c(2) \phi_d(2) \dd\mathbf{r}_1 \dd\mathbf{r}_2
+	(ab|cd) = \int \phi_a(1) \phi_b(1) \frac{1}{r_{12}}  \phi_c(2) \phi_d(2) \dd\mathbf{r}_1 \dd\mathbf{r}_2,
 \end{equation}
 
-We obtain 
+we obtain 
 
 \begin{equation}\label{eq:FockElement}
 	F_{\mu \nu} = H_{\mu \nu}^{core} +
-		\sum_{j} \sum_{\lambda \sigma} C_{\lambda j} C_{\sigma j}^* \left[ 2(\mu \nu | \sigma \lambda) - (\mu \lambda | \sigma \nu)   \right]
+		\sum_{j} \sum_{\lambda \sigma} C_{\lambda j} C_{\sigma j}^* \left[ 2(\mu \nu | \sigma \lambda) - (\mu \lambda | \sigma \nu)   \right].
 \end{equation}
 
 If we define \cite[p.139]{Attila}
 \begin{equation}
-	P_{\mu \nu} = 2 \sum_{j} C_{\lambda j} C_{\sigma j}^* 
+	P_{\mu \nu} = 2 \sum_{j} C_{\lambda j} C_{\sigma j}^* ,
 \end{equation}
 
-The final form of the Fock matrix element is :
+the final form of the Fock matrix element is :
 
 \begin{equation} \label{eq:fockElement}
 F_{\mu \nu} = H_{\mu \nu}^{core} +
-		\sum_{j} \sum_{\lambda \sigma} P_{\mu \nu} \left[ (\mu \nu | \sigma \lambda) - \frac{1}{2} (\mu \lambda | \sigma \nu)   \right]
+		\sum_{j} \sum_{\lambda \sigma} P_{\mu \nu} \left[ (\mu \nu | \sigma \lambda) - \frac{1}{2} (\mu \lambda | \sigma \nu)   \right].
 \end{equation}
 
 The matrix $\mathbf{P}$ is called the \textit{density matrix}, because the total electronic density as a function of the position $\mathbf{r}$ can be expressed as follows:
 \begin{equation}\label{eq:densityDef}
-\rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi_{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r})
+\rho (\mathbf{r}) = 2 \sum_{j}^{N/2} \psi_{j}^*(\mathbf{r}) \psi_{j}(\mathbf{r}) = \sum_{\mu \nu} P_{\mu \nu} \phi_{\mu}(\mathbf{r}) \phi_{\nu}(\mathbf{r}).
 \end{equation}
 
-the element $P_{\mu \nu}$ are referred to as density matrix elements, and are interpreted as the total electron density in the overlap region of $\phi_{\mu}$ and $\phi_{\nu}$.
+The elements $P_{\mu \nu}$ are referred to as density matrix elements, and are interpreted as the total electron density in the overlap region of $\phi_{\mu}$ and $\phi_{\nu}$.
 Because the number of integrals in \eqref{eq:fockElement} that has to be evaluated is of the order of $K^4$, where K is the size of our basis set $\{\phi_{\mu}\}$, even small basis sets for moderately-sized molecules can rapidly approach millions of two-electron integrals. 
 Even tough some of of them would result null because of their mutual distance, or the calculation isn't needed because of molecular symmetries, their efficient calculation poses the greatest challenge in HF-SCF.
 
@@ -905,14 +905,14 @@ Since the electrons, and the boxes, are completely independent, we can model eac
 We know that each energy levels in the well is expressed as \cite[p.74]{Basdevant}:
 
 \begin{equation}\label{eq:squareWellLevels}
-	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h^2}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2)
+	\varepsilon(n_{x},n_{y},n_{z}) = \frac{h^2}{8ml^{2}} (n_{x}^2+n_{y}^2+n_{z}^2),
 \end{equation}
 where $n_{x},n_{y},n_{z}$ are the quantum numbers associated with each level.
 \footnote{Although their suffix one should not think of them as a ``real" spacial representation. What we are about to do is to model the space of possible energies as a vector space. This will bring many simplifications.}
 
 By defining 
 \begin{equation}
-	R^2 = n_{x}^2+n_{y}^2+n_{z}^2
+	R^2 = n_{x}^2+n_{y}^2+n_{z}^2,
 \end{equation}
 
 we rewrite equations \eqref{eq:squareWellLevels} as:
@@ -923,31 +923,31 @@ we rewrite equations \eqref{eq:squareWellLevels} as:
 We want to have an estimate of the total number of energy levels below a certain threshold. 
 If R is large enough we can approximate this number with the volume contained in an octet of a sphere:
 \begin{equation}
-	\Phi(R) = \frac{1}{8} \left( \frac{4}{3} \pi R^{3} \right)
+	\Phi(R) = \frac{1}{8} \left( \frac{4}{3} \pi R^{3} \right).
 \end{equation}
 
 Using equation \eqref{eq:epsilon_R} we can express $\Phi$ as $\Phi(\varepsilon)$ 
 \begin{equation}\label{eq:phi_varepsilon}
-	\Phi(\varepsilon) = \frac{\pi}{6} \left( \frac{8 m l^2 \varepsilon}{h^2} \right)^{\frac{3}{2	}}
+	\Phi(\varepsilon) = \frac{\pi}{6} \left( \frac{8 m l^2 \varepsilon}{h^2} \right)^{\frac{3}{2	}}.
 \end{equation}
 
 We are interested in the variation of $\Phi(\varepsilon)$ around a fixed $\varepsilon$, this will give us the finest expression of the \textit{energy density} around $\varepsilon$. 
 We expand \eqref{eq:phi_varepsilon} in series:
 
 \begin{equation}
-	\Phi(\varepsilon + \var{\varepsilon}) - \Phi(\varepsilon) = \left[ \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}  \right] ~ \var{\varepsilon} + \mathcal{O}((\var{\varepsilon})^2)
+	\Phi(\varepsilon + \var{\varepsilon}) - \Phi(\varepsilon) = \left[ \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}  \right] ~ \var{\varepsilon} + \mathcal{O}((\var{\varepsilon})^2).
 \end{equation}
 
 The quantity between square braces represents the density of energy states around $\varepsilon$. 
 It gives us an estimate of how many energy levels can be occupied by an electron at a certain energy.
 \begin{equation}\label{eq:energyDensity}
-	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}
+	g(\varepsilon) =  \frac{\pi}{4} \left( \frac{8 m l^2}{h^2} \right)^{\frac{3}{2}} \varepsilon^{\frac{1}{2}}.
 \end{equation}
 
 To obtain the number of energy levels contained in an energy interval, we integrate \eqref{eq:energyDensity}:
 
 \begin{equation}
-	\Delta \xi_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}
+	\Delta \xi_{\varepsilon_1 \varepsilon_2} = \int_{\varepsilon_1}^{\varepsilon_2} g(\varepsilon) \dd{\varepsilon}.
 \end{equation}
 
 To calculate to total energy of the box, we need to know how many levels are occupied by electrons. 
@@ -956,20 +956,20 @@ More precisely, we need the probability that a given energy level is occupied by
 Since we are dealing with fermions, the Fermi-Dirac statistic must be used:
 
 \begin{equation} \label{eq:fermiDiracPartitionFunction}
-	f(\varepsilon) = \frac{1}{1 - e^{\beta (\varepsilon - \varepsilon_{f})}}
+	f(\varepsilon) = \frac{1}{1 - e^{\beta (\varepsilon - \varepsilon_{f})}},
 \end{equation}
 
-Where $\varepsilon_f$ is the Fermi energy\footnote{ The fermi energy is the energy difference between the highest and lowest occupied single-particle states in a quantum system of non-interacting fermions at absolute zero temperature}. 
+where $\varepsilon_f$ is the Fermi energy\footnote{ The fermi energy is the energy difference between the highest and lowest occupied single-particle states in a quantum system of non-interacting fermions at absolute zero temperature}. 
 
 If the system is in its ground state we have that the number of occupied energy level around $\varepsilon$ is :
 \begin{equation}
-	2 f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
+	2 f(\varepsilon) g(\varepsilon) \dd{\varepsilon}.
 \end{equation}
 Because the electrons are non-interacting, every energy level can be occupied by two electrons with opposite spin, hence the factor $2$.
 
 Finally to obtain the total energy of the box we multiply by $\varepsilon$ and integrate:
 \begin{equation}\label{eq:deltaE}
-	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
+	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}.
 \end{equation}
 
 The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (k_B T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} becomes:
@@ -979,23 +979,23 @@ The calculation is greatly simplified if we consider the system to be at 0K. In 
 		1 & \mbox{if $\varepsilon < \varepsilon_{f} $}  \\
 		0 & \mbox{if $\varepsilon > \varepsilon_{f} $}
 	\end{array}
-	\right.
+	\right. .
 \end{equation}
 
 
 Thus \eqref{eq:deltaE} becomes :
 \begin{equation}
-	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon}
+	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon}.
 \end{equation}
 
-Substituting \eqref{eq:energyDensity} in \eqref{eq:deltaE} and performing the integration we obtain the total energy of the box at 0K.
+Substituting \eqref{eq:energyDensity} in \eqref{eq:deltaE} and performing the integration we obtain the total energy of the box at 0K
 \begin{equation}
-	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{5} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} l^3 \varepsilon_{f}^{\frac{5}{2}}
+	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{5} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} l^3 \varepsilon_{f}^{\frac{5}{2}}.
 \end{equation}
 
 We can express $\varepsilon_f$ as a function of the number of electrons in the cell :
 \begin{equation}
-	\Delta N = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}
+	\Delta N = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon} = \frac{8\pi}{3} \left( \frac{2 m}{h^2} \right)^{\frac{3}{2}} \varepsilon_{f}^{\frac{3}{2}}.
 \end{equation}
 
 Then \cite{Parr}:
@@ -1003,7 +1003,7 @@ Then \cite{Parr}:
 	\Delta E  = \frac{3}{5} \Delta N \varepsilon_{f}
 \end{equation}
 \begin{equation}
-			  \Delta E = \frac{3}{10} \frac{h^2}{m} \left( \frac{3}{8\pi} \right)^{\frac{2}{3}} l^{3} \left( \frac{\Delta N}{l^{3}} \right)^{\frac{5}{3}}
+			  \Delta E = \frac{3}{10} \frac{h^2}{m} \left( \frac{3}{8\pi} \right)^{\frac{2}{3}} l^{3} \left( \frac{\Delta N}{l^{3}} \right)^{\frac{5}{3}}.
 \end{equation}
 
 Since we neglected any possible interaction between electrons, the quantity $\Delta E$ represents the kinetic energy of the electrons inside each box.
@@ -1014,7 +1014,7 @@ If we lower the dimensions of each box and sum the contributes for all the boxes
 \end{equation}
 \begin{align}
 	& T[\rho] = C_{F} \int \rho(\mathbf{r})^{\frac{5}{3}} \dd{\mathbf{r}}
-	& C_{F} = \frac{3}{10}(3 \pi^{2})^{\frac{2}{3}} \label{eq:TFKinetic}
+	& C_{F} = \frac{3}{10}(3 \pi^{2})^{\frac{2}{3}}, \label{eq:TFKinetic}
 \end{align}
 
 $\rho(\mathbf{r})$ is the spatial dependent electron density. $T[\rho]$ is the total kinetic energy of the system and it's a functional of the electron density $\rho(\mathbf{r})$.
@@ -1036,22 +1036,22 @@ Our unique constraint is that the integral of the electronic density must be equ
 \end{equation}
 Then the equation for Lagrange multipliers takes the form:
 \begin{equation}
-	\var{} \lbrace  E_{tf}[\rho] - \mu_{tf} \left( \int \rho(\mathbf{r}) \dd{\mathbf{r}} - N \right) \rbrace
+	\var{} \lbrace  E_{tf}[\rho] - \mu_{tf} \left( \int \rho(\mathbf{r}) \dd{\mathbf{r}} - N \right) \rbrace.
 \end{equation}
 
 By differentiating we have \cite[246-254]{Parr}
 \begin{align}
 	\mu_{tf} & = \frac{\var{E_{tf}}}{\var{\rho}}  \\
-	\mu_{tf} & = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}} \label{eq:TFEq}
+	\mu_{tf} & = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}}. \label{eq:TFEq}
 \end{align}
 
 We can define the \textit{electrostatic potential} due to the nucleus and the entire electron distribution as :
 \begin{equation}
-	\phi(\mathbf{r}) = \frac{Z}{r} - \int \frac{\rho(\mathbf{r_2})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}}
+	\phi(\mathbf{r}) = \frac{Z}{r} - \int \frac{\rho(\mathbf{r_2})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}},
 \end{equation}
 and write :
 \begin{equation}
-\mu_{tf} = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \phi(\mathbf{r})
+\mu_{tf} = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \phi(\mathbf{r}).
 \end{equation}
 
 
@@ -1106,14 +1106,14 @@ and introducing the following periodic boundaries conditions:
 	\right.
 \end{equation}
 \begin{equation}
-	\psi(x+l) = \psi(x)
+	\psi(x+l) = \psi(x).
 \end{equation}
 
 
 We can re-express \eqref{eq:diracExc} as \cite[p.105-109]{Parr} :
 
 \begin{align}
-	& K[\rho] = C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}} & C_{X} = \frac{3}{4} \left(\frac{3}{\pi} \right)^{\frac{1}{3}} \label{eq:DiracK}
+	& K[\rho] = C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}} & C_{X} = \frac{3}{4} \left(\frac{3}{\pi} \right)^{\frac{1}{3}}. \label{eq:DiracK}
 \end{align}
 
 
@@ -1125,7 +1125,7 @@ We can write the energy functional as :
 	E_{tfd}[\rho] = C_{F} \int \rho(\mathbf{r})^{\frac{5}{3}} \dd{\mathbf{r}} 
 			- Z \int \frac{\rho(\mathbf{r})}{r} \dd{r} 
 			+ \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}}
-			- C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}}
+			- C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}}.
 \end{equation}
 
 Then equation \eqref{eq:TFEq} becomes:
@@ -1167,17 +1167,17 @@ It can be formulated as :
 
 \textit{Then}
 \begin{equation}
-	E_0 \leq E[\rho'(\mathbf{r})]
+	E_0 \leq E[\rho'(\mathbf{r})],
 \end{equation}
 
 \textit{where $E_0$ is the ground state energy of the system.}
 
-We can now express more explicitly the $E[\dens]$, in analogy with the TFD model.
+We can now express more explicitly the $E[\dens]$, in analogy with the TFD model:
 
 \begin{align}
-	E[\rho(\mathbf{r})] &= E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} \\
-	E_{HK}[\dens] &= T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})] \\
-	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid}
+	E[\rho(\mathbf{r})] &= E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} ;\\
+	E_{HK}[\dens] &= T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})] ;\\
+	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid}.
 \end{align}
 
 $E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulombian and the excahnges-correlation terms.
@@ -1187,7 +1187,7 @@ By applying the variational principle with the usual constraint \eqref{eq:TFDens
 \begin{equation}\label{eq:FoundamentalDFT}
 \boxed{
 	\mu_{HK} = v(\erre) + \frac{\var{E_{HK}[\dens]}}{\var{\dens}}
-}
+}.
 \end{equation}
 
 
@@ -1204,7 +1204,7 @@ In such a system, all electrons are subject to an external potential $v_{ref}(\e
 In analogy with the HF method,\footnote{See section \ref{sec:HF}.} the Hamiltonian of the system is completely separable
 
 \begin{align}
-\hat{H}_{ref} &= \sum_{i} \hat{h}_i^{KS} \\
+\hat{H}_{ref} &= \sum_{i} \hat{h}_i^{KS} ;\\
 \hat{h}_i^{KS} &= - \frac{\nabla^{2}_{i}}{2} + v(\erre)_{ref} .
 \end{align}
 
@@ -1255,8 +1255,8 @@ Substituting \eqref{eq:KSExchangeEnergy} in \eqref{eq:KSEnergy}, equation \eqref
 with 
 \begin{align}
  v_{eff}(\erre) &= v(\erre)  + v_{h}(\erre)
- + v_{xc}(\erre) \\
- v_{h}(\erre) &= \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}\\
+ + v_{xc}(\erre) ;\\
+ v_{h}(\erre) &= \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}};\\
  v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}}.
 \end{align}
 $v_{h}$ is called the \textit{Hartree potential} and the associated energy 
@@ -1282,7 +1282,7 @@ Then the electronic density satisfying equation \eqref{eq:KSChemPot} is the same
 \end{equation}
 where 
 \begin{align}
-	h_{1} &= - \frac{\nabla_{1}^2}{2} + v(r)\\
+	h_{1} &= - \frac{\nabla_{1}^2}{2} + v(r);	\\
 	v(r) &= \sum_{\alpha} \frac{Z_{\alpha}}{r} .
 \end{align}
 
@@ -1294,12 +1294,12 @@ The main problem arises from the approximate nature of $E_{xc}$, which is usuall
 
 In the most primitive local density approximation (LDA), we use Dirac expression for the exchange energy, whereby the exchanges contribution is given by $E_{x}[\dens] = -\frac{1}{2} K[\dens]$ and $K[\dens]$ is the one in \eqref{eq:DiracK} with an adjustable parameter $\alpha$:
 \begin{align}
-	&E_{xc} = A \int \dens^{\frac{4}{3}} \dd{\erre} &A= -\frac{3}{8}\alpha \left( \frac{3}{\pi} \right)^{\frac{1}{3}}
+	&E_{xc} = A \int \dens^{\frac{4}{3}} \dd{\erre} &A= -\frac{3}{8}\alpha \left( \frac{3}{\pi} \right)^{\frac{1}{3}}.
 \end{align}
 
 As show in \eqref{eq:DiracK} the exchanges potential has the form:
 \begin{align}
-	v_{xc}(\erre) &=	\frac{\var{E_{xc}[\dens]}}{\var{\dens}}\\
+	v_{xc}(\erre) &=	\frac{\var{E_{xc}[\dens]}}{\var{\dens}};\\
 	&= \frac{4}{3} A \dens^{\frac{1}{3}} .
 \end{align}
 
@@ -1401,16 +1401,16 @@ The same can be said about the spatial orbitals  $\{\psi^{ks}_j\}$, which are no
 Nevertheless they constitute a set of useful tools to build other meaningful physical quantities, first and foremost the electronic density $\dens$.
 
 \subsection{Lattice Structures}
-It is convenient to introduce the concept of \textit{Bravais lattice} and \textit{reciprocal lattice} for their central role in solid state physic. 
+It is convenient to introduce the concept of \textit{Bravais lattice} and \textit{reciprocal lattice} for their central role in solid state physics. 
 
 
 \subsubsection{Bravais Lattice}
 The \textit{Bravais lattice} is a set of points in real space that can be identified by the following relation :
 \begin{equation}\label{eq:BravaisLattice}
-	\mathbf{R}_n = \sum_{i}^{D} n_{i} \mathbf{a}_{i},
+	\mathbf{R} = n_{1} \mathbf{a}_{1} + n_{2} \mathbf{a}_{2} + n_{3} \mathbf{a}_{3} ,
 \end{equation}
-where $D$ is the number of dimensions, $\{\mathbf{a}_{i}\}$ is as a set of $D$ linear independent vectors called the \textit{primitive vectors} and $n_{i}$ is always an integer number.
-The definition appears clear looking at figure \ref{fig:BravaisLattice}
+where $\{\mathbf{a}_{i}\}$ is as a set of linear independent vectors called the \textit{primitive vectors} and $n_{i}$ is always an integer number.
+The definition appears clear looking at figure \ref{fig:BravaisLattice}.
 
 \begin{figure}[h]
 \begin{center}
@@ -1447,10 +1447,11 @@ One can show \cite{Martin} that the reciprocal lattice is a Bravais lattice and 
 .
 \end{equation}
 
-A generic point in the reciprocal lattice is identified by the $\mathbf{G_m}$ vector 
+A generic point in the reciprocal lattice is identified by the $\mathbf{G}$ vector 
 \begin{equation}
-	\mathbf{G_m} = m_1\mathbf{b_1} + m_2\mathbf{b_2} + m_3\mathbf{b_3}.
+	\mathbf{G} = m_1\mathbf{b_1} + m_2\mathbf{b_2} + m_3\mathbf{b_3},
 \end{equation}
+where $m_i$ is an integer.
 
 Given the periodic condition, every plane wave must satisfy 
 \begin{equation}
@@ -1462,7 +1463,7 @@ hence
 \end{equation}
 equivalently 
 \begin{align}
-	&\mathbf{G}\cdot \mathbf{R} = 2\pi N, &N\in\mathbb{Z},
+	&\mathbf{G}\cdot \mathbf{R} = 2\pi N &N\in\mathbb{Z},
 \end{align}
 for every $\mathbf{R}$ in the Bravais lattice.
 
@@ -1537,14 +1538,14 @@ One possible approach to model this kind of behavior is to use plane waves as ba
 \end{equation}
 where $\{\ket{\mf{k}'}\}$ is a set of ortho-normalized plane wave states $\mathbf{k'}(\erre) = \sqrt{V}^{-1} e^{i\mf{k'}\cdot\erre}$ and $c_{j\mf{k}'}$ are the Fourier expansion coefficients.\footnote{Note that in general the sum extends over all possible $\mf{k}'$, leading to an integration:
 \begin{equation}
-	\psi_j(\erre) = \int \varphi_j(\mf{k}) e^{i\mf{k} \cdot \erre} \dd{\mf{k}}
+	\psi_j(\erre) = \int \varphi_j(\mf{k}) e^{i\mf{k} \cdot \erre} \dd{\mf{k}}.
 \end{equation}
 }
 
 Replacing \eqref{eq:PWExpansion} in \eqref{eq:KSeq} and multiplying on the left for $\bra{\mf{k}}$ we obtain \cite{Martin} 
 \begin{align}
 	\bra{\mf{k}} -\frac{1}{2}\nabla^2 + v_{eff} \ket{\psi_j} &= \varepsilon_j \bra{\mf{k}}\ket{\psi_j}  \\
-	\sum_{\mf{k'}} \left( \frac{1}{2}\mid\mf{k}\mid^2  \delta_{\mf{k},\mf{k'}} + \bra{\mf{k}}v_{eff}\ket{\mf{k'}} \right) c_{\mathbf{jk'}} &= \varepsilon_j \sum_{\mf{k'}} \delta_{\mf{k},\mf{k'}} c_{\mathbf{jk'}} \label{eq:SCHFourier}
+	\sum_{\mf{k'}} \left( \frac{1}{2}\mid\mf{k}\mid^2  \delta_{\mf{k},\mf{k'}} + \bra{\mf{k}}v_{eff}\ket{\mf{k'}} \right) c_{\mathbf{jk'}} &= \varepsilon_j \sum_{\mf{k'}} \delta_{\mf{k},\mf{k'}} c_{\mathbf{jk'}} \label{eq:SCHFourier},
 \end{align}
 
 where we have used $\bra{\mf{k}}\ket{\mf{k'}} = \delta_{\mf{k},\mf{k'}}$ and the fact that $\ket{\mf{k}}$ are eigenstates of the momentum operator.
@@ -1570,7 +1571,7 @@ Then the continuous-indexed $\mf{H}^{KS}$ matrix becomes a diagonal discrete-ind
 For computational purposes the discrete index is obviously a great advantage, but we still have to address the problem that we need an infinite number of $G$ to completely describe the system.
 Following the same process of the Hartree-Fock method, we select only a subset of all the possible plane waves by imposing a condition on the energy of the plane wave, the so-called \textit{cutoff energy}:
 \begin{align}
-	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre}\\
+	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre};\\
 	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}.
 \end{align}
 
