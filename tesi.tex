@@ -639,7 +639,7 @@ Since \eqref{eq:toNull} must be zero for every $i$ and for every possible variat
 	\hat{h}  \ket{i} + \sum_{j}^{N}  \bra{i} \frac{1}{r_{ij}} \ket{j j } - \bra{ j } \frac{1}{r_{ij}} \ket{j i} + \sum_{j}^{N} \varepsilon_{ij} \ket{j} = 0.
 \end{equation}
 
-We define respectively the \textit{Coulomb operator} and the \textit{Exchanges operator} by:
+We define respectively the \textit{Coulomb operator} and the \textit{Exchange operator} by:
 \begin{align}
 	J_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{j}(2) \right] \chi_i(1); \label{eq:coulombOperator} \\
 	K_{j}(1) \chi_{i}(1) = \left[  \int \dd \mathbf{x}_{2} \chi_{j}^{*}(2) \frac{1}{r_{12}} \chi_{i}(2) \right] \chi_j(1);
@@ -783,7 +783,7 @@ Rewriting the Hartree-Fock equation for the $i$-th electron we have:
 
 $\hat{h}$ is usually called the \textit{core Hamiltonian} because it represents the energy associated to the $i$-th electron under the potential generated uniquely by the nuclei.
 
-$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchanges operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin. \footnote{Electron exchange has not to be confused with electron correlation}
+$\hat{v}^{HF}$ is referred as an average potential, or \textit{mean field potential}, because it considers the effect of the average distribution of the $N-1$ electrons on the $i$-th electron. It also takes under consideration the effect of electron exchange thanks to the exchange operator $\hat{K}_j$. Electronic correlation are fully neglected for the electrons of opposite spin, but are taken into account for electrons of parallel spin. \footnote{Electron exchange has not to be confused with electron correlation}
 
 In the case of closed-shell Hartree-Fock we have restricted our problem only to spatial orbitals, and in a more handy matrix form expressed by equation \eqref{eq:RoothaanEquation}.
 
@@ -889,11 +889,11 @@ Density Functional Theory is among the most popular and versatile methods availa
 
 Using this theory, the properties of a many-electron system can be determined by using functionals depending solely on the spatially dependent electron density.
 
-In order to better understand DFT's foundations, it is convenient to introduce the atomic model developed by Thomas\cite{Thomas27} and Fermi\cite{Fermi27} in the late 20s. The model was later refined by Dirac including exchanges effects.
+In order to better understand DFT's foundations, it is convenient to introduce the atomic model developed by Thomas\cite{Thomas27} and Fermi\cite{Fermi27} in the late 20s. The model was later refined by Dirac as to include exchange effects.
 
 \subsubsection{The Thomas-Fermi Atomic Model}
 
-The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$, each box containing $\Delta N$ electrons which number can vary from box to box. 
+The basic idea behind the TF model is to divide the space around the atom in a grid of boxes of equal length $l$, each box containing $\Delta N$ electrons whose number can vary from box to box. 
 
 The electrons will always behave like independent fermions and there is no interaction between boxes.
 Finally, as we will later justify, the temperature of the system is 0 Kelvin \cite[p.47-51]{Parr}.
@@ -921,7 +921,7 @@ we rewrite equations \eqref{eq:squareWellLevels} as:
 \end{equation}
 
 We want to have an estimate of the total number of energy levels below a certain threshold. 
-If R is large enough we can approximate this number with the volume contained in an octet of a sphere:
+If R is large enough we can approximate this number with the volume contained in an eighth of a sphere:
 \begin{equation}
 	\Phi(R) = \frac{1}{8} \left( \frac{4}{3} \pi R^{3} \right).
 \end{equation}
@@ -969,7 +969,7 @@ Because the electrons are non-interacting, every energy level can be occupied by
 
 Finally to obtain the total energy of the box we multiply by $\varepsilon$ and integrate:
 \begin{equation}\label{eq:deltaE}
-	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}.
+	\Delta E = 2 \int \varepsilon f(\varepsilon) g(\varepsilon) \dd{\varepsilon}.
 \end{equation}
 
 The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (k_B T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} becomes:
@@ -1019,7 +1019,7 @@ If we lower the dimensions of each box and sum the contributes for all the boxes
 
 $\rho(\mathbf{r})$ is the spatial dependent electron density. $T[\rho]$ is the total kinetic energy of the system and it's a functional of the electron density $\rho(\mathbf{r})$.
 
-We can now add the nuclear potential and the electron-electron Coulombic repulsion
+We can now add the nuclear potential and the electron-electron Coulomb repulsion
 
 
 \begin{equation}\label{eq:ThomasFermiEnergy}
@@ -1028,7 +1028,7 @@ We can now add the nuclear potential and the electron-electron Coulombic repulsi
 			+ \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} .
 \end{equation}
 
-Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchanges and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
+Now that we have an expression for the total energy that depends functionally on the electronic density\footnote{The Thomas-Fermi model neglects any exchange and correlation effect.}, we can apply the variational principle to find the density that minimizes equation \eqref{eq:ThomasFermiEnergy}.
 
 Our unique constraint is that the integral of the electronic density must be equal to the total number of electrons in the system
 \begin{equation}\label{eq:TFDensityConstraint}
@@ -1065,7 +1065,7 @@ The correction to this approximation was introduced by Dirac in the Thomas-Fermi
 
 \subsubsection{Thomas-Fermi-Dirac Atomic Model}
 
-The contribute of P.A.M. Dirac was to model the exchanges term\footnote{Correlation effects are still neglected.} for a closed shell system as follows:
+The contribute of P.A.M. Dirac was to model the exchange term\footnote{Correlation effects are still neglected.} for a closed shell system as follows:
 \begin{equation}\label{eq:diracExc}
 	K[\rho] = \frac{1}{4} \iint \frac{\mid \rho(\mathbf{r_1},\mathbf{r_2})\mid^2 }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}},
 \end{equation}
@@ -1139,10 +1139,10 @@ Because the models completely neglects correlation effects, the results obtained
 
 \subsubsection{Hohenberg and Kohn Theorems}
 
-The TFD model lead the way in a different kind of approach to the electronic problem. 
+The TFD model paved the way to a different kind of approach to the electronic problem. 
 The importance of the electronic density became central and extending the TFD model to molecular systems was the next step.
 
-If it was certain that an external potential $v(\mathbf{r})$\footnote{Which nature is to be considered as general as possible.} acting on electrons describes an unique electronic density $\dens$ \cite[p.318]{Atkins}, there was no formal proof that the contrary was true.
+If it was certain that an external potential $v(\mathbf{r})$\footnote{Which nature is to be considered as general as possible.} acting on electrons described an unique electronic density $\dens$ \cite[p.318]{Atkins}, there was no formal proof that the contrary was true.
 
 Can an electronic density function $\rho(\mathbf{r})$ be associated with an unique external potential $v(\mathbf{r})$?
 
@@ -1155,7 +1155,7 @@ The question remained open until 1964, when Hohenberg and Kohn published their m
 The fist theorem states that an external potential ``\textit{$v(\mathbf{r})$ is an unique functional of $\rho(\mathbf{r})$ }".
 The proof outlined in \cite{HK} proceeds by \textit{reductio ab absurdum} and, despite its simplicity, its rather powerful.
 
-The second theorem states that the variational principle can be applied to system described by the electronic density.
+The second theorem states that the variational principle can be applied to systems described by the electronic density.
 It can be formulated as : 
 
 \textit{Given a trial density function $\rho'(\mathbf{r})$ for which: }
@@ -1180,7 +1180,7 @@ We can now express more explicitly the $E[\dens]$, in analogy with the TFD model
 	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid}.
 \end{align}
 
-$E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulombian and the excahnges-correlation terms.
+$E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulomb and the excahnges-correlation terms.
 
 By applying the variational principle with the usual constraint \eqref{eq:TFDensityConstraint}, the fundamental equation of DFT is obtained:
 
@@ -1195,7 +1195,7 @@ By applying the variational principle with the usual constraint \eqref{eq:TFDens
 
 Kohn and Sham \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
 
-Given a \textit{real} system one could associate a \textit{reference} system in which all electrons are not correlated, but with the same electronic density $\dens$.
+Given a \textit{real} system one could associate a \textit{reference} system in which all electrons are not correlated, but has the same electronic density $\dens$.
 
 In such a system, all electrons are subject to an external potential $v_{ref}(\erre)$, depending only on the spatial coordinate $\erre$.\footnotemark
 
@@ -1239,7 +1239,7 @@ To ``\textit{link}" the reference system and the real system together, one could
 
 where in the last step we have dropped the $ref$ suffix from $J_{ref}$ because $J$ is a universal functional of $\dens$ and has the same form in both the systems \footnote{Remember that the the reference system has the same $\dens$.}.
 
-We define the \textit{exchanges energy functional} as 
+We define the \textit{exchange energy functional} as 
 \begin{equation}\label{eq:KSExchangeEnergy}
 E_{xc}[\dens] = T[\dens] + V_{ee}[\dens] - 
 			 	\left( 
@@ -1290,14 +1290,14 @@ Equations \eqref{eq:KSeq} are called the \textit{Kohn-Sham equations}, once solv
 
 However, in order to proceed, it is necessary to choose a proper form of $E_{xc}[\dens]$ (consequently of $v_{xc}(\erre)$), which is far from being an easy task. The search for more accurate functionals is an active area of current research efforts.
 
-The main problem arises from the approximate nature of $E_{xc}$, which is usually split in an exchanges part $E_{x}$ and a correlation part $E_c$.
+The main problem arises from the approximate nature of $E_{xc}$, which is usually split in an exchange part $E_{x}$ and a correlation part $E_c$.
 
-In the most primitive local density approximation (LDA), we use Dirac expression for the exchange energy, whereby the exchanges contribution is given by $E_{x}[\dens] = -\frac{1}{2} K[\dens]$ and $K[\dens]$ is the one in \eqref{eq:DiracK} with an adjustable parameter $\alpha$:
+In the most primitive local density approximation (LDA), we use Dirac expression for the exchange energy, whereby the exchange contribution is given by $E_{x}[\dens] = -\frac{1}{2} K[\dens]$ and $K[\dens]$ is the one in \eqref{eq:DiracK} with an adjustable parameter $\alpha$:
 \begin{align}
 	&E_{xc} = A \int \dens^{\frac{4}{3}} \dd{\erre} &A= -\frac{3}{8}\alpha \left( \frac{3}{\pi} \right)^{\frac{1}{3}}.
 \end{align}
 
-As show in \eqref{eq:DiracK} the exchanges potential has the form:
+As show in \eqref{eq:DiracK} the exchange potential has the form:
 \begin{align}
 	v_{xc}(\erre) &=	\frac{\var{E_{xc}[\dens]}}{\var{\dens}};\\
 	&= \frac{4}{3} A \dens^{\frac{1}{3}} .
@@ -1320,7 +1320,7 @@ where
 $\mathbf{C}$ is the matrix of expansion coefficients \eqref{eq:coeffMatrix} and $\mathbf{S}$ is the overlap matrix.
 
 We can see that from a computational standpoint there is a deep difference between the $\mathbf{H}^{KS}$ matrix and the Fock matrix $\mathbf{F}$: evaluation of $\mathbf{H}^{KS}_{ij}$ is much easier than $\mathbf{F}_{ij}$ because there is no need to evaluate the onerous exchange integrals $\sum_{\nu \lambda}^{K}(\mu \lambda | \sigma \nu)$ in \eqref{eq:FockElement}. 
-All the exchanges-correlation contribution is reduced to a multiplicative potential $v_{xc}(\erre)$.
+All the exchange-correlation contribution is reduced to a multiplicative potential $v_{xc}(\erre)$.
 
 In fact the complexity associated to DFT calculation is lower than a standard HF calculation, but it depends strongly on the choice of basis set. Please refer to section \ref{sec:QE} for a more in-depth analysis.
 
@@ -1336,7 +1336,7 @@ and substituting \eqref{eq:HartreeEnergy} in equation \eqref{eq:KSEnergy}, the e
 \end{equation}
 
 Once $\dens$ is obtained by solving \eqref{eq:KSeq}, one still have to provide an expression of $T_{ref}[\dens]$. 
-Although the Thomas-Fermi model can provide an approximation \eqref{eq:TFKinetic}, we can use equations \eqref{eq:KSeq} to obtain a more convenient expression.
+Although the Thomas-Fermi model can provide an approximation \eqref{eq:TFKinetic}, we use equation \eqref{eq:KSeq} to obtain a more convenient expression.
 
 For a diagonal set of spatial orbitals $\{\psi^{KS}_{j}\}$\footnote{Guaranteed to exist after the diagonalization of \eqref{eq:DFTH}}, the expectation value for the total Energy has the form :
 \begin{align}
@@ -1350,7 +1350,7 @@ Then
 T_{ref} = - \sum_{j} \bra{\psi^{KS}_{j}}v\ket{\psi^{KS}_{j}} - \sum_{j} \bra{\psi^{KS}_{j}}v_{h}\ket{\psi^{KS}_{j}} - \sum_{j} \bra{\psi^{KS}_{j}}v_{xc}\ket{\psi^{KS}_{j}} + \sum_{j} \varepsilon^{KS}_{j} .
 \end{equation}
 
-Re-expressing \eqref{eq:EnergyFuntional} in the $\{\psi^{KS}_{j}\}$ base and substituting \eqref{eq:Tref} in \eqref{eq:EnergyFuntional}, we finally obtain :
+Re-expressing \eqref{eq:EnergyFuntional} in the $\{\psi^{KS}_{j}\}$ base and replacing \eqref{eq:Tref} in \eqref{eq:EnergyFuntional}, we finally obtain :
 \begin{align}\label{eq:DFTEnergy}
 	E[\dens] = \sum_{j}\varepsilon^{KS}_{j} - E_{h}[\dens] - \int \dens v(\erre) \dd{\erre}+ E_{xc}[\dens].
 \end{align}
@@ -1478,9 +1478,9 @@ We will see that the duality between the direct lattice and the reciprocal latti
 \subsection{Electrons in Lattice}
 
 Solid state physics studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
-Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole lattice.
+Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole crystal.
 \subsubsection{The Bloch Theorem}
-Since, as we have seen before, the potential the electrons are subjected to is mainly defined by ions' positions \footnote{Remember that the Born-Oppenheimer approximations stands firmly.} we must expect a periodic $v_{eff}$ potential.
+Since, as we have seen before, the potential the electrons are subjected to is mainly defined by ions' positions\footnote{Remember that the Born-Oppenheimer approximations stands firmly.}, in a lattice we must expect a periodic $v_{eff}$ potential.
 
 Namely, we have that in equation \eqref{eq:KSeq} 
 \begin{equation}
@@ -1488,7 +1488,7 @@ Namely, we have that in equation \eqref{eq:KSeq}
 \end{equation}
 But what are the implications of this condition on the solutions of \eqref{eq:KSeq}?
 
-The well celebrated \textit{Bloch's theorem} \cite[p.136]{Manini} answers the question:
+The well celebrated \textit{Bloch's theorem} \cite[p.136]{Manini} answers the question.
 
 \begin{center}
 \begin{framed}
@@ -1544,13 +1544,13 @@ where $\{\ket{\mf{k}'}\}$ is a set of ortho-normalized plane wave states $\mathb
 
 Replacing \eqref{eq:PWExpansion} in \eqref{eq:KSeq} and multiplying on the left for $\bra{\mf{k}}$ we obtain \cite{Martin} 
 \begin{align}
-	\bra{\mf{k}} -\frac{1}{2}\nabla^2 + v_{eff} \ket{\psi_j} &= \varepsilon_j \bra{\mf{k}}\ket{\psi_j}  \\
+	\bra{\mf{k}} -\frac{1}{2}\nabla^2 + v_{eff} \ket{\psi_j} &= \varepsilon_j \bra{\mf{k}}\ket{\psi_j},  \\
 	\sum_{\mf{k'}} \left( \frac{1}{2}\mid\mf{k}\mid^2  \delta_{\mf{k},\mf{k'}} + \bra{\mf{k}}v_{eff}\ket{\mf{k'}} \right) c_{\mathbf{jk'}} &= \varepsilon_j \sum_{\mf{k'}} \delta_{\mf{k},\mf{k'}} c_{\mathbf{jk'}} \label{eq:SCHFourier},
 \end{align}
 
 where we have used $\bra{\mf{k}}\ket{\mf{k'}} = \delta_{\mf{k},\mf{k'}}$ and the fact that $\ket{\mf{k}}$ are eigenstates of the momentum operator.
 
-This the form equation \eqref{eq:DFTMatrix} takes when plane waves are used as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
+This is the form equation \eqref{eq:DFTMatrix} takes when plane waves are used as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
 
 Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cite{Martin} 
 \begin{equation}
@@ -1575,11 +1575,11 @@ Following the same process of the Hartree-Fock method, we select only a subset o
 	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}.
 \end{align}
 
-In order to pick the correct cutoff energy a series of tests can be performed with little (and constant) computational effort.
+In order to pick the correct cutoff energy a series of tests can be performed beforehand with little (and constant) computational effort.
 
 We can now summarize the advantages of plane waves basis sets in periodic potentials:
 \begin{enumerate}
-	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
+	\item It is possible to perform calculations in the reciprocal space and then transpose the result in the direct space. Remember that differentiating in direct space corresponds multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
 	\item The continuous indexed matrix $\mf{H}^{KS}$ becomes a finite discrete-indexed matrix.
 	\item The $\mf{H}^{KS}$ matrix becomes diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
 \end{enumerate}
@@ -1628,11 +1628,14 @@ It is based on density-functional theory, plane waves, and pseudopotentials.
 
 Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
 
-In any parallel computer system, CPUs working on different parts of the same job must communicate to exchange information. Precisely how they should do this is the subject of much debate in the architectural community. 
+In any parallel computer system, CPUs working on different parts of the same job must communicate to exchange information. How precisely they should do this is the subject of much debate in the architectural community. 
 Two distinct designs, multiprocessors and multicomputers, have been proposed and implemented.
 
-The key difference between the two is the presence or absence of shared memory. 
+The key difference between the two is the presence or absence of shared memory.
 This difference permeates how they are designed, built, and programmed, as well as their scale and price\cite[p.586]{Tanenbaum}.
+
+Shared memory refers to a (typically large) block of random access memory (RAM) that can be accessed simultaneously by several different CPUs with an intent to provide communication among them or avoid redundant copies.
+
 
 \subsection{Multiprocessor Architectures}
 A parallel computer in which all the CPUs share a common memory is called a multiprocessor. 
@@ -1644,13 +1647,6 @@ Because all CPUs in a multiprocessor see the same memory image, there is only on
 Consequently, there is only one page map and one process table. 
 It is this single-system image that distinguishes a multiprocessor from a multicomputer, in which each computer has its own copy of the operating system.
 
-\begin{comment}
-A multiprocessor, like all computers, must have I/O devices, such as disks, network adapters, and other equipment. In some multiprocessor systems, only certain
-CPUs have access to the I/O devices, and thus have a special I/O function. In other
-ones, every CPU has equal access to every I/O device. When every CPU has equal
-access to all the memory modules and all the I/O devices, and is treated as interchangeable with the others by the operating system, the system is called an SMP
-(Symmetric MultiProcessor).
-\end{comment}
 
 \subsection{Multicomputer Architectures}
 
