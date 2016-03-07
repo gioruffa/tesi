@@ -190,7 +190,7 @@ Rewriting $\hat{H}_{e}$  using atomic units:
 					+ \frac{1}{2} \sum_{i \neq j}^{N_{e}} \frac{1}{r_{ij}}
 \end{equation}
 
-Then equation \eqref{eq:eq_sch} then become:
+Then equation \eqref{eq:eq_sch} then becomes:
 \begin{equation}
 	\hat{H}_{e} \ket{\Phi_{e}} = \varepsilon_{e} \ket{\Phi_{e}}
 \end{equation}
@@ -709,7 +709,7 @@ And the closed shell restricted ground state is :
 
 We can say that every spatial orbital $\psi(\mathbf{r})$ is occupied by both spin-up and spin-down electrons (there is no ``odd" electron alone in a spatial orbital).
 
-Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator become :
+Separating the integration of the spin function (which are orthonormal) and taking into account the correlation interaction between electrons with parallel spin (see section \ref{sec:slaterPropr}) \cite[p.132-133]{Attila} the Fock operator becomes :
 
 \begin{equation}
 \hat{f}(1) = \hat{h}(1) +\sum_{j=1}^{N/2}[2\hat J_j(1)-\hat K_j(1)]
@@ -717,7 +717,7 @@ Separating the integration of the spin function (which are orthonormal) and taki
 
 Where $J_j$ and $K_j$ are expressed as functions of the spatial orbitals $\{\psi_i\}$.
 
-Thus the Hartree-Fock equation become:
+Thus the Hartree-Fock equation becomes:
 \begin{equation}\label{eq:hfSpatial}
 	\hat{f}(\mathbf{r_1}) \ket{\psi_i(\mathbf{r_1})} = \varepsilon_i \ket{\psi(\mathbf{r_1})}
 \end{equation}
@@ -972,7 +972,7 @@ Finally to obtain the total energy of the box we multiply by $\varepsilon$ and i
 	\Delta E = 2 \int f(\varepsilon) g(\varepsilon) \dd{\varepsilon}
 \end{equation}
 
-The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (k_B T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} become:
+The calculation is greatly simplified if we consider the system to be at 0K. In this case $\beta = (k_B T)^{-1} \rightarrow + \infty$ and the Fermi-Dirac distribution \eqref{eq:fermiDiracPartitionFunction} becomes:
 
 \begin{equation}
 	f(\varepsilon) = \left\lbrace \begin{array}{ll}
@@ -983,7 +983,7 @@ The calculation is greatly simplified if we consider the system to be at 0K. In 
 \end{equation}
 
 
-Thus \eqref{eq:deltaE} become :
+Thus \eqref{eq:deltaE} becomes :
 \begin{equation}
 	\Delta E = 2 \int_{0}^{\varepsilon_F} g(\varepsilon) \dd{\varepsilon}
 \end{equation}
@@ -1128,7 +1128,7 @@ We can write the energy functional as :
 			- C_{x} \int \rho^{\frac{4}{3}}(\mathbf{r}) \dd{\mathbf{r}}
 \end{equation}
 
-Then equation \eqref{eq:TFEq} become:
+Then equation \eqref{eq:TFEq} becomes:
 \begin{equation}
 \mu_{tf}  = \frac{5}{3} C_{F} \rho(\mathbf{r})^{\frac{2}{3}} - \frac{Z}{r} + \frac{1}{2} \int \frac{\rho(\mathbf{r})}{\mid \mathbf{r} - \mathbf{r_2} \mid} \dd{\mathbf{r_2}} - \frac{4}{3	} C_{X} \rho(\mathbf{r})^{\frac{1}{3}}.
 \end{equation}
@@ -1248,7 +1248,7 @@ E_{xc}[\dens] = T[\dens] + V_{ee}[\dens] -
 .
 \end{equation}
 
-Substituting \eqref{eq:KSExchangeEnergy} in \eqref{eq:KSEnergy}, equation \eqref{eq:FoundamentalDFT} become 
+Substituting \eqref{eq:KSExchangeEnergy} in \eqref{eq:KSEnergy}, equation \eqref{eq:FoundamentalDFT} becomes 
 \begin{equation}\label{eq:KSChemPot} 
 	\mu_{KS} = \frac{\var{T_{ref}[\dens]}}{\var{\dens}}  + v_{eff}(\erre),
 \end{equation}
@@ -1330,7 +1330,7 @@ By defining
 \begin{equation}
 	V[\dens] = \int \dens v(\erre) \dd{\erre}
 \end{equation}
-and substituting \eqref{eq:HartreeEnergy} in equation \eqref{eq:KSEnergy}, the energy functional become:
+and substituting \eqref{eq:HartreeEnergy} in equation \eqref{eq:KSEnergy}, the energy functional becomes:
 \begin{equation}\label{eq:EnergyFuntional}
 	E[\dens] = T_{ref}[\dens] + E_{h}[\dens] + V[\dens] + E_{xc}[\dens].
 \end{equation}
@@ -1565,7 +1565,7 @@ If we introduce the condition of a periodic potential, as a consequence of the B
 
 This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
 
-Then the continuous-indexed $\mf{H}^{KS}$ matrix become a diagonal discrete-indexed block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
+Then the continuous-indexed $\mf{H}^{KS}$ matrix becomes a diagonal discrete-indexed block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
 
 For computational purposes the discrete index is obviously a great advantage, but we still have to address the problem that we need an infinite number of $G$ to completely describe the system.
 Following the same process of the Hartree-Fock method, we select only a subset of all the possible plane waves by imposing a condition on the energy of the plane wave, the so-called \textit{cutoff energy}:
@@ -1580,13 +1580,13 @@ We can now summarize the advantages of plane waves basis sets in periodic potent
 \begin{enumerate}
 	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
 	\item The continuous indexed matrix $\mf{H}^{KS}$ becomes a finite discrete-indexed matrix.
-	\item The $\mf{H}^{KS}$ matrix become diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
+	\item The $\mf{H}^{KS}$ matrix becomes diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
 \end{enumerate}
 
 Point \ref{en:Kpoints} is the so-called \textit{K-points parallelization}, and, as one can image, it has a great impact on the resolution of the electronic problem in symmetric crystals.
 
 In this work we mainly focused on the study of systems having little symmetries\footnote{Non-periodic systems usually has peculiar physical properties, this is why they are of great research interest and why we focused on them.}, this implies the enlargement of the elementary cell to accommodate all asymmetric factors. 
-As a result the $\mf{H}^{KS}$ matrix become occupied mostly by a single block and no k-points parallelization can be performed.
+As a result the $\mf{H}^{KS}$ matrix becomes occupied mostly by a single block and no k-points parallelization can be performed.
 This configuration is usually referred as \textit{Lambda point}.
 
 
