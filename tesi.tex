@@ -1559,17 +1559,36 @@ Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cit
 
 that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
 
+This means that by using plane waves we can perform a set of calculation in the reciprocal space, and then transpose the results in the direct space trough Fourier transformations.
+
 So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
 
 If we introduce the condition of a lattice system (then of a periodic potential), as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice.
 
-This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because to have a non-null element the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
+This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
 
-Then the general matrix became a diagonal block matrix, meaning that one can diagonalize only the blocks on non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
+Then the general matrix became a diagonal block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
 
+For computational purposes the discrete index is obviously a great advantage, but we still have to address the fact that we will need an infinite number of $G$ to completely describe the system.
+As did for the Hartree-Fock method we select only a subset of all the possible plane waves by imposing a so-called \textit{cutoff energy}:
+\begin{align}
+	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre}\\
+	\mid \mf{k + G} \mid < E_{cut}.
+\end{align}
+To pick the correct cutoff energy a series of system specif tests can be performed with little computational effort.
 
+We can now summarize the advantages of plane waves basis sets in periodic potentials:
+\begin{enumerate}
+	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms.
+	\item The continuous indexed matrix $\mf{H}^{KS}$ become a finite discrete-indexed matrix.
+	\item The $\mf{H}^{KS}$ matrix became diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
+\end{enumerate}
 
-figate onde piane : problema continuo e' diventato discreto, la matrice e' diagonale a blocchi, la derivazione e' una moltiplicazione in spazio reciproco!
+Point \ref{en:Kpoints} is the so-called \textit{K points parallelization}, and, as one can image, have great impact on the calculation of big symmetric crystal systems.
+
+In this work we focused on the study of system having little symmetries\footnote{Non-periodic systems usually has peculiar physical properties, this is why they are of great research interest and why we focused on them.}, this implies the enlargement of the elementary cell to accommodate all antisymmetric factors. 
+As a result the $\mf{H}^{KS}$ matrix become occupied mostly by a single block and no parallelization can be performed.
+
 
 \newpage
 
