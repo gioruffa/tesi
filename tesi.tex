@@ -9,6 +9,7 @@
 \usepackage{amssymb}
 \usepackage{physics}
 \usepackage{enumitem}
+\usepackage{framed}
 \usepackage[width=125mm]{caption}
 
 \graphicspath{{./media/images/}}
@@ -41,6 +42,7 @@
 \textcolor{red}{TODO: #1}\end{flushright}}
 \newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
+\newcommand\mf[1]{\mathbf{#1}}
 \newcommand\dens{\rho(\mathbf{r})}
 \newcommand\erre{\mathbf{r}}
 
@@ -1189,9 +1191,9 @@ By applying the variational principle with the usual constraint \eqref{eq:TFDens
 \end{equation}
 
 
-\subsubsection{Kohn and Shan Equations}
+\subsubsection{Kohn and Sham Equations}
 
-Kohn and Shan \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
+Kohn and Sham \cite{KS} developed a practical method to solve equation \eqref{eq:FoundamentalDFT}.
 
 Given a \textit{real} system one could associate a \textit{reference} system in which all electrons are not correlated, but with the same electronic density $\dens$.
 
@@ -1284,7 +1286,7 @@ where
 	v(r) &= \sum_{\alpha} \frac{Z_{\alpha}}{r} .
 \end{align}
 
-Equations \eqref{eq:KSeq} are called the \textit{Kone-Shan equations}, once solved it's possible to calculate the electronic density using definition \eqref{eq:densityDef}.
+Equations \eqref{eq:KSeq} are called the \textit{Kohn-Sham equations}, once solved it's possible to calculate the electronic density using definition \eqref{eq:densityDef}.
 
 However, in order to proceed, it is necessary to choose a proper form of $E_{xc}[\dens]$ (consequently of $v_{xc}(\erre)$), which is far from being an easy task. The search for more accurate functionals is an active area of current research efforts.
 
@@ -1394,13 +1396,207 @@ We will call the initial density $\rho^{in}(\erre)$ and  the density obtained at
 As one can imagine, the main computational complexity is contained in step \ref{en:SCFDiag}.
 The choice of the basis set has great impact on the implementation of this procedure, both for the evaluation of $H \ket{\psi}$ and the diagonalization strategy. 
 
-As a final consideration of this section we must say that the Kone-Shan eigenvalues $\varepsilon^{KS}_j$ don't posses a physical meaning \cite[p.144]{Martin}, they cannot be associated with \textit{real} energies \footnote{With the exception of the highest $\varepsilon_{i}$ \cite[p.144]{Martin}}. 
+As a final consideration of this section we must say that the Kohn-Sham eigenvalues $\varepsilon^{KS}_j$ don't posses a physical meaning \cite[p.144]{Martin}, they cannot be associated with \textit{real} energies \footnote{With the exception of the highest $\varepsilon_{i}$ \cite[p.144]{Martin}}. 
 The same can be said about the spatial orbitals  $\{\psi^{ks}_j\}$, which are not \textit{real} electronic orbitals. 
 Nevertheless they constitute a set of useful tools to build other meaningful physical quantities, first and foremost the electronic density $\dens$.
 
+\subsection{Lattice Structures}
+It is convenient to introduce the concept of \textit{Bravais lattice} and \textit{reciprocal lattice} for their central role in solid state physic. 
 
-\subsection{Plane Waves}
-\mynotes{mancano onde piane}
+
+\subsubsection{Bravais Lattice}
+The \textit{Bravais lattice} is a set of points in real space that can be identified by the following relation :
+\begin{equation}\label{eq:BravaisLattice}
+	\mathbf{R}_n = \sum_{i}^{D} n_{i} \mathbf{a}_{i},
+\end{equation}
+where $D$ is the number of dimensions, $\{\mathbf{a}_{i}\}$ is as a set of $D$ linear independent vectors called the \textit{primitive vectors} and $n_{i}$ is always an integer number.
+The definition appears clear looking at figure \ref{fig:BravaisLattice}
+
+\begin{figure}[h]
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{Bravais_2D.png}
+	\caption{Bi-dimensional Bravais lattice, with two of the possible primitive vectors.}
+	\label{fig:BravaisLattice}
+\end{center}
+\end{figure}
+
+\subsubsection{Primitive Cell}
+The \textit{primitive cell} is the single smallest portion of lattice that can generate the whole lattice by applying translation and symmetry operations.
+
+\subsubsection{Wigner-Seitz Cell}
+
+The \textit{Wigner-Seitz} cell around a lattice point $\mathbf{R}$ is defined as the locus of points in space that are closer to that lattice point than to any of the other lattice points (see figure \ref{fig:WSCell}).
+
+\begin{figure}[h]
+\begin{center}
+	\includegraphics[width=0.4\linewidth]{Wigner.pdf}
+	\caption{Bi-dimensional Wigner-Seitz cell}
+	\label{fig:WSCell}
+\end{center}
+\end{figure}
+
+\subsubsection{The Reciprocal Lattice}
+Considering a set of $\mathbf{R}$ points constituting a Bravais lattice and a plane wave $\psi(\erre) = e^{i\mathbf{k}\cdot\mathbf{r}}$, for a generic $\mathbf{k} \in \mathbb{R}$ the plane wave $\psi(\erre)$ will be periodic on the lattice only for certain values of $\mathbf{k}$.
+
+
+We call the ``\textit{reciprocal lattice}" the set $\{\mathbf{K}\}$ of points $\mathbf{k}$ for which the associated plane wave $\psi(\erre)$ is periodic in the Bravais lattice.
+
+One can show \cite{Martin} that the reciprocal lattice is a Bravais lattice and that the following relationship (in matrix form) between the reciprocal primitive vectors $\{\mathbf{b}_i\}$ and the original primitive vectors $\{\mathbf{a}_i\}$ held:
+\begin{equation}
+\left[\mathbf{b_{1}b_{2}b_{3}}\right]^{T} = (2\pi^3) \left[\mathbf{a_{1}a_{2}a_{3}}\right]^{-1}
+.
+\end{equation}
+
+A generic point in the reciprocal lattice is identified by the $\mathbf{G_m}$ vector 
+\begin{equation}
+	\mathbf{G_m} = m_1\mathbf{b_1} + m_2\mathbf{b_2} + m_3\mathbf{b_3}.
+\end{equation}
+
+Given the periodic condition, every plane wave must satisfy 
+\begin{equation}
+	e^{i \mathbf{G}\cdot (\mathbf{r} + \mathbf{R})} =  	e^{i \mathbf{G}\cdot \mathbf{r}},
+\end{equation}
+hence 
+\begin{equation}
+	e^{i \mathbf{G}\cdot \mathbf{R}} =  	1,
+\end{equation}
+equivalently 
+\begin{align}
+	&\mathbf{G}\cdot \mathbf{R} = 2\pi N, &N\in\mathbb{Z},
+\end{align}
+for every $\mathbf{R}$ in the Bravais lattice.
+
+Usually the original Bravais lattice $\{ \mathbf{R} \}$ is called the ``\textit{direct}" lattice.
+
+Finally, the Wigner-Seitz cell of the reciprocal lattice is called the ``\textit{first Brillouin zone}".
+
+As explained in \cite[p.121]{Manini} the reciprocal lattice is the (discrete) Fourier transform of the direct lattice.
+
+We will see that the duality between the direct lattice and the reciprocal lattice is one of the greatest computational strength of theories based on plane waves basis sets.
+
+\subsection{Electrons in Lattice}
+
+Solid state physics studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
+Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole lattice.
+\subsubsection{The Bloch Theorem}
+Since, as we have seen before, the potential the electrons are subjected to is mainly defined by ions' positions \footnote{Remember that the Born-Oppenheimer approximations stands firmly.} we must expect a periodic $v_{eff}$ potential.
+
+Namely, we have that in equation \eqref{eq:KSeq} 
+\begin{equation}
+	v_{eff}(\erre) = 	v_{eff}(\erre + \mf{R}).
+\end{equation}
+But what are the implications of this condition on the solutions of \eqref{eq:KSeq}?
+
+The well celebrated \textit{Bloch's theorem} \cite[p.136]{Manini} answers the question:
+
+\begin{center}
+\begin{framed}
+
+\textit{All Schr\"odinger eigenstates in a periodic potential $v_{eff}(\erre) = 	v_{eff}(\erre + \mf{R})$ can be chosen in the factorized form:}
+\begin{equation}\label{eq:Bloch}
+		\psi_{j}(\erre) = e^{i \mf{k} \cdot \erre } ~ u_{\mf{k}j}(\erre), 
+\end{equation}
+\textit{where the function $u_{\mf{k}j}(\erre)$ has the same periodicity of the lattice $u_{\mf{k}j}(\erre) = u_{\mf{k}j}(\erre + \mf{R}) $, and $\mf{k}$ is a suitable wave vector (depending on $\psi_j$, but otherwise subject to no restriction).}
+\end{framed}
+\end{center}
+
+Which implies two equivalent considerations.
+\begin{itemize}
+	\item In a periodic context all electronic eigenfunctions have non-trivial spatial  dependence only within one primitive unit cell: in any other cell the wave function is equal to that in the original cell, apart from a constant phase factor $e^{i \mf{k} \cdot \mf{R}}$ (which leaves the probability distribution unaffected).
+	\item In a periodic potential, the Schr\"odinger eigenstates are essentially plane-wave-like states, except for a periodic amplitude modulation.
+\end{itemize}
+
+If we substitute \eqref{eq:Bloch} in the Kone-Sham equations \eqref{eq:KSeq} we obtain \cite[p.137]{Manini}
+\begin{framed}
+\begin{equation}\label{eq:BlochEq}
+	\left\lbrace -\frac{1}{2}  \left( \nabla + i\mf{k} \right)^2 + v_{eff}(\erre) \right\rbrace u_{\mf{k}j}(\erre) = \varepsilon_{\mf{k}j}  u_{\mf{k}j}(\erre),
+\end{equation}
+\end{framed}
+which is the basic equation for stationary states of an electron characterized by a given $\mf{k}$.\footnote{Note that this result is the same for every ``\textit{mean field}" approximation (i.e. HF equations)}
+
+The consequence of the Bloch's theorem is that, thanks to the periodicity of $u_{\mf{k}j}(\erre)$, equation \eqref{eq:BlochEq} must be solved within a single cell of the direct lattice\footnote{With applied boundaries conditions}.
+This is to be compared with the solution of equations \eqref{eq:KSeq} that must be solved in the \textit{whole} crystal lattice.
+
+Once $u_{\mf{k}j}(\erre)$ is found, the true electronic wave function $\psi_j(\erre)$ is extended to the whole lattice trough \eqref{eq:Bloch}.
+
+Apart for the $\mf{k}$ shift of wave vector, equation \eqref{eq:BlochEq} is equivalent to a stationary Schr\"oendiger equation. Then, for a fixed $\mf{k}$, its solutions must be qualitatively similar to those of standard Schr\"oendiger equations in a finite volume, namely : a ladder of discrete eigenenergies $\varepsilon_{\mf{k}j}$ associated with eigenfunctions $u_{\mf{k}j}(\erre)$ with larger and larger number of nodes for increasing energies, labeled precisely by the index $j$.\footnote{With a noticeable parallelism to atomic orbitals.}
+
+It is absolutely fundamental to note that $\mf{k}$ can vary freely within the first Brillouin zone; 
+then for a fixed $j$ the eigenenergies $\varepsilon_{\mf{k}j}$ depends on $\mf{k}$ as \textbf{continuous} functions!
+
+These function are called ``\textit{energy bands}" or simply ``\textit{bands}", because they varies with $\mf{k}$ within a certain energy interval. 
+In general, in solids, bands of contiguous $j$ can either overlap or not; 
+thus the main consequence of the Bloch's theorem is that the allowed energies forms a spectrum of bands, separated by ranges of forbidden energies (\textit{band gaps}).
+
+\subsubsection{Plane Waves}
+In a crystals, electrons are characterized by an energy spectrum somewhat intermediate between that of a free particle (plane waves with all positive energies) and that of an atom (isolated eigenvalues separated by gaps).
+
+One possible approach to model this kind of behavior is to use plane waves as basis set for the expansion of $\psi_{j}$.
+\begin{equation}\label{eq:PWExpansion}
+	\ket{\psi_j}  = \sum_{\mf{k}'} c_{j\mf{k}'} \ket{\mf{k}'},
+\end{equation}
+where $\{\ket{\mf{k}'}\}$ is a set of ortho-normalized plane wave states $\mathbf{k'}(\erre) = \sqrt{V}^{-1} e^{i\mf{k'}\cdot\erre}$ and $c_{j\mf{k}'}$ are the Fourier expansion coefficients.\footnote{Note that in general the sum extends over all possible $\mf{k}'$, leading to an integration:
+\begin{equation}
+	\psi_j(\erre) = \int \varphi_j(\mf{k}) e^{i\mf{k} \cdot \erre} \dd{\mf{k}}
+\end{equation}
+}
+
+Replacing \eqref{eq:PWExpansion} in \eqref{eq:KSeq} and multiplying on the left for $\bra{\mf{k}}$ we obtain \cite{Martin} 
+\begin{align}
+	\bra{\mf{k}} -\frac{1}{2}\nabla^2 + v_{eff} \ket{\psi_j} &= \varepsilon_j \bra{\mf{k}}\ket{\psi_j}  \\
+	\sum_{\mf{k'}} \left( \frac{1}{2}\mid\mf{k}\mid^2  \delta_{\mf{k},\mf{k'}} + \bra{\mf{k}}v_{eff}\ket{\mf{k'}} \right) c_{\mathbf{jk'}} &= \varepsilon_j \sum_{\mf{k'}} \delta_{\mf{k},\mf{k'}} c_{\mathbf{jk'}} \label{eq:SCHFourier}
+\end{align}
+
+where we have used $\bra{\mf{k}}\ket{\mf{k'}} = \delta_{\mf{k},\mf{k'}}$ and the fact that $\ket{\mf{k}}$ are eigenstates of the momentum operator.
+
+This the form equation \eqref{eq:DFTMatrix} takes when plane waves are used as basis set, where $\mathbf{S}$ is diagonal and $\mathbf{C}$ is composed by Fourier expansion coefficients.
+
+Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cite{Martin} 
+\begin{equation}
+	\bra{\mf{k}} v_{eff} \ket{\mf{k'}} = \mathcal{N} \int e^{i\left(\mf{k} - \mf{k'} \right)} v_{eff}(\erre) \dd{\erre} = \tilde{v}_{eff}(\mf{k} - \mf{k'}),
+\end{equation}
+
+that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
+
+So far we said nothing about the nature of our system, in fact equation \eqref{eq:SCHFourier} is the equivalent formulation of \eqref{eq:KSeq} in Fourier space, where in general $\mf{k}$ are continuous quantities.
+This means that by using plane waves we can perform a set of calculations in the reciprocal space, and then transpose the results in the direct space trough inverse Fourier transformations.
+
+If we introduce the condition of a periodic potential, as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice \cite{Martin}.
+
+This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
+
+Then the continuous-indexed $\mf{H}^{KS}$ matrix become a diagonal discrete-indexed block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
+
+For computational purposes the discrete index is obviously a great advantage, but we still have to address the problem that we need an infinite number of $G$ to completely describe the system.
+Following the same process of the Hartree-Fock method, we select only a subset of all the possible plane waves by imposing a condition on the energy of the plane wave, the so-called \textit{cutoff energy}:
+\begin{align}
+	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre}\\
+	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}.
+\end{align}
+
+In order to pick the correct cutoff energy a series of tests can be performed with little (and constant) computational effort.
+
+We can now summarize the advantages of plane waves basis sets in periodic potentials:
+\begin{enumerate}
+	\item It is possible to perform terms calculation in the reciprocal space. Remember that to a differentiation in direct space corresponds a multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
+	\item The continuous indexed matrix $\mf{H}^{KS}$ becomes a finite discrete-indexed matrix.
+	\item The $\mf{H}^{KS}$ matrix become diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
+\end{enumerate}
+
+Point \ref{en:Kpoints} is the so-called \textit{K-points parallelization}, and, as one can image, it has a great impact on the resolution of the electronic problem in symmetric crystals.
+
+In this work we mainly focused on the study of systems having little symmetries\footnote{Non-periodic systems usually has peculiar physical properties, this is why they are of great research interest and why we focused on them.}, this implies the enlargement of the elementary cell to accommodate all asymmetric factors. 
+As a result the $\mf{H}^{KS}$ matrix become occupied mostly by a single block and no k-points parallelization can be performed.
+This configuration is usually referred as \textit{Lambda point}.
+
+
+\newpage
+
+
+
+
+
+
 
 
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
@@ -1565,6 +1761,11 @@ Electronic Structure,
 Cambridge Press,
 2008.
 
+\bibitem{Manini}
+N. Manini, 
+Introduction to the Physics of Matter,
+2006,
+\url{http://materia.fisica.unimi.it/manini/dida/Struttura_della_Materia_1.html}.
 
 \end{thebibliography}
 
