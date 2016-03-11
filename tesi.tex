@@ -1554,7 +1554,7 @@ This is the form equation \eqref{eq:DFTMatrix} takes when plane waves are used a
 
 Expliciting the matrix element $\bra{\mf{k}} v_{eff} \ket{\mf{k'}}$ we have \cite{Martin} 
 \begin{equation}
-	\bra{\mf{k}} v_{eff} \ket{\mf{k'}} = \mathcal{N} \int e^{i\left(\mf{k} - \mf{k'} \right)} v_{eff}(\erre) \dd{\erre} = \tilde{v}_{eff}(\mf{k} - \mf{k'}),
+	\bra{\mf{k}} v_{eff} \ket{\mf{k'}} = \mathcal{N} \int e^{i\left(\mf{k} - \mf{k'} \right) \cdot \erre} v_{eff}(\erre) \dd{\erre} = \tilde{v}_{eff}(\mf{k} - \mf{k'}),
 \end{equation}
 
 that are the Fourier components of the potential $v_{eff}$, where $\mathcal{N}$ is the appropriate normalizing constant.
@@ -1581,7 +1581,7 @@ We can now summarize the advantages of plane waves basis sets in periodic potent
 \begin{enumerate}
 	\item It is possible to perform calculations in the reciprocal space and then transpose the result in the direct space. Remember that differentiating in direct space corresponds multiplication in reciprocal space! This greatly simplify the calculation on kinetic terms, and often also of $E_{xc}$.\footnote{As said before, the functional is often expressed in function of $(\dens,\grad\dens,\nabla^2\dens)$.}
 	\item The continuous indexed matrix $\mf{H}^{KS}$ becomes a finite discrete-indexed matrix.
-	\item The $\mf{H}^{KS}$ matrix becomes diagonal at block, and each block can be diagonalized in parallel. \label{en:Kpoints}
+	\item The $\mf{H}^{KS}$ matrix becomes diagonal at blocks, and each block can be diagonalized in parallel. \label{en:Kpoints}
 \end{enumerate}
 
 Point \ref{en:Kpoints} is the so-called \textit{K-points parallelization}, and, as one can image, it has a great impact on the resolution of the electronic problem in symmetric crystals.
@@ -1616,6 +1616,9 @@ Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electr
 It is based on density-functional theory, plane waves, and pseudopotentials.
 
 \mynotes{Scritto per girare su un gazilione di architetture}
+
+
+
 
 
 
