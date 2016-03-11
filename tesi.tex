@@ -46,6 +46,8 @@
 \newcommand\dens{\rho(\mathbf{r})}
 \newcommand\erre{\mathbf{r}}
 \newcommand\QE{\textsc{Quantum} ESPRESSO }
+\newcommand\numbands{n_{bands}}
+\newcommand\numG{n_{G}}
 
 \begin{document}
 
@@ -1178,7 +1180,7 @@ We can now express more explicitly the $E[\dens]$, in analogy with the TFD model
 \begin{align}
 	E[\rho(\mathbf{r})] &= E_{HK}[\dens] + \int \rho(\mathbf{r}) v(\mathbf{r}) \dd{\mathbf{r}} ;\\
 	E_{HK}[\dens] &= T[\rho(\mathbf{r})] + V_{ee}[\rho(\mathbf{r})] ;\\
-	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid}.
+	v(\mathbf{r}) &= \sum_{\alpha} \frac{Z_{\alpha}}{\mid \erre - \erre_{\alpha} \mid} \label{eq:electronionPotential}.
 \end{align}
 
 $E_{HK}$ is a universal functional of $\dens$ and the contribute $V_{ee}$ contains both the Coulomb and the excahnges-correlation terms.
@@ -1257,8 +1259,8 @@ with
 \begin{align}
  v_{eff}(\erre) &= v(\erre)  + v_{h}(\erre)
  + v_{xc}(\erre) ;\\
- v_{h}(\erre) &= \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}};\\
- v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}}.
+ v_{h}(\erre) &= \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}; \label{eq:HartreePot}\\
+ v_{xc}(\erre) &= \frac{\var{E_{xc}[\dens]}}{\var{\dens}} \label{eq:ExchangePotDer}.
 \end{align}
 $v_{h}$ is called the \textit{Hartree potential} and the associated energy 
 \begin{equation}\label{eq:HartreeEnergy}
@@ -1573,7 +1575,7 @@ For computational purposes the discrete index is obviously a great advantage, bu
 Following the same process of the Hartree-Fock method, we select only a subset of all the possible plane waves by imposing a condition on the energy of the plane wave, the so-called \textit{cutoff energy}:
 \begin{align}
 	\mf{k'}(\erre) = e^{i(\mf{k + G}) \cdot \erre};\\
-	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}.
+	\frac{\hbar^2}{2m_e}\mid \mf{k + G} \mid < E_{cut}. \label{eq:cutoffEnergy}
 \end{align}
 
 In order to pick the correct cutoff energy a series of tests can be performed beforehand with little (and constant) computational effort.
@@ -1617,24 +1619,130 @@ In our work we focused only on the \textit{PWscf} package, which implements an i
 In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm based on DFT (see figure \ref{fig:SCF-DFT}).
 In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set impacts on the solution of Kohn-Sham equations.
 
-In the following we will show the calculation needed to perform each SCF step as used in the PWscf package.
+In the following section we will show the calculations needed to perform each SCF step as used in the PWscf package.
 
-Since, thanks to the Bloch's theorem, the calculation for each $\mf{k}$ point is independent and, as said above, we focused on system in gamma-point configuration, we will consider $\mf{k}=0$ in order to simplify the exposition without loosing any important information regarding the implementation.
+Since, thanks to the Bloch's theorem, the calculation for each $\mf{k}$ point is independent and, as said above, we focused on system in gamma-point configuration, we will consider $\mf{k}=0$ in order to simplify the exposition without loosing important information regarding the implementation.
+Consequently any following consideration is valid within a given (and fixed) k-point sub-block of $\mf{H}^{KS}$.
 
 From equation \eqref{eq:BlochEq} we have clear that we need a set of informations to perform the calculation :
 \begin{enumerate}
-	\item We need an expression of $v_{eff} = v + v_{H} + v_{xc}$;
+	\item We need an expression of $v_{eff} = v + v_{h} + v_{xc}$;
 	\item We need to apply efficiently the operator $\nabla^2$ to any $u_{\mf{k}j}$;
 	\item We need to perform the diagonalization of $\mf{H}^{KS}$;
 \end{enumerate}
 
 \subsubsection{Evaluating the potential}
 
-The potential $v_{eff}$ is composed by three components:
+The potential $v_{eff}$ is composed by three terms:
 \begin{equation}
-	v_{eff} = v + v_{H} + v_{xc},
+	v_{eff} = v + v_{h} + v_{xc},
 \end{equation}
-where $v$ is the electron-ion potential, $v_{H}$ the electrostatic Hartee potential and $v_{xc}$ is the exchange-correlation potential.
+where $v$ is the electron-ion potential, $v_{h}$ the electrostatic Hartee potential and $v_{xc}$ is the exchange-correlation potential.
+
+\paragraph{The electron-ion potential:}
+$v$ was originally defined in \eqref{eq:electronionPotential} considering every ion as a point-like distribution of charge. 
+However, since we choose plane waves as basis set, modeling the behavior of electrons in the valence band (strongly localized around each ion) is rather difficult due to the delocalized nature of plane waves.
+
+Nevertheless plane waves suit greatly the description of electrons in the conduction bands, since the ionic potential they are subject to is screened by valence electrons\cite[p.136]{Manini} they result more delocalized, especially in lattice crystals.
+
+To model this dual nature without having to enlarge wildly the basis set to describe valence electrons\footnote{i.e. using an high number of Fourier coefficients in \eqref{eq:PWExpansion}, hence a large cutoff energy.}, \QE uses the so-called \textit{pseudopotentials}.
+
+A discussion on the nature of pseudopotentials is out of the scope of this work, however a good dissertation on the matter can be found in \cite[chap. 11]{Martin}.
+What we need to know about pseudopotentials is that the electron-ion potential generated by a single ion can be expressed in reciprocal space as :
+\begin{equation}
+	\tilde{v}_{\alpha}(\mf{G}) = \sum_{\mid\mf{G}\mid < G_{cut}} f_{ps}^{sp}(G) e^{i \mf{G} \cdot \mf{R}_{\alpha}},
+\end{equation}
+where $G_{cut}$ is the maximum module of a reciprocal vector below the cutoff energy \eqref{eq:cutoffEnergy}, $\mf{R}_{\alpha}$ is the position of the ion and $f_{sp}^{sp}(G)$ is the function describing the pseudopotential of the given atomic species ``\textit{sp}" (e.g. hydrogen, oxygen, sodium, ...).
+
+Given the position of each ion within the elementary cell and its atomic species, $\tilde{v}(\mf{G})$ is calculated as a superposition of each $\tilde{v}_{\alpha}(\mf{G})$.
+
+Note that because ion position is fixed under the Born-Oppenheimer approximation, $\tilde{v}(\mf{G})$ is calculated only once for the whole SCF iteration, then its impact on the computational cost is negligible.  
+
+The calculation of $\tilde{v}$ happens inside the \texttt{init\_run} routine, which is the first routine called by PWscf and it's called only once in the whole execution (see section \ref{sec:CoreRoutines} for further details).
+
+
+\paragraph{The Hartree Potential:}
+
+$v_{h}(\erre)$ is defined in \eqref{eq:HartreePot} as 
+\begin{equation}
+ v_{h}(\erre) = \int \frac{\rho(\mathbf{r'})}{\mid \mathbf{r} - \mathbf{r'} \mid}  \dd{\mathbf{r'}}.
+\end{equation}
+
+$v_{h}$ is nothing else than the classical electrostatic potential generated by a tridimensional distribution of charge with volumetric charge density $\rho(\erre')$.
+
+We know that any electrostatic potential must satisfy the Poisson's equation :
+\begin{equation}\label{eq:Poisson}
+	\nabla^2 v_{h}(\erre) = - \frac{\dens}{\varepsilon_{0}},
+\end{equation} 
+where $\varepsilon_{0}$ is the dielectric constant $(4\pi e^2)^{-1}$.
+
+Equation \eqref{eq:Poisson} in reciprocal space becomes:
+\begin{equation}\label{eq:HartreePotReciprocal}
+	\tilde{v}_{h}(\mf{G}) = \frac{\tilde{\rho}(\mf{G})}{G^2 \varepsilon_{0}},
+\end{equation}
+where $\tilde{v}_{h}(\mf{G})$ and $\tilde{\rho}(\mf{G})$ are the Fourier transforms respectively of $v_{h}(\erre)$ and $\dens$.
+
+\mynotes{magari lo mettiamo in appendice}
+For the sake of simplicity we can derive equation \eqref{eq:HartreePotReciprocal} in one dimension.
+
+\begin{equation} \label{eq:PossionMono}
+	\pdv[2]{v_{h}(x)}{x} = - \frac{\rho(x)}{\varepsilon_0},
+\end{equation}
+then 
+\begin{align*}
+	v_{h}(x) &= \frac{1}{\sqrt{2\pi}} \int \tilde{v}_{h}(g) e^{i g x} \dd{g}; \\
+	\rho(x) &= \frac{1}{\sqrt{2\pi}} \int \tilde{\rho}(g) e^{i g x} \dd{g}.
+\end{align*}
+
+Replacing into  \eqref{eq:PossionMono} and differentiating, we obtain :
+\begin{equation}
+	\frac{g^2}{\sqrt{2\pi}} \int \tilde{v}_{h}(g) e^{i g x} \dd{g} = \frac{1}{\varepsilon_{0}\sqrt{2\pi}} \int \tilde{\rho}(g) e^{i g x} \dd{g},
+\end{equation}
+hence 
+\begin{equation}
+	\tilde{v}_{h}(g) = \frac{\tilde{\rho}(g)}{g^2 \varepsilon_{0}}.
+\end{equation}
+
+The computational advantage of \eqref{eq:HartreePotReciprocal} over \eqref{eq:HartreePot} is that we do not need to perform the integration over the real grid composing the elementary cell, the complexity lies in the evaluation of $\tilde{\rho}(\mf{G})$ which is computed at the beginning of each SCF step along with $\dens$.
+
+\mynotes{di questa parte sulla complessita' non sono sicuro:}
+
+Neglecting the constants we have that 
+\begin{equation}
+	\mathcal{O}(\tilde{v}_{h}) = 	\mathcal{O}(\tilde{\rho}) = \mathcal{O}(\numbands)
+\end{equation}
+instead of 
+\begin{equation}
+	\mathcal{O}(v) = \mathcal{O}(\numbands \cdot \numG)
+\end{equation}
+
+because the number of points of the direct grid used to perform the integration is equal to the number of $G$ points in the reciprocal space.
+
+
+Note that instead of $v(\mf{G})$, $v_{h}(\mf{G})$ is calculated once for every SCF step in the routine.
+
+\paragraph{Exchange correlation potential:} 
+As explained in section \ref{sec:SCF-DFT} $E_{xc}[\dens]$ is fixed at the beginning of the SCF iteration and never changes trough the whole iteration. $v_{xc}(\erre)$ is obtained analytically trough equation \eqref{eq:ExchangePotDer}.
+Then the impact on computational complexity of $v_{xc}(\erre)$ is negligible, analogously to $\tilde{v}(\mf{G})$.
+
+
+
+
+
+\subsection{Domande per davice}
+\begin{enumerate}
+	\item $\tilde{\rho}$ e' calcolata come una FFT di $\dens$ oppure visto che la davidson lavora in spazio reciproco e alla fine della diagonalizzazione si ottengono gli orbitali in spazio reciproco e' il contrario, cioe' $\dens = IFFT\{\tilde{\rho}\}$ ?
+	\item la complessita' della FFT va con il numero dei coefficienti, quindi con il numero di punti G? cioe' $\mathcal{O}(\numG \log \numG)$?
+	
+	
+	
+\end{enumerate}
+
+
+
+
+
+
 
 
 
@@ -1664,12 +1772,12 @@ where $v$ is the electron-ion potential, $v_{H}$ the electrostatic Hartee potent
 
 
 \newpage
+\subsection{Core Routines}\label{sec:CoreRoutines}
 
 
 
 
-
-\section{Computational Architectures} \label{comparch:sec}
+\section{Computational Architectures} \label{sec:comparch}
 
 Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
 
