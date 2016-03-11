@@ -45,6 +45,7 @@
 \newcommand\mf[1]{\mathbf{#1}}
 \newcommand\dens{\rho(\mathbf{r})}
 \newcommand\erre{\mathbf{r}}
+\newcommand\QE{\textsc{Quantum} ESPRESSO }
 
 \begin{document}
 
@@ -1354,14 +1355,13 @@ Re-expressing \eqref{eq:EnergyFuntional} in the $\{\psi^{KS}_{j}\}$ base and rep
 \begin{align}\label{eq:DFTEnergy}
 	E[\dens] = \sum_{j}\varepsilon^{KS}_{j} - E_{h}[\dens] - \int \dens v(\erre) \dd{\erre}+ E_{xc}[\dens].
 \end{align}
-\mynotes{Per Davide: l'ho controllata, se si definishe $E_{h}$ con il fattore $\frac{1}{2}$ e' giusta cosi'}
 Equation \eqref{eq:DFTEnergy} is the one used by the vast majority of \textit{ab initio} calculations softwares because it's composed by terms that are already computed at the end of every SCF iteration.
 
 
 
 
 
-\subsubsection{Self Consistent DFT}
+\subsubsection{Self Consistent DFT}\label{sec:SCF-DFT}
 Because $v_{h}$ and $v_{xc}$ in \eqref{eq:KSeq} implicitly depend on the orbitals set trough $\dens$ (see eq. \eqref{eq:densityDef}), an interative SCF approach must be used. 
 
 We briefly outline the general procedure used in DFT-SCF calculations.
@@ -1389,6 +1389,7 @@ We will call the initial density $\rho^{in}(\erre)$ and  the density obtained at
 \begin{figure}[h]
 	\includegraphics[width=\linewidth]{SCF-DFT_schema.pdf}
 	\caption{DFT SCF procedure layout}
+	\label{fig:SCF-DFT}
 \end{figure}
 
 
@@ -1475,7 +1476,7 @@ As explained in \cite[p.121]{Manini} the reciprocal lattice is the (discrete) Fo
 
 We will see that the duality between the direct lattice and the reciprocal lattice is one of the greatest computational strength of theories based on plane waves basis sets.
 
-\subsection{Electrons in Lattice}
+\subsection{Electrons in Lattice}\label{sec:elLattice}
 
 Solid state physics studies the properties of matter when arranged in crystal lattice form, i.e. each lattice point (or node) accommodate an atom or a molecular structure. 
 Elementary cells composed by a group of nodes are then replicated trough translation and symmetry operations to generate the whole crystal.
@@ -1590,38 +1591,79 @@ In this work we mainly focused on the study of systems having little symmetries\
 As a result the $\mf{H}^{KS}$ matrix becomes occupied mostly by a single block and no k-points parallelization can be performed.
 This configuration is usually referred as \textit{Gamma point}.
 
-
-\newpage
-
-
-
-
-
-
-
-
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
 
-
-
-
-
-
-
 %----------------------------------------------------------------------------
-\section{Quantum Espresso}\label{sec:QE}
+\section{\QE}\label{sec:QE}
 %----------------------------------------------------------------------------
 
-Quantum ESPRESSO is an integrated suite of Open-Source computer codes for electronic-structure calculations and materials modeling at the nanoscale.
-It is based on density-functional theory, plane waves, and pseudopotentials.
+\QE  is an integrated suite of computer codes for electronic-structure calculations and materials modeling based on density-functional theory, plane waves basis sets and pseudopotentials to represent electron-ion interactions.
 
-\mynotes{Scritto per girare su un gazilione di architetture}
+\QE is free, open-source software distributed under the terms of the GNU General Public License (GPL) and is written, mostly,in Fortran-95, with some parts in C or in Fortran-77.
+
+\QE supports a great variety of implementations of his core functionalities fully leveraging the well optimized versions of linear algebra and parallelization libraries like BLAS, LAPACK, SCALAPACK, FFTW, that are easily available for a wide range of computational architectures.
+
+The MPI standard\cite{MPI} is used for interprocess communication and the OpenMP standard\cite{OMP} is used for thread parallelization.
+
+
+\QE has been compiled and tested on numerous computing systems\cite{QEManual}: i386 Linux desktops, i386 Linux clusters, Mac OS X, Cray machines, IMB AIX, IBM BlueGene, NUMA machines, Intel-Phi co-processors, CUDA accelerators, FPGA accelerators and even mobile devices. 
+
+Quantum ESPRESSO distribution is composed by a set of packages (executables) built upon a versatile core library, a complete list of executables and various features can be found in \cite{QE}.
+
+In our work we focused only on the \textit{PWscf} package, which implements an iterative approach to reach self-consistency, using at each step iterative diagonalization techniques, in the framework of plane waves basis set.
+
+
+\subsection{SCF Implementation in \textit{PWscf} package}
+In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm based on DFT (see figure \ref{fig:SCF-DFT}).
+In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set impacts on the solution of Kohn-Sham equations.
+
+In the following we will show the calculation needed to perform each SCF step as used in the PWscf package.
+
+Since, thanks to the Bloch's theorem, the calculation for each $\mf{k}$ point is independent and, as said above, we focused on system in gamma-point configuration, we will consider $\mf{k}=0$ in order to simplify the exposition without loosing any important information regarding the implementation.
+
+From equation \eqref{eq:BlochEq} we have clear that we need a set of informations to perform the calculation :
+\begin{enumerate}
+	\item We need an expression of $v_{eff} = v + v_{H} + v_{xc}$;
+	\item We need to apply efficiently the operator $\nabla^2$ to any $u_{\mf{k}j}$;
+	\item We need to perform the diagonalization of $\mf{H}^{KS}$;
+\end{enumerate}
+
+\subsubsection{Evaluating the potential}
+
+The potential $v_{eff}$ is composed by three components:
+\begin{equation}
+	v_{eff} = v + v_{H} + v_{xc},
+\end{equation}
+where $v$ is the electron-ion potential, $v_{H}$ the electrostatic Hartee potential and $v_{xc}$ is the exchange-correlation potential.
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newpage
 
 
 
@@ -1766,6 +1808,19 @@ N. Manini,
 Introduction to the Physics of Matter,
 2006,
 \url{http://materia.fisica.unimi.it/manini/dida/Struttura_della_Materia_1.html}.
+
+
+\bibitem{QE}
+P. Giannozzi , S. Baroni , N. Bonini,``QUANTUM ESPRESSO: a modular and open-source software project for quantum simulations of materials", J. Phys.: Condens. Matter \textbf{21} (2009) 395502 (19pp)
+
+\bibitem{QEManual}
+``User's Guide for Quantum ESPRESSO", \url{http://www.quantum-espresso.org/wp-content/uploads/Doc/user_guide.pdf}.
+
+\bibitem{MPI}
+``MPI :A Message-Passing Interface Standard", \url{http://www.mpi-forum.org/docs/mpi-3.1/mpi31-report.pdf}
+
+\bibitem{OMP}
+``OpenMP Application Programming Interface", \url{http://www.openmp.org/mp-documents/openmp-4.5.pdf}
 
 \end{thebibliography}
 
