@@ -44,10 +44,15 @@
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
 \newcommand\mf[1]{\mathbf{#1}}
 \newcommand\dens{\rho(\mathbf{r})}
+\newcommand\rdens{\tilde{\rho}(\mathbf{G})}
 \newcommand\erre{\mathbf{r}}
+\newcommand\GI{\mathbf{G}}
 \newcommand\QE{\textsc{Quantum} ESPRESSO }
 \newcommand\numbands{n_{bands}}
 \newcommand\numG{n_{G}}
+\newcommand\numR{n_{R}}
+\newcommand\bigO{\mathcal{O}}
+
 
 \begin{document}
 
@@ -1423,6 +1428,11 @@ The definition appears clear looking at figure \ref{fig:BravaisLattice}.
 \end{center}
 \end{figure}
 
+Forming a matrix from the primitive vectors, one can express the volume of the primitive cell as 
+\begin{align}
+	\Omega = det(\left[\mf{a}_1 \mf{a}_2 \mf{a}_3\right]).
+\end{align}
+
 \subsubsection{Primitive Cell}
 The \textit{primitive cell} is the single smallest portion of lattice that can generate the whole lattice by applying translation and symmetry operations.
 
@@ -1621,17 +1631,120 @@ In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set
 
 In the following section we will show the calculations needed to perform each SCF step as used in the PWscf package.
 
-Since, thanks to the Bloch's theorem, the calculation for each $\mf{k}$ point is independent and, as said above, we focused on system in gamma-point configuration, we will consider $\mf{k}=0$ in order to simplify the exposition without loosing important information regarding the implementation.
-Consequently any following consideration is valid within a given (and fixed) k-point sub-block of $\mf{H}^{KS}$.
 
-From equation \eqref{eq:BlochEq} we have clear that we need a set of informations to perform the calculation :
+
+\subsubsection{Grid representation and the size of the problem} \label{sec:Grid}
+
+Thanks to the Bloch's theorem, the calculation for each $\mf{k}$ point is independent and, as said above, we focused on systems in gamma-point configuration. 
+%then for the sake of simplicity we will consider $\mf{k}=0$.
+
+Consequently, any of the following considerations is valid within a given (and fixed) k-point sub-block of $\mf{H}^{KS}$.
+
+We know that the solutions to equation \eqref{eq:BlochEq} are in factorized form :
+\begin{align}
+	\psi_{j}(\erre,\mf{k}) &= e^{i \mf{k} \cdot	 \erre} u_{\mf{k},j}(\erre,\mf{k}), \\
+	u_{\mf{k},j}(\erre,\mf{k}) &= \frac{1}{\sqrt{\Omega}} \sum_{\GI} c_{j}(\GI,\mf{k})e^{i \GI \cdot \erre}.
+\end{align}
+
+Using the above convention $u_{jk}$ became:
+
+\begin{align}
+	u_{kj}(\erre) = \frac{1}{\sqrt{\Omega}} \sum_{\GI} c_{kj}(\GI)e^{i \GI \cdot \erre}.
+\end{align}
+
+Which coincides with the use of a Discrete Fourier Transform, being $c_kj(\GI)$ the Fourier coefficients.
+
+The expansion is truncated using equation \eqref{eq:cutoffEnergy} to a certain $\mid \GI \mid < G_{cut}$ (where $G_{cut}$ is the maximum module of a reciprocal vector below the cutoff energy \eqref{eq:cutoffEnergy}) that fix the size of the basis set. This can be done because $v_{eff}$ converge rapidly with increasing modulus of $\GI$.
+
+According to \cite[p.88]{Marx} a rough estimate of the number of plane waves is \footnote{With both $\Omega$ and $E_{cut}$ expressed in atomic units.}
+\begin{equation}\label{eq:NGPW}
+	N_{G}^{PW} = \frac{1}{2\pi^2}\Omega E_{cut}^{\frac{3}{2}}.
+\end{equation}
+
+A function given as a finite linear combination of plane waves can also be defined as a set of functional values on an equally spaced grid in real space.
+
+The sampling theorem gives the maximal grid spacing
+that still allows us to hold the same information as the expansion coefficients
+of the plane waves. The real space sampling points R are defined
+
+\begin{equation}
+	\mf{R} = \left[\mf{a}_1 \mf{a}_2 \mf{a}_3 \right] \mf{N} \mf{q},
+\end{equation}
+
+where N is a diagonal matrix with the entries $1/N_i$ and $\mf{q}$ is a vector of
+integers ranging from $0$ to $N_i - 1$ and $i = x, y, z$. In order to fulfill the
+sampling theorem $N_i$ has to be bigger than $2 max(\mf{b}_i) + 1$\footnote{Where $\mf{b}_i$ is a primitive vector of the reciprocal lattice}. 
+In addition, $N_i$ must be decomposable into small prime numbers (typically 2, 3, and 5) when fast Fourier transformation techniques are used.
+In practice, the smallest number $N_i$ that fulfills the above requirements is
+chosen.
+
+A periodic function can be calculated at the real space grid points $\mf{R}$ as \cite[p.89]{Marx} :
+\begin{align}
+	f(\erre) &= \sum_{\GI} \tilde{f}(\GI) e^{i \GI \cdot \erre} \\
+			 &= \sum_{\mf{b}} \tilde{f}(\GI) exp\left[ \frac{2\pi}{N_{x}} i b_x q_x \right] + exp\left[ \frac{2\pi}{N_{y}} i b_y q_y \right] + exp\left[ \frac{2\pi}{N_{z}} i b_z q_z \right],
+\end{align}
+where we have expanded every $\GI$ in a linear combination of the primitive reciprocal vectors $\{\mf{b}_i\}$.
+
+The function $\tilde{f}(\GI)$ is zero outside the cutoff region, and the sum over the \textbf{b}-vectors can be extended over all indices in the cube $-\mf{b}_{i}^{max} , \cdots ,\mf{b}_{i}^{max}$ . 
+
+The functions $f(\mf{R})$ and $\tilde{f}(\GI)$ are related
+\begin{align}
+	f(\mf{R}) &= IFT[ \tilde{f}(\GI) ]\\
+	\tilde{f}(\GI) &= FT[ f(\mf{R}) ].
+\end{align}
+
+The calculation of the three-dimensional Fourier transforms can be performed by a
+series of one-dimensional Fourier transforms \cite{Marx}. The number of transforms in
+each direction is $N_y N_z$ , $N_x N_z$ , and $N_x N_y$ , respectively. Assuming that the
+one-dimensional transforms are performed within the fast Fourier transform
+framework, the number of operations per transform of length $n$ is approximately $\mathcal{O}(n log(n))$. This leads to an estimate for the number of operations for the full three-dimensional transform of $\mathcal{O}(N log(N))$ , where $N = N_x N_y N_z$ .
+
+Because to use the FFT a regular grid in the form of a parallelepiped is needed (both in direct and reciprocal space), the number of points in the FFT grid for density $N = N_{R} = N_{G}$ is roughly an order of magnitude larger than the number $N_{G}^{PW}$ defined in \eqref{eq:NGPW}.
+
+See table \ref{tab:FFTSummary} for a summary of the relationships between direct and reciprocal grid.
+
+\begin{table}[]
+\centering
+\begin{tabular}{lc}
+\hline
+\multicolumn{1}{|l|}{\textbf{Size}} & \multicolumn{1}{l|}{\textbf{Description}}                                                                                                                        \\ \hline
+\multicolumn{1}{|l|}{$N_{R}$}       & \multicolumn{1}{l|}{Number of $\mf{R}$ points in the real grid}                                                                                                  \\ \hline
+\multicolumn{1}{|l|}{$N_{G}$}       & \multicolumn{1}{l|}{Number of $\GI$ points in the reciprocal grid}                                                                                               \\ \hline
+\multicolumn{1}{|l|}{$N_{G}^{PW}$}  & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Number of $\GI$ points in the reciprocal grid associated to \\ plane waves below the cutting energy\end{tabular}} \\ \hline
+
+                                    & \multicolumn{1}{l}{}                                                                                                                                             \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Relationships}}                                                                                                                      \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{R} = N_{G} = N = N_x N_y N_z$}                                                                                                                         \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{G}^{PW} < N$}                                                                                                                       \\ \cline{2-2} 
+                                    &                                                                                                                                                                  \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Computational cost of every Fast Fourier Transform}}                                                                                           \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$\mathcal{O}(N log (N))$}                                                                                                                    \\ \cline{2-2} 
+\end{tabular}
+\caption{Summary of typical dimensions between direct and reciprocal grid}
+\label{tab:FFTSummary}
+\end{table}
+
+
+\newpage
+
+\subsubsection{Key calculations}
+
+
+From equation \eqref{eq:BlochEq} it's clear what are the key components of any DFT-SCF calculation:
 \begin{enumerate}
-	\item We need an expression of $v_{eff} = v + v_{h} + v_{xc}$;
-	\item We need to apply efficiently the operator $\nabla^2$ to any $u_{\mf{k}j}$;
-	\item We need to perform the diagonalization of $\mf{H}^{KS}$;
+%	\item We need the expression of $\dens$ and his Fourier transform $\rdens$;
+	\item evaluate $v_{eff} = v + v_{h} + v_{xc}$;
+	\item apply the operator $\nabla^2$ to any $u_{\mf{k}j}$;
+	\item perform the diagonalization of $\mf{H}^{KS}$;
 \end{enumerate}
 
-\subsubsection{Evaluating the potential}
+
+In section \ref{sec:Grid} we showed that we have two valid representations of the system, one in direct space and the other in reciprocal space. We can leverage this feature to calculate the terms in $\mf{H}^{KS}$ where it is more convenient and then transpose the results using FFT transformations\footnote{This is why we preferred not to specify any dependency of $v$,$v_{h}$,...}.
+
+This concept is the key model upon which PWscf has been developed.
+
+
+\subsubsection{Evaluating the potential}\label{sec:Potential}
 
 The potential $v_{eff}$ is composed by three terms:
 \begin{equation}
@@ -1650,9 +1763,9 @@ To model this dual nature without having to enlarge wildly the basis set to desc
 A discussion on the nature of pseudopotentials is out of the scope of this work, however a good dissertation on the matter can be found in \cite[chap. 11]{Martin}.
 What we need to know about pseudopotentials is that the electron-ion potential generated by a single ion can be expressed in reciprocal space as :
 \begin{equation}
-	\tilde{v}_{\alpha}(\mf{G}) = \sum_{\mid\mf{G}\mid < G_{cut}} f_{ps}^{sp}(G) e^{i \mf{G} \cdot \mf{R}_{\alpha}},
+	\tilde{v}_{\alpha}(\mf{G}) = \sum_{\mf{G}} f_{ps}^{sp}(G) e^{i \mf{G} \cdot \mf{R}_{\alpha}},
 \end{equation}
-where $G_{cut}$ is the maximum module of a reciprocal vector below the cutoff energy \eqref{eq:cutoffEnergy}, $\mf{R}_{\alpha}$ is the position of the ion and $f_{sp}^{sp}(G)$ is the function describing the pseudopotential of the given atomic species ``\textit{sp}" (e.g. hydrogen, oxygen, sodium, ...).
+where  $\mf{R}_{\alpha}$ is the position of the ion and $f_{sp}^{sp}(G)$ is the function describing the pseudopotential of the given atomic species ``\textit{sp}" (e.g. hydrogen, oxygen, sodium, ...).
 
 Given the position of each ion within the elementary cell and its atomic species, $\tilde{v}(\mf{G})$ is calculated as a superposition of each $\tilde{v}_{\alpha}(\mf{G})$.
 
@@ -1670,7 +1783,7 @@ $v_{h}(\erre)$ is defined in \eqref{eq:HartreePot} as
 
 $v_{h}$ is nothing else than the classical electrostatic potential generated by a tridimensional distribution of charge with volumetric charge density $\rho(\erre')$.
 
-We know that any electrostatic potential must satisfy the Poisson's equation :
+We know that every electrostatic potential must satisfy the Poisson's equation :
 \begin{equation}\label{eq:Poisson}
 	\nabla^2 v_{h}(\erre) = - \frac{\dens}{\varepsilon_{0}},
 \end{equation} 
@@ -1681,6 +1794,12 @@ Equation \eqref{eq:Poisson} in reciprocal space becomes:
 	\tilde{v}_{h}(\mf{G}) = \frac{\tilde{\rho}(\mf{G})}{G^2 \varepsilon_{0}},
 \end{equation}
 where $\tilde{v}_{h}(\mf{G})$ and $\tilde{\rho}(\mf{G})$ are the Fourier transforms respectively of $v_{h}(\erre)$ and $\dens$.
+
+Instead of having to compute the integral in \eqref{eq:HartreePot}, we just need the expression of $\tilde{\rho}(\mf{G})$.
+This is undoubtedly a great advantage from a computational standpoint, because all the complexity lies in the evaluation of $\tilde{\rho}(\mf{G})$, which is performed at the beginning of every iteration step as a FFT of $\dens$.
+Hence the computational cost associated to $v_{h}$ is $\bigO(N log(N))$.
+
+Using the definition \eqref{eq:HartreePot} requires to compute the integral for every point of the real grid . That is : for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). This leads to a complexity of $\mathcal{O}(N^2)$.
 
 \mynotes{magari lo mettiamo in appendice}
 For the sake of simplicity we can derive equation \eqref{eq:HartreePotReciprocal} in one dimension.
@@ -1703,60 +1822,74 @@ hence
 	\tilde{v}_{h}(g) = \frac{\tilde{\rho}(g)}{g^2 \varepsilon_{0}}.
 \end{equation}
 
-The computational advantage of \eqref{eq:HartreePotReciprocal} over \eqref{eq:HartreePot} is that we do not need to perform the integration over the real grid composing the elementary cell, the complexity lies in the evaluation of $\tilde{\rho}(\mf{G})$ which is computed at the beginning of each SCF step along with $\dens$.
 
-\mynotes{di questa parte sulla complessita' non sono sicuro:}
-
-Neglecting the constants we have that 
-\begin{equation}
-	\mathcal{O}(\tilde{v}_{h}) = 	\mathcal{O}(\tilde{\rho}) = \mathcal{O}(\numbands)
-\end{equation}
-instead of 
-\begin{equation}
-	\mathcal{O}(v) = \mathcal{O}(\numbands \cdot \numG)
-\end{equation}
-
-because the number of points of the direct grid used to perform the integration is equal to the number of $G$ points in the reciprocal space.
-
-
-Note that instead of $v(\mf{G})$, $v_{h}(\mf{G})$ is calculated once for every SCF step in the routine.
 
 \paragraph{Exchange correlation potential:} 
 As explained in section \ref{sec:SCF-DFT} $E_{xc}[\dens]$ is fixed at the beginning of the SCF iteration and never changes trough the whole iteration. $v_{xc}(\erre)$ is obtained analytically trough equation \eqref{eq:ExchangePotDer}.
-Then the impact on computational complexity of $v_{xc}(\erre)$ is negligible, analogously to $\tilde{v}(\mf{G})$.
+
+Even if $v_{xc}(\erre)$ is computed at the beginning of each iteration step, because $E_{xc}[\dens]$ depends on the electronic density, the computational cost of \eqref{eq:ExchangePotDer} is negligible.
 
 
+~
 
 
+We now have an expression for all the terms in $v_{eff}$, but two of them ($\tilde{v}_{h}$ and $\tilde{v}$) are calculated in the reciprocal space.
 
-\subsection{Domande per davice}
+Since $v_{eff}$ is applied in the direct space, where it's a simple multiplicative operator, we need to inverse transform $\tilde{v}_{h}$ and $\tilde{v}$.
+
+We have that
+\begin{equation}
+	v_{eff}(\erre) = IFFT\{\tilde{v}(\mf{G})\}(\erre) + IFFT\{\tilde{v}_{h}(\mf{G})\}(\erre) + v_{ex}(\erre),
+\end{equation}
+where $IFFT$ is the inverse fast Fourier transform.
+
+This operation is performed once for every iteration step.
+
+\subsubsection{The kinetic term}\label{sec:KineticTerm}
+
+Another great advantage of plane waves is that differentiation against the state function becomes a mere multiplication in reciprocal space.
+
+In fact we have that 
+\begin{equation}
+	\nabla^2 u_{kj}(\erre) = \sum_{\mf{G}} - c_{kj}(\mf{G})  G^2  e^{i \GI  \cdot \erre}.
+\end{equation}
+
+
+\subsection{Diagonalization}
+The diagonalization of $\mf{H}^{KS}$ is the core problem of any SCF implementation.
+
+As specified in \cite[Appendix A.2]{QE}, the strategy adopted by \QE is to use an algorithm called the \textit{Davidson method}\cite{Davidson}\footnote{\QE has also an alternative algorithm, called the \textit{conjugate gradient} method.}.
+
+The Davidson method follows an iterative approach to the solution of the eigenvalue problem.
+One of the great advantages of this method is that it is possible to obtain the set of the $n$ eigenvectors with the lower (or upper) eigenvalues without performing a \textit{dense diagonalization} of the whole matrix.
+That is : there is no need to store the whole matrix in memory!
+
+In order for the algorithm to work it is necessary to implement just one basic operation: the application of the matrix to a generic state vector:
+\begin{equation}
+	\mf{H^{KS}} \ket{u_{kj}}.
+\end{equation}
+This operation is implemented inside well-named subroutine \texttt{h\_psi}.
+
+Inside \QE the Davidson diagonalization is performed in the reciprocal space and works as follows:
+
+$\mf{H^{KS}}$ is divided in the kinetic term $\nabla^2$ and the potential term $v_{eff}$, each term is applied sequentially.
+
+As we said in section \ref{sec:KineticTerm}, the application of the kinetic term in the reciprocal space accounts just for a multiplication over $N^{PW}_G$.
+
+In section \ref{sec:Potential} we showed that $v_{eff}(\erre)$ is calculated once per SCF iteration step, then it is fixed during the whole Davidson iteration. Since we are in the reciprocal space but $v_{eff}$ is multiplicative only in real space it is necessary to: 
 \begin{enumerate}
-	\item $\tilde{\rho}$ e' calcolata come una FFT di $\dens$ oppure visto che la davidson lavora in spazio reciproco e alla fine della diagonalizzazione si ottengono gli orbitali in spazio reciproco e' il contrario, cioe' $\dens = IFFT\{\tilde{\rho}\}$ ?
-	\item la complessita' della FFT va con il numero dei coefficienti, quindi con il numero di punti G? cioe' $\mathcal{O}(\numG \log \numG)$?
-	
-	
-	
+	\item transform $\tilde{u}_{jk}(\GI)$ in $u_{kj}(\mf{R})$ using IFFT;
+	\item multiply $v_{eff}(\mf{R})$ for $u_{kj}(\mf{R})$ for every $\mf{R}$ in the real grid;
+	\item transform the result to the reciprocal space : \\ $[v_{eff}(\mf{R}) u_{kj}(\mf{R})](\GI) = FFT\{v_{eff}(\mf{R}) u_{kj}(\mf{R})\}$;
 \end{enumerate}
 
+This means that for every call of \texttt{h\_psi} an FFT and an IFFT must be performed, each of them has complexity $\bigO(N log (N))$. 
 
+Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total complexity is $\bigO(N_{b} N log (N))$, where $N_{b}$ is the number of bands (that is of the order of the number of electrons in the system).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\mynotes{manca la parte di algebra lineare della Davidson}
+\mynotes{manca schema che e' fondamentale}
+\mynotes{manca sum\_bands}
 
 
 
@@ -1908,7 +2041,7 @@ Pearson,
 \bibitem{Martin}
 R. Martin, 
 Electronic Structure,
-Cambridge Press,
+Cambridge University Press,
 2008.
 
 \bibitem{Manini}
@@ -1929,6 +2062,17 @@ P. Giannozzi , S. Baroni , N. Bonini,``QUANTUM ESPRESSO: a modular and open-sour
 
 \bibitem{OMP}
 ``OpenMP Application Programming Interface", \url{http://www.openmp.org/mp-documents/openmp-4.5.pdf}
+
+
+\bibitem{Marx}
+D. Marx, J. Hutter,
+Ab initio Molecular Dynamics,
+Basic Theory and Advanced Methods,
+Cambridge University Press,
+2009.
+
+\bibitem{Davidson}
+E. R. Davidson, ``Super-Matrix Methods", Comput. Phys. Comm., \textbf{53} 49 (1989)
 
 \end{thebibliography}
 
