@@ -1394,7 +1394,9 @@ We will call the initial density $\rho^{in}(\erre)$ and  the density obtained at
 
 
 \begin{figure}[h]
-	\includegraphics[width=\linewidth]{SCF-DFT_schema.pdf}
+	\begin{framed}
+			\includegraphics[width=\linewidth]{SCF-DFT_schema.pdf}	
+	\end{framed}
 	\caption{DFT SCF procedure layout}
 	\label{fig:SCF-DFT}
 \end{figure}
@@ -1603,34 +1605,6 @@ In this work we mainly focused on the study of systems having little symmetries\
 As a result the $\mf{H}^{KS}$ matrix becomes occupied mostly by a single block and no k-points parallelization can be performed.
 This configuration is usually referred as \textit{Gamma point}.
 
-We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
-
-%----------------------------------------------------------------------------
-\section{\QE}\label{sec:QE}
-%----------------------------------------------------------------------------
-
-\QE  is an integrated suite of computer codes for electronic-structure calculations and materials modeling based on density-functional theory, plane waves basis sets and pseudopotentials to represent electron-ion interactions.
-
-\QE is free, open-source software distributed under the terms of the GNU General Public License (GPL) and is written, mostly,in Fortran-95, with some parts in C or in Fortran-77.
-
-\QE supports a great variety of implementations of his core functionalities fully leveraging the well optimized versions of linear algebra and parallelization libraries like BLAS, LAPACK, SCALAPACK, FFTW, that are easily available for a wide range of computational architectures.
-
-The MPI standard\cite{MPI} is used for interprocess communication and the OpenMP standard\cite{OMP} is used for thread parallelization.
-
-
-\QE has been compiled and tested on numerous computing systems\cite{QEManual}: i386 Linux desktops, i386 Linux clusters, Mac OS X, Cray machines, IMB AIX, IBM BlueGene, NUMA machines, Intel-Phi co-processors, CUDA accelerators, FPGA accelerators and even mobile devices. 
-
-Quantum ESPRESSO distribution is composed by a set of packages (executables) built upon a versatile core library, a complete list of executables and various features can be found in \cite{QE}.
-
-In our work we focused only on the \textit{PWscf} package, which implements an iterative approach to reach self-consistency, using at each step iterative diagonalization techniques, in the framework of plane waves basis set.
-
-
-\subsection{SCF Implementation in \textit{PWscf} package}
-In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm based on DFT (see figure \ref{fig:SCF-DFT}).
-In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set impacts on the solution of Kohn-Sham equations.
-
-In the following section we will show the calculations needed to perform each SCF step as used in the PWscf package.
-
 
 
 \subsubsection{Grid representation and the size of the problem} \label{sec:Grid}
@@ -1725,32 +1699,72 @@ See table \ref{tab:FFTSummary} for a summary of the relationships between direct
 \end{table}
 
 
+We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
+
+
 \newpage
 
-\subsubsection{Key calculations}
+%----------------------------------------------------------------------------
+\section{\QE}\label{sec:QE}
+%----------------------------------------------------------------------------
+
+\QE  is an integrated suite of computer codes for electronic-structure calculations and materials modeling based on density-functional theory, plane waves basis sets and pseudopotentials to represent electron-ion interactions.
+
+\QE is free, open-source software distributed under the terms of the GNU General Public License (GPL) and is written, mostly,in Fortran-95, with some parts in C or in Fortran-77.
+
+\QE supports a great variety of implementations of his core functionalities fully leveraging the well optimized versions of linear algebra and parallelization libraries like BLAS, LAPACK, SCALAPACK, FFTW, that are easily available for a wide range of computational architectures.
+
+The MPI standard\cite{MPI} is used for interprocess communication and the OpenMP standard\cite{OMP} is used for thread parallelization.
 
 
-From equation \eqref{eq:BlochEq} it's clear what are the key components of any DFT-SCF calculation:
-\begin{enumerate}
-%	\item We need the expression of $\dens$ and his Fourier transform $\rdens$;
-	\item evaluate $v_{eff} = v + v_{h} + v_{xc}$;
-	\item apply the operator $\nabla^2$ to any $u_{\mf{k}j}$;
-	\item perform the diagonalization of $\mf{H}^{KS}$;
-\end{enumerate}
+\QE has been compiled and tested on numerous computing systems\cite{QEManual}: i386 Linux desktops, i386 Linux clusters, Mac OS X, Cray machines, IMB AIX, IBM BlueGene, NUMA machines, Intel-Phi co-processors, CUDA accelerators, FPGA accelerators and even mobile devices. 
+
+Quantum ESPRESSO distribution is composed by a set of packages (executables) built upon a versatile core library, a complete list of executables and various features can be found in \cite{QE}.
+
+In our work we focused only on the \textit{PWscf} package, which implements an iterative approach to reach self-consistency, using at each step iterative diagonalization techniques, in the framework of plane waves basis set.
 
 
-In section \ref{sec:Grid} we showed that we have two valid representations of the system, one in direct space and the other in reciprocal space. We can leverage this feature to calculate the terms in $\mf{H}^{KS}$ where it is more convenient and then transpose the results using FFT transformations\footnote{This is why we preferred not to specify any dependency of $v$,$v_{h}$,...}.
+\subsection{SCF Implementation in \textit{PWscf} package}
+In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm based on DFT.
 
-This concept is the key model upon which PWscf has been developed.
+In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set impacts on the solution of Kohn-Sham equations.
+
+Finally in section \ref{sec:Grid} we showed how the direct and reciprocal space are represented and how it's possible to move from one representation to another. 
+\QE leverages this feature to calculate the terms in $\mf{H}^{KS}$ where it is more convenient to.
 
 
-\subsubsection{Evaluating the potential}\label{sec:Potential}
+In the following section we will show the calculations needed to perform each SCF step as used in the PWscf package.
+
+We will use as a reference the steps outlined in figure \ref{fig:SCF-DFT} on page \pageref{fig:SCF-DFT}.
+The figure is reprinted here to help the reader.
+
+\begin{figure}[h]
+	\includegraphics[width=\linewidth]{SCF-DFT_schema.pdf}	
+\end{figure}
+
+\subsection{Initialization (Step 0)}
+For the SCF iteration to be performed a set of preliminary initializations must occur.
+This preliminary step is implemented within the \texttt{init\_run} subroutine.
+
+Besides the allocation of all the array and buffers, the real goal of this step is to obtain an initial electronic density a $\dens$ and an estimate of the total energy of the system.
+
+As a default behavior, \QE combines the electronic densities of every atomic species within the elementary cell.
+The same is done for the atomic orbitals, composing a preliminary set of Kohn-Sham orbitals $\{\psi_j\}$.
+\footnote{This is the default behavior of \QE ,it is also possible to perform a random initialization.}
+
+Using $\dens$ to evaluate $v_{eff}$ and $\{\psi_j\}$ to compute $\mf{H}_{ij}^{KS}$, $\mf{H}^{KS}$ is diagonalized to obtain the initial energy of the system thanks to equation \eqref{eq:DFTEnergy}. 
+This calculation is required because of the methods used to check self-consistency; nevertheless this first diagonalization is much faster than the ones performed during the SCF iteration.
+
+
+
+
+\subsubsection{Evaluating the potential (Step 1)}\label{sec:Potential}
 
 The potential $v_{eff}$ is composed by three terms:
 \begin{equation}
 	v_{eff} = v + v_{h} + v_{xc},
 \end{equation}
-where $v$ is the electron-ion potential, $v_{h}$ the electrostatic Hartee potential and $v_{xc}$ is the exchange-correlation potential.
+where $v$ is the electron-ion potential, $v_{h}$ the electrostatic Hartee potential and $v_{xc}$ is the exchange-correlation potential\footnote{The ``spatial" dependency of the potentials will be explicited when needed.}.
 
 \paragraph{The electron-ion potential:}
 $v$ was originally defined in \eqref{eq:electronionPotential} considering every ion as a point-like distribution of charge. 
@@ -1769,9 +1783,9 @@ where  $\mf{R}_{\alpha}$ is the position of the ion and $f_{sp}^{sp}(G)$ is the 
 
 Given the position of each ion within the elementary cell and its atomic species, $\tilde{v}(\mf{G})$ is calculated as a superposition of each $\tilde{v}_{\alpha}(\mf{G})$.
 
-Note that because ion position is fixed under the Born-Oppenheimer approximation, $\tilde{v}(\mf{G})$ is calculated only once for the whole SCF iteration, then its impact on the computational cost is negligible.  
+Note that because ions' position is fixed under the Born-Oppenheimer approximation, $\tilde{v}(\mf{G})$ is calculated only once for the whole SCF iteration, then its impact on the computational cost is negligible.  
 
-The calculation of $\tilde{v}$ happens inside the \texttt{init\_run} routine, which is the first routine called by PWscf and it's called only once in the whole execution (see section \ref{sec:CoreRoutines} for further details).
+As said above, the calculation of $\tilde{v}(\GI)$ happens inside the \texttt{init\_run} routine in the first evaluation of $v_{eff}$.
 
 
 \paragraph{The Hartree Potential:}
@@ -1799,9 +1813,10 @@ Instead of having to compute the integral in \eqref{eq:HartreePot}, we just need
 This is undoubtedly a great advantage from a computational standpoint, because all the complexity lies in the evaluation of $\tilde{\rho}(\mf{G})$, which is performed at the beginning of every iteration step as a FFT of $\dens$.
 Hence the computational cost associated to $v_{h}$ is $\bigO(N log(N))$.
 
-Using the definition \eqref{eq:HartreePot} requires to compute the integral for every point of the real grid . That is : for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). This leads to a complexity of $\mathcal{O}(N^2)$.
+Using the definition \eqref{eq:HartreePot} requires to compute the integral for every point of the real grid . That is : for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). 
+This would lead to a complexity of $\mathcal{O}(N^2)$.
 
-\mynotes{magari lo mettiamo in appendice}
+\mynotes{magari quello che segue le mettiamo in appendice}
 For the sake of simplicity we can derive equation \eqref{eq:HartreePotReciprocal} in one dimension.
 
 \begin{equation} \label{eq:PossionMono}
@@ -1825,7 +1840,7 @@ hence
 
 
 \paragraph{Exchange correlation potential:} 
-As explained in section \ref{sec:SCF-DFT} $E_{xc}[\dens]$ is fixed at the beginning of the SCF iteration and never changes trough the whole iteration. $v_{xc}(\erre)$ is obtained analytically trough equation \eqref{eq:ExchangePotDer}.
+As explained in section \ref{sec:SCF-DFT}, $E_{xc}[\dens]$ is fixed at the beginning of the SCF iteration and never changes trough the whole iteration. $v_{xc}(\erre)$ is obtained analytically trough equation \eqref{eq:ExchangePotDer}.
 
 Even if $v_{xc}(\erre)$ is computed at the beginning of each iteration step, because $E_{xc}[\dens]$ depends on the electronic density, the computational cost of \eqref{eq:ExchangePotDer} is negligible.
 
@@ -1855,7 +1870,7 @@ In fact we have that
 \end{equation}
 
 
-\subsection{Diagonalization}
+\subsection{Diagonalization (Step 2)}
 The diagonalization of $\mf{H}^{KS}$ is the core problem of any SCF implementation.
 
 As specified in \cite[Appendix A.2]{QE}, the strategy adopted by \QE is to use the \textit{Davidson method}\cite{Davidson}\footnote{\QE has also an alternative algorithm, called the \textit{conjugate gradient} method.}.
@@ -1899,10 +1914,13 @@ In section \ref{sec:Potential} we showed that $v_{eff}(\erre)$ is calculated onc
 
 This means that for every call of \texttt{h\_psi} an FFT and an IFFT must be performed, each of them with complexity $\bigO(N log (N))$. 
 
-Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total complexity per iteration step is $\bigO(N_{b} N log (N))$, where $N_{b}$ is the number of bands (that is of the order of the number of electrons in the system\footnote{Neglecting spin effects, $N_b = 1/2 N_e$}).
+Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total complexity per iteration step is $\bigO(N_{b} N log (N))$, where $N_{b}$ is the number of bands (that is of the order of the number of electrons in the system\footnote{Neglecting spin effects, $N_b = 1/2 N_e$}). 
 
-The computational cost of the whole Davidson diagonalization goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
+Note that this is the complexity of a single Davidson iteration, the number of iterations required to solve the eigenvalue problem cannot be predicted beforehand but the computational cost of the whole Davidson diagonalization goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
 
+
+
+\subsection{Brief comparison with Hartree-Fock methods}
 The complexity of the HF method is $\bigO(N^4)$\footnote{N is the size of the HF basis set.}, and rises from the evaluation of the exchange terms in the Fock matrix (see section \ref{sec:FockMatrix}). 
 What usually is not mentioned is that this is just the complexity of the evaluation of the Fock matrix, every HF method has still to perform the diagonalization\footnote{Which, depending on the algorithm, can have a complexity ranging from $\bigO(N_{b}^2)$ to $\bigO(N_{b}^3)$.}!
 
