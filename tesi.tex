@@ -44,6 +44,8 @@
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
 \newcommand\mf[1]{\mathbf{#1}}
 \newcommand\dens{\rho(\mathbf{r})}
+\newcommand\densin{\rho^{in}(\mathbf{r})}
+\newcommand\densout{\rho^{out}(\mathbf{r})}
 \newcommand\rdens{\tilde{\rho}(\mathbf{G})}
 \newcommand\erre{\mathbf{r}}
 \newcommand\GI{\mathbf{G}}
@@ -1626,7 +1628,7 @@ Using the above convention $u_{\mf{k},j}(\erre,\mf{k})$ became:
 	u_{kj}(\erre) = \frac{1}{\sqrt{\Omega}} \sum_{\GI} c_{kj}(\GI)e^{i \GI \cdot \erre}.
 \end{align}
 
-Which coincides with the use of a Discrete Fourier Transform, being $c_kj(\GI)$ the Fourier coefficients.
+Which coincides with the use of a Discrete Fourier Transform, being $c_{kj}(\GI)$ the Fourier coefficients.
 
 The expansion is truncated using equation \eqref{eq:cutoffEnergy} to a certain $\mid \GI \mid < G_{cut}$ (where $G_{cut}$ is the maximum module of a reciprocal vector below the cutoff energy \eqref{eq:cutoffEnergy}) that fix the size of the basis set. This can be done because $v_{eff}$ converge rapidly with increasing modulus of $\GI$.
 
@@ -1920,6 +1922,34 @@ Note that this is the complexity of a single Davidson iteration, the number of i
 
 
 
+\subsection{Calculation of the electronic density (Step 3)}
+
+After Davidson's diagonalization is concluded, a set $\{ u_{kj}(\GI) \}$ of $N_{b}$ eigenstates is obtained, obviously the ones with the lowest energy.
+
+To obtain the final density in real space it is convenient to use equation \eqref{eq:densityDef}, but, to do so, one need to transform $\{ u_{kj}(\GI) \}$ in $\{ u_{kj}(\erre) \}$ using an IFFT.
+
+As said in section \ref{sec:Grid}, the transformation can be performed independently for every dimension. 
+
+What \QE does is to divide the tridimensional grid in layers parallel to the $xy$ plane \footnote{This is why it is convenient to set the $z$ axis as the longest primitive vector.} and performs the IFFT on each layer separately.
+
+See \cite[p.246]{Martin}
+
+\mynotes{questa parte meglio chiederla a Davide}
+
+
+\subsection{Convergence criteria (Step 4)}
+
+\subsection{Density mixing (Step 5)}
+In the most primitive approach one could use $\densout$ as the new $\densin$ and continue the iteration.
+
+In reality this approach is not recommended since it won't lead to a fast convergence of the SCF calculation\footnote{It can lead to no convergence at all.}.
+
+What \QE does is to mix the value of $\densout$ with the values of the $n=1,..,8$ previously obtained densities.
+
+The details of how the mixing is performed can be found in \cite{Johnson} and the subroutine implementing this operation is called \texttt{mix\_rho}.
+
+
+
 \subsection{Brief comparison with Hartree-Fock methods}
 The complexity of the HF method is $\bigO(N^4)$\footnote{N is the size of the HF basis set.}, and rises from the evaluation of the exchange terms in the Fock matrix (see section \ref{sec:FockMatrix}). 
 What usually is not mentioned is that this is just the complexity of the evaluation of the Fock matrix, every HF method has still to perform the diagonalization\footnote{Which, depending on the algorithm, can have a complexity ranging from $\bigO(N_{b}^2)$ to $\bigO(N_{b}^3)$.}!
@@ -1930,7 +1960,7 @@ As a matter of fact, thanks to the use of the exchange-correlation potential, th
 
 
 
-\mynotes{manca sum\_bands}
+\mynotes{metti tabella da appunti con Davide}
 
 
 
@@ -2114,6 +2144,9 @@ Cambridge University Press,
 
 \bibitem{Davidson}
 E. R. Davidson, ``Super-Matrix Methods", Comput. Phys. Comm., \textbf{53} 49 (1989)
+
+\bibitem{Johnson}
+D. D. Johnson, ``Modified Broyden’s method for accelerating convergence in self-consistent calculations", Phys. Rev. B \textbf{38}, 12807 (1988)
 
 \end{thebibliography}
 
