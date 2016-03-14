@@ -1700,7 +1700,7 @@ See table \ref{tab:FFTSummary} for a summary of the relationships between direct
 \label{tab:FFTSummary}
 \end{table}
 
-
+\mynotes{Aggiungi tabellina con ordini di grandezza per sistema a 100 atomi}
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
 
 
@@ -1789,6 +1789,7 @@ Note that because ions' position is fixed under the Born-Oppenheimer approximati
 
 As said above, the calculation of $\tilde{v}(\GI)$ happens inside the \texttt{init\_run} routine in the first evaluation of $v_{eff}$.
 
+\mynotes{in realta' puo' essere costoso anche applicarli gli pseudopotenziali per via di come sono fatti, Davide.}
 
 \paragraph{The Hartree Potential:}
 
@@ -1883,7 +1884,7 @@ One of the great advantages of this method is that it is possible to obtain the 
 Instead, the $\mf{H}^{KS}$ matrix is reduced in smaller components each to be diagonalized with standard techniques implemented in \QE using LAPACK or SCALAPACK libraries. 
 This drastically decreases the amount of memory needed to perform the diagonalization.
 
-Making a rough estimate, a dense diagonalization would require $N_{b} \cdot N_{b}$ elements to be evaluated and stored in memory; Davidson diagonalization only requires $2 N_{b}$ elements.
+Making a rough estimate, the diagonalization of the dense matrix would require $N_{G}^{PW} \cdot N_{G}^{PW}$ elements to be evaluated and stored in memory; Davidson diagonalization only requires $N_{b} \cdot N_{b}$ elements.
 
 In order for the algorithm to work it is necessary to implement just one basic operation: the application of the matrix to a generic state vector:
 \begin{equation}
@@ -1920,7 +1921,15 @@ Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total comple
 
 Note that this is the complexity of a single Davidson iteration, the number of iterations required to solve the eigenvalue problem cannot be predicted beforehand but the computational cost of the whole Davidson diagonalization goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
 
+\mynotes{Spiega come \QE scegli di parallelizzare i conti. Usa scalapack solo quando i core sono tanti, i core li piazza intervallati. Se usa il seriale alla fine una solo CPU fa il conto, la figata e' quando sceglie il seriale ma gli dai i thread, in questo modo va molto piu' veloce. Caso sotto 8 core per la titania.}
 
+\subsubsection{Implementazione FFT}
+
+qui parla di come da formule di marx viene fatta l'implementazione di FFT.
+Praticamente si parallelizza il calcolo delle colonnette su z e poi si fa una all to all su tutti i piani, a loro volta si parallelizzano i piani.
+Il conto del marx non e' indipendente per dimensione ma e' fattorizzabile!!! Vuol dire che puoi nestare i cicli!!!
+
+\mynotes{Overloadare i thread non conviene perche nella fft non ci sono race conditions! Sono totalmente indipendenti i threads}
 
 \subsection{Calculation of the electronic density (Step 3)}
 
@@ -1934,10 +1943,29 @@ What \QE does is to divide the tridimensional grid in layers parallel to the $xy
 
 See \cite[p.246]{Martin}
 
-\mynotes{questa parte meglio chiederla a Davide}
+\mynotes{conta come una FFT perche' viene fatta come una fft! Lo vedi nel Martin, quindi conta come uno step di davidson senza l'algebra lineare. (solo la transformazione degli u)}
 
 
 \subsection{Convergence criteria (Step 4)}
+As explained in \ref{sec:SCF-DFT} a set of convergence test can be performed on $\densout$ and $E[\densout]$.
+\QE uses a refined methods that estimates the impact of the difference between $\densout$ and $\densin$ on the energy of the system.
+First we define the difference between $\densout$ and $E[\densout]$ as 
+\begin{equation}
+	\Delta\dens = \densin - \densout.
+\end{equation}
+Then consider the terms which are quadratical in $\Delta\dens$ in the quantity $E[\dens + \Delta\dens] - E[\dens ]$.
+
+One obtains
+\begin{align}
+	E[\dens + \Delta\dens] - E[\dens ] \simeq \frac{e^2}{2} \iint \frac{\Delta\rho(\erre) \Delta\rho(\erre')}{\mid \erre - \erre' \mid} \dd{\erre} \dd{\erre'}\\
+	
+	
+	,
+\end{align}
+Where we have not consider the second order derivative of $E_{xc}$ because of his complexity.
+As a result the only second order contribution to the energy difference is in the Hartree energy.
+
+cerchi il termine quadratico nella densita' in \eqref{eq:DFTEnergy}, alla fine ti viene fuori che il termine ione e' lineare (quindi se ne va), il termine in autovalori e' costante, il termine in hartree resta solo in parte ed e' quello che si usa perche' la derivata funzionale seconda del potenziale di scambio e' troppo costosa da applicare.
 
 \subsection{Density mixing (Step 5)}
 In the most primitive approach one could use $\densout$ as the new $\densin$ and continue the iteration.
@@ -2010,8 +2038,13 @@ It is this single-system image that distinguishes a multiprocessor from a multic
 \subsection{IBM NetXScale ``Galileo" Cluster Architecture}\label{galileoarch:sec}
 \subsection{SGI ALTIX UV-2000 NUMA-CC}\label{numaarch:sec}
 
+\mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
 
 \section{Discussion and Conclusion}
+
+\mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
+\mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
+
 
 May the force be with you.
 
