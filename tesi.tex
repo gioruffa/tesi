@@ -97,7 +97,7 @@ External Advisor: {\it Dott. Davide Ceresoli}\\
 \newpage
 
 
-\section{Ab Initio calculations in modern Solid State Physic}
+\section{Ab Initio calculations in modern Solid State Physics}
 \mynotes{importanza dei conti nel calcula delle strutture elettroniche}
 
 
@@ -1692,6 +1692,8 @@ See table \ref{tab:FFTSummary} for a summary of the relationships between direct
 \multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Relationships}}                                                                                                                      \\ \cline{2-2} 
 \multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{R} = N_{G} = N = N_x N_y N_z$}                                                                                                                         \\ \cline{2-2} 
 \multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{G}^{PW} < N$}                                                                                                                       \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Estimate for a 100 atom system}}                                                                                                                       \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{ $N_{b} \simeq \frac{1}{2} N_{e^{-}} \simeq 10^3~;~ N_{G}^{PW} \simeq 10^{6} ~;~ N \simeq 10^7 $}                                                                                                                       \\ \cline{2-2} 
                                     &                                                                                                                                                                  \\ \cline{2-2} 
 \multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Computational cost of every Fast Fourier Transform}}                                                                                           \\ \cline{2-2} 
 \multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$\mathcal{O}(N log (N))$}                                                                                                                    \\ \cline{2-2} 
@@ -1700,7 +1702,8 @@ See table \ref{tab:FFTSummary} for a summary of the relationships between direct
 \label{tab:FFTSummary}
 \end{table}
 
-\mynotes{Aggiungi tabellina con ordini di grandezza per sistema a 100 atomi}
+
+
 We shall now proceed with an in-depth analysis of the implementation of DFT SCF methods in the Quantum ESPRESSO suite, one of the most popular and solid software for materials modeling.
 
 
@@ -1956,8 +1959,7 @@ Being every term independent, there are no race-conditions between threads, they
 Once the sum on z columns is completed, the grid is separated in horizontal layers. 
 The layers are grouped in function of the MPI ranks and bidimensionals FFT are perfomed; the second thread parallelization can still be used.
 
-\mynotes{metti ref a link FFTW)}
-\QE uses the well known library FFTW (Fast Fourier Transform in the West) to perform one dimensional transformations. 
+\QE uses the well known library FFTW (Fast Fourier Transform in the West)\cite{FFTW} to perform one dimensional transformations. 
 Even if a native parallel implementation of tridimensional transformations was developed in FFTWv3, \QE uses his own parallelization strategy. 
 This design was developed when architectures like CrayAX an Sun HPC solutions where still supported. It was common for this kind of architectures to expose native and well optimized implementations of one-dimensional FFT transformations.
 
@@ -1976,18 +1978,18 @@ See section XXX for an test case analysis of this scenario.
 Not all the ranks will be used: depending on the total number of ranks or on user setting, a number ranging from one-forth to one-half of ranks will be used. 
 These ranks will be equally spaced and distributed over the whole computational resource, this is done to prevent the overload of the memory controller of a single machine.
 Thread parallelization can still be performed, as noted above.
-\mynotes{Se riusciamo proviamo a vedere cosa succede sulla numa se gli metti i rank vicini, sulla stessa piastra, dobbiamo patchare il codice pero'}
+\mynotes{Se riusciamo proviamo a vedere cosa succede sulla numa se gli mettiamo i rank vicini, sulla stessa piastra. Bisogna patchare il codice.}
 
 
 \subsection{Calculation of the electronic density (Step 3)}
 
-After Davidson's diagonalization is concluded, a set $\{ u_{kj}(\GI) \}$ of $N_{b}$ eigenstates is obtained, obviously the ones with the lowest energy.
+After Davidson's diagonalization is concluded, a set $\{ u_{kj}(\GI) \}$ of $N_{b}$ eigenstates with the lowest energy is obtained.
 
-To obtain the final density in real space it is convenient to use equation \eqref{eq:densityDef}, but, to do so, one need to transform $\{ u_{kj}(\GI) \}$ in $\{ u_{kj}(\erre) \}$ using an IFFT.
+To obtain the final density in real space it is convenient to use equation \eqref{eq:densityDef}, but, to do so, one need to transform $\{ u_{kj}(\GI) \}$ in $\{ u_{kj}(\erre) \}$ using an IFFT \cite[p.246]{Martin}.
 
-See \cite[p.246]{Martin}
+The IFFT transform constitute the major computational cost, and it's comparable with the cost of a single Davidson iteration.
 
-\mynotes{conta come una FFT perche' viene fatta come una fft! Lo vedi nel Martin, quindi conta come uno step di davidson senza l'algebra lineare. (solo la transformazione degli u)}
+The procedure is implemented inside the routine \texttt{sum\_band}, which is also responsible for the computation of occupations and the sum of eigenvalues.
 
 
 \subsection{Convergence criteria (Step 4)}
@@ -2008,45 +2010,77 @@ As a result the only second order contribution to the energy difference is in th
 Convergence is achieved when $\Delta E$ is lower than the parameter \texttt{conv\_thr}\footnote{Default value is $10^-6$ Rb.}.
 
 \subsection{Density mixing (Step 5)}
-In the most primitive approach one could use $\densout$ as the new $\densin$ and continue the iteration.
-
-In reality this approach is not recommended since it won't lead to a fast convergence of the SCF calculation\footnote{It can lead to no convergence at all.}.
+In the most primitive approach one could use $\densout$ as the $\densin$ for the next SCF step. In reality this approach is not recommended because it won't lead to a fast convergence of the whole SCF iteration\footnote{It can lead to no convergence at all.}.
 
 What \QE does is to mix the value of $\densout$ with the values of the $n=1,..,8$ previously obtained densities.
 
 The details of how the mixing is performed can be found in \cite{Johnson} and the subroutine implementing this operation is called \texttt{mix\_rho}.
 
+The computational cost of this operation roughly goes as the size of the grid ($\bigO(N)$), but is definitely negligible.
 
 
-\subsection{Brief comparison with Hartree-Fock methods}
-The complexity of the HF method is $\bigO(N^4)$\footnote{N is the size of the HF basis set.}, and rises from the evaluation of the exchange terms in the Fock matrix (see section \ref{sec:FockMatrix}). 
+\subsection{Brief comparison with Hartree-Fock method}
+In table \ref{tab:HF-DFTComp} we perform a comparison between two of the most popular computational model in solid state physics: DFT SCF algorithm using plane waves as basis set and HF SCF algorithm using Gaussian orbitals.
+
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l|ll|l|}
+\cline{2-2} \cline{5-5}
+                                    & \textbf{DFT-PW}        &                       &                    & \textbf{HF-Gaussian} \\ \cline{1-2} \cline{4-5} 
+\multicolumn{1}{|l|}{\textbf{FFT}}  & $\bigO(N_{b}N ln(N) )$ & \multicolumn{1}{l|}{} & $\mf{H}_{ij}$ & $\bigO(N_{gauss}^4)$ \\ \cline{1-2} \cline{4-5} 
+\multicolumn{1}{|l|}{\textbf{DIAG}} & $\bigO(N_{b}^3)$       & \multicolumn{1}{l|}{} & \textbf{DIAG}      & $\bigO(N_{b}^3)$     \\ \cline{1-2} \cline{4-5} 
+\end{tabular}
+\caption{Comparison of computational complexity between DFT method using plane waves and HF method using Gaussian orbitals. $\mf{H}_{ij}$ stands for the evaluation of the Hamiltonian(mainly the Fock operator), \textbf{DIAG} is the cost of the diagonalization, $N_b$ is the number of bands, $N_{gauss}$ is the number of Gaussian orbitals in the basis set.}
+\label{tab:HF-DFTComp}
+\end{table}
+
+The main complexity of the HF method is $\bigO(N^4)$\footnote{N is the size of the HF basis set.}, and rises from the evaluation of the exchange terms in the Fock matrix (see section \ref{sec:FockMatrix}). 
 What usually is not mentioned is that this is just the complexity of the evaluation of the Fock matrix, every HF method has still to perform the diagonalization\footnote{Which, depending on the algorithm, can have a complexity ranging from $\bigO(N_{b}^2)$ to $\bigO(N_{b}^3)$.}!
 
-As a matter of fact, thanks to the use of the exchange-correlation potential, the DFT have lowered the cost of Hamiltonian evaluation, in exchange of the massive use of FFT transformations\footnote{At least for \QE suite.}.
+As a matter of fact, thanks to the use of the exchange-correlation potential, the DFT have lowered the cost of Hamiltonian evaluation, in exchange of a massive and highly parallelized use of FFT transformations\footnote{At least for \QE suite.}.
 
 
+Another advantage of DFT-PW is that if number of plane waves in the basis set is increased (i.e. $N_G \simeq N$, i.e. the cutoff energy), in order to obtain a more precise estimate, the old basis-set will still be a subset of the new one and no overlapping can ever occour. 
+As a consequence, the energy of the system is variational against $N_G$, that is : increasing the basis set can only lead to a more precise calculation\footnote{To a lower energy.}.
 
+As a downside, the number of plane waves needed to sample empty space within the grid is incredibly high compared to Gaussian orbitals.
 
+In contrast, Gaussian orbitals tends to overlap strongly when the basis set size in increase (i.e. for large systems) making the diagonalization increasingly difficult.\footnote{Higher orbitals can be obtained as a linear combination of lower ones, making the determinant null.} 
+In addition, the nature of the orbitals in the basis set depends on the size of the set; 
+	this means that the energy (and also other observables) can oscillate in function of $N_{gauss}$!
 
-\mynotes{metti tabella da appunti con Davide}
+What happens in modern solid state simulations is that DFT and HF are used together to simulate the same system. The final contribution in than weighted as $75\%$ DFT and $25\%$ HF. Both methods sharing the same plane wave basis set.
 
+An approach based on the automatic projection of Gaussian orbitals into plane waves and vice-versa 
+%to perform some calculation with HF and some with DFT, 
+is actually under development and will be included in future releases of \QE.
 
-
-
-
-
-
-
-
-
-
-
-
-
-\newpage
 \subsection{Core Routines}\label{sec:CoreRoutines}
 
+\begin{table}[h]
+\centering
 
+
+\begin{tabular}{llll}
+\textbf{Routine}            & \textbf{Description} & \textbf{Calls} & \textbf{Complexity} \\
+\hline
+\hline
+\\[0pt]
+\texttt{init\_run} &  \begin{tabular}[c]{@{}l@{}} first approximation of\\ $\dens$, $\{u_{kj}\}$ and $v_{eff}$. \end{tabular} & 1 per PWscf run &  \begin{tabular}[c]{@{}l@{}} $v_{eff} : \bigO(N log (N) )$ \\ Diag $: \bigO(N_{b}^3)$ \end{tabular} \\[20pt]
+\texttt{c\_bands}  & Diagonalization of $\mf{H}^{KS}$ & 1 per SCF step & $\bigO(N_{b}^3)$           
+\\[20pt]
+\texttt{h\_psi}    & Compute $\mf{H}^{KS} \ket{u_{kj}}$  & $N_{b}$ per Davidson step     & $\bigO(N log (N))$            
+\\[20pt]
+
+\texttt{sum\_bads} & \begin{tabular}[c]{@{}l@{}} Calculate $\densout$,$\varepsilon_{j}$\\ and occupations \end{tabular} & 1 per SCF step      &  $\bigO(N log (N))$  
+\\[20pt]
+\hline         
+
+\end{tabular}
+\caption{Summary of the most important routines in \QE}
+\label{tab:coreRoutines}
+\end{table}
 
 \newpage
 \section{Computational Architectures} \label{sec:comparch}
@@ -2084,6 +2118,7 @@ It is this single-system image that distinguishes a multiprocessor from a multic
 
 \mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
 \mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
+\mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
 
 
 May the force be with you.
@@ -2206,6 +2241,9 @@ P. Giannozzi , S. Baroni , N. Bonini,``QUANTUM ESPRESSO: a modular and open-sour
 
 \bibitem{OMP}
 ``OpenMP Application Programming Interface", \url{http://www.openmp.org/mp-documents/openmp-4.5.pdf}
+
+\bibitem{FFTW}
+``Fast Fourier Transform in the West" project page, \url{http://www.fftw.org/}.
 
 
 \bibitem{Marx}
