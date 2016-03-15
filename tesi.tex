@@ -1884,7 +1884,7 @@ One of the great advantages of this method is that it is possible to obtain the 
 Instead, the $\mf{H}^{KS}$ matrix is reduced in smaller components each to be diagonalized with standard techniques implemented in \QE using LAPACK or SCALAPACK libraries. 
 This drastically decreases the amount of memory needed to perform the diagonalization.
 
-Making a rough estimate, the diagonalization of the dense matrix would require $N_{G}^{PW} \cdot N_{G}^{PW}$ elements to be evaluated and stored in memory; Davidson diagonalization only requires $N_{b} \cdot N_{b}$ elements.
+Making a rough estimate, the diagonalization of the dense matrix would require $N_{G}^{PW} \cdot N_{G}^{PW} \simeq N^2$ elements to be evaluated and stored in memory; Davidson diagonalization only requires $N_{b}^2$ elements.
 
 In order for the algorithm to work it is necessary to implement just one basic operation: the application of the matrix to a generic state vector:
 \begin{equation}
@@ -1892,7 +1892,13 @@ In order for the algorithm to work it is necessary to implement just one basic o
 \end{equation}
 In \QE this operation is implemented inside the well-named subroutine \texttt{h\_psi} and is performed in the reciprocal space (see figure \ref{fig:hpsi}).
 
-$\mf{H^{KS}}$ is divided in the kinetic term $\nabla^2$ and the potential term $v_{eff}$, each term is applied sequentially.
+The evaluation of $\mf{H^{KS}}$ is divided in the kinetic term $\nabla^2$ and the potential term $v_{eff}$, each term is applied sequentially; 
+the trial eigenvectors $\{\ket{u_{kj}}\}^{in}$  are the ones obtained in the previous SCF step, if any, or the ones obtained in \texttt{init\_run}.
+\footnote{When the SCF step has converged, the $\{\ket{u_{kj}}\}^{out}$ obtained are not subjected to mixing, unlike $\densout$. The reason is that the amount of memory needed to store them would be too much. 
+As a matter of fact $\densin$ could not be generated from $\{\ket{u_{kj}}\}^{in}$; 
+this in not important because the Davidson method, which is iterative, will guarantee the convergence to the real $\{\ket{u_{kj}}\}^{out}$. 
+As a matter of fact $\{\ket{u_{kj}}\}^{in}$ are a reasonable guess of the new eigenstates $\{\ket{u_{kj}}\}^{out}$, reducing the number of Davidson steps required to reach convergence.
+}
 
 As we said in section \ref{sec:KineticTerm}, the application of the kinetic term in the reciprocal space accounts just for a multiplication over $N^{PW}_G$.
 
@@ -1941,23 +1947,36 @@ Usually the cycle on the $z$ axis (index $l$) is the first to be performed:
 		exp \left[i \frac{2\pi}{N_y}kv \right] 
 		\sum_{l}^{N_z} 	f^{\GI}_{jkl} exp \left[i \frac{2\pi}{N_x}lw \right].
 \end{equation}
-What \QE does is to divide the grid in a set of $N_x \cdot N_y$ columns along $z$, then the sum is performed in parallel for each column. This parallelization is performed using MPI, that is : each rank calculates a set of columns.
-Since the terms in the rightmost sum in \eqref{eq:NestedFFT2} are independent from one another, also the sum over each column can be parallelized. 
+What \QE does is to divide the grid in a set of $N_x \cdot N_y$ columns along the $z$ axis, then the sum is performed in parallel for each column. 
+This parallelization is implemented using MPI, that is : each rank calculates sequentially a set of columns.
+Since the terms in the rightmost sum in \eqref{eq:NestedFFT2} are independent from one another, the sum over each column can be parallelized. 
 This second layer of parallelization is performed using thread parallelization, thanks to the OpenMP library.
 Being every term independent, there are no race-conditions between threads, they do not need to wait the computation performed by other threads and they work on independent chunks of memory. \footnote{See section XXX for the effects of threads overload.}
 
 Once the sum on z columns is completed, the grid is separated in horizontal layers. 
-The layers are grouped in function of the MPI ranks, and second thread parallelization can still be performed.
+The layers are grouped in function of the MPI ranks and bidimensionals FFT are perfomed; the second thread parallelization can still be used.
 
 \mynotes{metti ref a link FFTW)}
 \QE uses the well known library FFTW (Fast Fourier Transform in the West) to perform one dimensional transformations. 
-Even if a native parallel implementation of tridimensional transformations was developed inside FFTWv3, \QE uses his own parallelization strategy. 
-This design need rises from the early development phase, when architectures like CrayAX an Sun HPC solutions where still supported. It was common for this architectures to expose native and well optimized implementations fro one-dimensional FFT transformations.
+Even if a native parallel implementation of tridimensional transformations was developed in FFTWv3, \QE uses his own parallelization strategy. 
+This design was developed when architectures like CrayAX an Sun HPC solutions where still supported. It was common for this kind of architectures to expose native and well optimized implementations of one-dimensional FFT transformations.
 
-\subsubsection{Parallelizzazione cbands e FFT}
+\subsubsection{Dense matrices diagonalization}
 
-\mynotes{Spiega come \QE scegli di parallelizzare i conti. Usa scalapack solo quando i core sono tanti, i core li piazza intervallati. Se usa il seriale alla fine una solo CPU fa il conto, la figata e' quando sceglie il seriale ma gli dai i thread, in questo modo va molto piu' veloce. Caso sotto 8 core per la titania.}
+As said above, the Davidson method reduces the problem to the diagonalization of a $N_{b}^2$ matrix.
+\QE can perform this operation either in parallel or serially.
+The kind of parallelization used can be manually set or automatically decided.
 
+\paragraph{Serial diagonalization: }  In this case only one MPI rank performs the diagonalization.
+\footnote{Actually, depending on the version of \QE, a set of different ranks would perform the same operation, obtaining the same result.}
+Be aware that thread parallelization is still an option, if threads are enabled and the threaded version of MKL libraries have been linked.
+See section XXX for an test case analysis of this scenario.
+
+\paragraph{Parallel Diagonalization: } In this case \QE would leverage the features of the SCALAPACK library and distribuite the load over a set of MPI ranks. 
+Not all the ranks will be used: depending on the total number of ranks or on user setting, a number ranging from one-forth to one-half of ranks will be used. 
+These ranks will be equally spaced and distributed over the whole computational resource, this is done to prevent the overload of the memory controller of a single machine.
+Thread parallelization can still be performed, as noted above.
+\mynotes{Se riusciamo proviamo a vedere cosa succede sulla numa se gli metti i rank vicini, sulla stessa piastra, dobbiamo patchare il codice pero'}
 
 
 \subsection{Calculation of the electronic density (Step 3)}
@@ -1965,10 +1984,6 @@ This design need rises from the early development phase, when architectures like
 After Davidson's diagonalization is concluded, a set $\{ u_{kj}(\GI) \}$ of $N_{b}$ eigenstates is obtained, obviously the ones with the lowest energy.
 
 To obtain the final density in real space it is convenient to use equation \eqref{eq:densityDef}, but, to do so, one need to transform $\{ u_{kj}(\GI) \}$ in $\{ u_{kj}(\erre) \}$ using an IFFT.
-
-As said in section \ref{sec:Grid}, the transformation can be performed independently for every dimension. 
-
-What \QE does is to divide the tridimensional grid in layers parallel to the $xy$ plane \footnote{This is why it is convenient to set the $z$ axis as the longest primitive vector.} and performs the IFFT on each layer separately.
 
 See \cite[p.246]{Martin}
 
