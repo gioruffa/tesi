@@ -1657,7 +1657,7 @@ chosen.
 A periodic function can be calculated at the real space grid points $\mf{R}$ as \cite[p.89]{Marx} :
 \begin{align}
 	f(\erre) &= \sum_{\GI} \tilde{f}(\GI) e^{i \GI \cdot \erre} \\
-			 &= \sum_{\mf{b}} \tilde{f}(\GI) exp\left[ \frac{2\pi}{N_{x}} i b_x q_x \right]  exp\left[ \frac{2\pi}{N_{y}} i b_y q_y \right]  exp\left[ \frac{2\pi}{N_{z}} i b_z q_z \right],
+			 &= \sum_{\mf{b}} \tilde{f}(\GI) exp\left[ \frac{2\pi}{N_{x}} i b_x q_x \right]  exp\left[ \frac{2\pi}{N_{y}} i b_y q_y \right]  exp\left[ \frac{2\pi}{N_{z}} i b_z q_z \right], \label{eq:FFTDef}
 \end{align}
 where we have expanded every $\GI$ in a linear combination of the primitive reciprocal vectors $\{\mf{b}_i\}$.
 
@@ -1921,15 +1921,44 @@ Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total comple
 
 Note that this is the complexity of a single Davidson iteration, the number of iterations required to solve the eigenvalue problem cannot be predicted beforehand but the computational cost of the whole Davidson diagonalization goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
 
+\subsubsection{Implementazione FFT}
+Given their central role, it is convenient to outline how FFT transformations are performed inside \QE .
+We can explicitly rewrite equation \eqref{eq:FFTDef} for an IFFT from reciprocal to real grid.
+
+\begin{align}
+	IFFT[f(\GI)] &= \sum_{j}^{N_x} \sum_{k}^{N_y} \sum_{l}^{N_z} f^{\GI}_{jkl}
+		exp \left[i \frac{2\pi}{N_x}ju \right] 
+		exp \left[i \frac{2\pi}{N_y}kv \right] 
+		exp \left[i \frac{2\pi}{N_x}lw \right] \\
+		[u,v,w] &= \mf{q} \\
+		[j,k,l] &= \mf{b}_i.
+\end{align}
+This factorized form can be implemented as a series of three nested cycles, one for each dimension.
+Usually the cycle on the $z$ axis (index $l$) is the first to be performed:
+\begin{equation}\label{eq:NestedFFT2}
+	IFFT[f(\GI)] = \sum_{j}^{N_x} \sum_{k}^{N_y} 
+		exp \left[i \frac{2\pi}{N_x}ju \right] 
+		exp \left[i \frac{2\pi}{N_y}kv \right] 
+		\sum_{l}^{N_z} 	f^{\GI}_{jkl} exp \left[i \frac{2\pi}{N_x}lw \right].
+\end{equation}
+What \QE does is to divide the grid in a set of $N_x \cdot N_y$ columns along $z$, then the sum is performed in parallel for each column. This parallelization is performed using MPI, that is : each rank calculates a set of columns.
+Since the terms in the rightmost sum in \eqref{eq:NestedFFT2} are independent from one another, also the sum over each column can be parallelized. 
+This second layer of parallelization is performed using thread parallelization, thanks to the OpenMP library.
+Being every term independent, there are no race-conditions between threads, they do not need to wait the computation performed by other threads and they work on independent chunks of memory. \footnote{See section XXX for the effects of threads overload.}
+
+Once the sum on z columns is completed, the grid is separated in horizontal layers. 
+The layers are grouped in function of the MPI ranks, and second thread parallelization can still be performed.
+
+\mynotes{metti ref a link FFTW)}
+\QE uses the well known library FFTW (Fast Fourier Transform in the West) to perform one dimensional transformations. 
+Even if a native parallel implementation of tridimensional transformations was developed inside FFTWv3, \QE uses his own parallelization strategy. 
+This design need rises from the early development phase, when architectures like CrayAX an Sun HPC solutions where still supported. It was common for this architectures to expose native and well optimized implementations fro one-dimensional FFT transformations.
+
+\subsubsection{Parallelizzazione cbands e FFT}
+
 \mynotes{Spiega come \QE scegli di parallelizzare i conti. Usa scalapack solo quando i core sono tanti, i core li piazza intervallati. Se usa il seriale alla fine una solo CPU fa il conto, la figata e' quando sceglie il seriale ma gli dai i thread, in questo modo va molto piu' veloce. Caso sotto 8 core per la titania.}
 
-\subsubsection{Implementazione FFT}
 
-qui parla di come da formule di marx viene fatta l'implementazione di FFT.
-Praticamente si parallelizza il calcolo delle colonnette su z e poi si fa una all to all su tutti i piani, a loro volta si parallelizzano i piani.
-Il conto del marx non e' indipendente per dimensione ma e' fattorizzabile!!! Vuol dire che puoi nestare i cicli!!!
-
-\mynotes{Overloadare i thread non conviene perche nella fft non ci sono race conditions! Sono totalmente indipendenti i threads}
 
 \subsection{Calculation of the electronic density (Step 3)}
 
@@ -1953,19 +1982,15 @@ First we define the difference between $\densout$ and $E[\densout]$ as
 \begin{equation}
 	\Delta\dens = \densin - \densout.
 \end{equation}
-Then consider the terms which are quadratical in $\Delta\dens$ in the quantity $E[\dens + \Delta\dens] - E[\dens ]$.
-
-One obtains
+Then we consider the terms in $E[\dens + \Delta\dens] - E[\dens ]$ which are quadratical in $\Delta\dens$ \footnote{Linear terms are zero in proximity of the minimum.} :
 \begin{align}
-	E[\dens + \Delta\dens] - E[\dens ] \simeq \frac{e^2}{2} \iint \frac{\Delta\rho(\erre) \Delta\rho(\erre')}{\mid \erre - \erre' \mid} \dd{\erre} \dd{\erre'}\\
-	
-	
-	,
+	\Delta E = E[\dens + \Delta\dens] - E[\dens ] &\simeq \frac{e^2}{2} \iint \frac{\Delta\rho(\erre) \Delta\rho(\erre')}{\mid \erre - \erre' \mid} \dd{\erre} \dd{\erre'}\\
+	 &= \int \Delta\dens \Delta v_{h}(\erre') \dd{\erre},
 \end{align}
-Where we have not consider the second order derivative of $E_{xc}$ because of his complexity.
+where we have not consider the second order derivative of $E_{xc}$ because of his complexity.
 As a result the only second order contribution to the energy difference is in the Hartree energy.
 
-cerchi il termine quadratico nella densita' in \eqref{eq:DFTEnergy}, alla fine ti viene fuori che il termine ione e' lineare (quindi se ne va), il termine in autovalori e' costante, il termine in hartree resta solo in parte ed e' quello che si usa perche' la derivata funzionale seconda del potenziale di scambio e' troppo costosa da applicare.
+Convergence is achieved when $\Delta E$ is lower than the parameter \texttt{conv\_thr}\footnote{Default value is $10^-6$ Rb.}.
 
 \subsection{Density mixing (Step 5)}
 In the most primitive approach one could use $\densout$ as the new $\densin$ and continue the iteration.
