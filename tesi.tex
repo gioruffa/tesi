@@ -1625,7 +1625,7 @@ We know that the solutions to equation \eqref{eq:BlochEq} are in factorized form
 Using the above convention $u_{\mf{k},j}(\erre,\mf{k})$ became:
 
 \begin{align}
-	u_{kj}(\erre) = \frac{1}{\sqrt{\Omega}} \sum_{\GI} c_{kj}(\GI)e^{i \GI \cdot \erre}.
+	u_{kj}(\erre) = \frac{1}{\sqrt{\Omega}} \sum_{\GI} c_{kj}(\GI)e^{i \GI \cdot \erre},
 \end{align}
 
 being $c_{kj}(\GI)$ the Fourier expansion coefficients, it coincides with a discrete Fourier transformation.
@@ -1679,7 +1679,7 @@ framework, the number of operations per transform of length $n$ is approximately
 
 Because to use the FFT a regular grid in the form of a parallelepiped is needed (both in direct and reciprocal space), the number of points in the FFT grid for density $N = N_{R} = N_{G}$ is roughly an order of magnitude larger than the number $N_{G}^{PW}$ defined in \eqref{eq:NGPW} \cite{Martin}.
 
-See table \ref{tab:FFTSummary} for a summary of the relationships between direct and reciprocal grid.
+See table \ref{tab:FFTSummary} for a summary of the relationships between direct and reciprocal grid and an estimate of their typical dimensions.
 
 \begin{table}[]
 \centering
@@ -1736,7 +1736,7 @@ In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm 
 
 In section \ref{sec:elLattice} we saw how the choice of plane waves as basis set impacts on the solution of Kohn-Sham equations.
 
-Finally in section \ref{sec:Grid} we showed how the direct and reciprocal space are represented and how it's possible to move from one representation to another. 
+Finally, in section \ref{sec:Grid} we showed how direct and reciprocal space are represented and how it's possible to move from one representation to another. 
 \QE leverages this feature to calculate the terms in $\mf{H}^{KS}$ where it is more convenient to.
 
 
@@ -1746,7 +1746,9 @@ As a reference, we will use  the steps outlined in figure \ref{fig:SCF-DFT} on p
 The figure is reprinted here to help the reader.
 
 \begin{figure}[h]
+\begin{center}
 	\includegraphics[width=\linewidth]{SCF-DFT_schema.pdf}	
+	\end{center}
 \end{figure}
 
 \subsection{Initialization (Step 0)}
@@ -1886,25 +1888,29 @@ The diagonalization of $\mf{H}^{KS}$ is the core problem of any SCF implementati
 As specified in \cite[Appendix A.2]{QE}, the strategy adopted by \QE is to use the \textit{Davidson method}\cite{Davidson}\footnote{\QE has also an alternative algorithm, called the \textit{conjugate gradient} method.}.
 
 The Davidson method follows an iterative approach to the solution of the eigenvalue problem.
-One of the great advantages of this method is that it is possible to obtain the set of the $n$ eigenvectors with the lower (or upper) eigenvalues without performing a \textit{dense diagonalization} of the whole matrix.
+One of the great advantages of this method is that it is possible to obtain the set of the $n$ eigenvectors with the lower (or upper) eigenvalues without performing the diagonalization of the whole $\mf{H}^{KS}$ dense matrix of dimension $N_{G}^{PW} \cdot N_{G}^{PW} \simeq N^2$.
 
-Instead, the $\mf{H}^{KS}$ matrix is reduced in smaller components each to be diagonalized with standard techniques implemented in \QE using LAPACK or SCALAPACK libraries. 
+Instead, the $\mf{H}^{KS}$ matrix is reduced in a smaller matrix which generic element is 
+\begin{equation}\label{eq:DavidsonMatrix}
+	\mf{H}_{ij} = \bra{u_{ki}}\mf{H}^{KS}\ket{u_{kj}},
+\end{equation}
+where $\ket{u_{kj}}$ is a trial eigenvector. 
+Then the size of the matrix is reduced to $N_{b}^2$, to be diagonalized with standard techniques implemented in \QE using LAPACK or SCALAPACK libraries.
 This drastically decreases the amount of memory needed to perform the diagonalization.
 
-Making a rough estimate, the diagonalization of the dense matrix would require $N_{G}^{PW} \cdot N_{G}^{PW} \simeq N^2$ elements to be evaluated and stored in memory; Davidson diagonalization only requires $N_{b}^2$ elements.
-
-In order for the algorithm to work it is necessary to implement just one basic operation: the application of the matrix to a generic state vector:
+From equation \eqref{eq:DavidsonMatrix} we can see that for the algorithm to work it is necessary to implement just one basic operation: the application of the matrix to a generic state vector
+\footnote{The braket calculation $ \bra{u_{ki}} (\mf{H}^{KS}\ket{u_{kj}})$ is trivial using LAPACK or SCALAPACK libraries.}
 \begin{equation}
 	\mf{H^{KS}} \ket{u_{kj}}.
 \end{equation}
 In \QE this operation is implemented inside the well-named subroutine \texttt{h\_psi} and is performed in the reciprocal space (see figure \ref{fig:hpsi}).
 
 The evaluation of $\mf{H^{KS}}$ is divided in the kinetic term $\nabla^2$ and the potential term $v_{eff}$, each term is applied sequentially; 
-the trial eigenvectors $\{\ket{u_{kj}}\}^{in}$  are the ones obtained in the previous SCF step, if any, or the ones obtained in \texttt{init\_run}.
+the trial eigenvectors $\{\ket{u_{kj}}\}^{in}$  are the ones obtained in the previous SCF step, if any, or the ones obtained from \texttt{init\_run}.
 \footnote{When the SCF step has converged, the $\{\ket{u_{kj}}\}^{out}$ obtained are not subjected to mixing, unlike $\densout$. The reason is that the amount of memory needed to store them would be too much. 
-As a matter of fact $\densin$ could not be generated from $\{\ket{u_{kj}}\}^{in}$; 
-this in not important because the Davidson method, which is iterative, will guarantee the convergence to the real $\{\ket{u_{kj}}\}^{out}$. 
-As a matter of fact $\{\ket{u_{kj}}\}^{in}$ are a reasonable guess of the new eigenstates $\{\ket{u_{kj}}\}^{out}$, reducing the number of Davidson steps required to reach convergence.
+As a matter of fact $\densin$ can not be generated from $\{\ket{u_{kj}}\}^{in}$.
+This in not important because the Davidson method, which is iterative, will guarantee the convergence to the real $\{\ket{u_{kj}}\}^{out}$. 
+$\{\ket{u_{kj}}\}^{in}$ have to be considered as a reasonable guess of the new eigenstates $\{\ket{u_{kj}}\}^{out}$, reducing the number of Davidson steps required to reach convergence.
 }
 
 As we said in section \ref{sec:KineticTerm}, the application of the kinetic term in the reciprocal space accounts just for a multiplication over $N^{PW}_G$.
@@ -1930,7 +1936,7 @@ In section \ref{sec:Potential} we showed that $v_{eff}(\erre)$ is calculated onc
 
 This means that for every call of \texttt{h\_psi} an FFT and an IFFT must be performed, each of them with complexity $\bigO(N log (N))$. 
 
-Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total complexity per iteration step is $\bigO(N_{b} N log (N))$, where $N_{b}$ is the number of bands (that is of the order of the number of electrons in the system\footnote{Neglecting spin effects, $N_b = 1/2 N_e$}). 
+Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total complexity per iteration step is $\bigO(N_{b} N log (N))$, where $N_{b}$ is the number of bands (that is of the order of the number of electrons in the system\footnote{Neglecting spin effects, $N_b = 1/2 N_e$.}). 
 
 Note that this is the complexity of a single Davidson iteration, the number of iterations required to solve the eigenvalue problem cannot be predicted beforehand but the computational cost of the whole Davidson diagonalization\footnote{Excluding the evaluation of $\mf{H}^{KS}$} goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
 
@@ -1963,7 +1969,7 @@ Being every term independent, there are no race-conditions between threads, they
 Once the sum on z columns is completed, the grid is separated in horizontal layers. 
 The layers are grouped in function of the MPI ranks and bidimensionals FFT are perfomed; the second thread parallelization can still be used.
 
-\QE uses the well known library FFTW (Fast Fourier Transform in the West)\cite{FFTW} to perform one dimensional transformations. 
+\QE uses the well known library FFTW (``Fast Fourier Transform in the West")\cite{FFTW} to perform one dimensional transformations. 
 Even if a native parallel implementation of tridimensional transformations was developed in FFTWv3, \QE uses his own parallelization strategy. 
 This design was developed when architectures like CrayAX an Sun HPC solutions where still supported. It was common for this kind of architectures to expose native and well optimized implementations of one-dimensional FFT transformations.
 
@@ -1973,12 +1979,12 @@ As said above, the Davidson method reduces the problem to the diagonalization of
 \QE can perform this operation either in parallel or serially.
 The kind of parallelization used can be manually set or automatically decided.
 
-\paragraph{Serial diagonalization: }  In this case only one MPI rank performs the diagonalization.
+\paragraph{Serial diagonalization: }  In this case, only one MPI rank performs the diagonalization.
 \footnote{Actually, depending on the version of \QE, a set of different ranks would perform the same operation, obtaining the same result.}
 Be aware that thread parallelization is still an option, if threads are enabled and the threaded version of MKL libraries have been linked.
 See section XXX for an test case analysis of this scenario.
 
-\paragraph{Parallel Diagonalization: } In this case \QE would leverage the features of the SCALAPACK library and distribuite the load over a set of MPI ranks. 
+\paragraph{Parallel Diagonalization: } In this case \QE leverages the features of the SCALAPACK library and distribuite the load over a set of MPI ranks. 
 Not all the ranks will be used: depending on the total number of ranks or on user setting, a number ranging from one-forth to one-half of ranks will be used. 
 These ranks will be equally spaced and distributed over the whole computational resource, this is done to prevent the overload of the memory controller of a single machine.
 Thread parallelization can still be performed, as noted above.
@@ -1991,7 +1997,7 @@ After Davidson's diagonalization is concluded, a set $\{ u_{kj}(\GI) \}$ of $N_{
 
 To obtain the final density in real space it is convenient to use equation \eqref{eq:densityDef}, but, to do so, one need to transform $\{ u_{kj}(\GI) \}$ in $\{ u_{kj}(\erre) \}$ using an IFFT \cite[p.246]{Martin}.
 
-The IFFT transform constitute the major computational cost, and it's comparable with the cost of a single Davidson iteration.
+The IFFT transform constitute the major computational cost, and it's comparable with the cost of a single Davidson step.
 
 The procedure is implemented inside the routine \texttt{sum\_band}, which is also responsible for the computation of occupations and the sum of eigenvalues.
 
@@ -2054,13 +2060,20 @@ In contrast, Gaussian orbitals tends to overlap strongly when the basis set size
 In addition, the nature of the orbitals in the basis set depends on the size of the set; 
 	this means that the energy (and also other observables) can oscillate in function of $N_{gauss}$!
 
-What happens in modern solid state simulations is that DFT and HF are used together to simulate the same system. The final contribution in than weighted as $75\%$ DFT and $25\%$ HF. Both methods sharing the same plane wave basis set.
+What happens in modern solid state calculations is that DFT and HF are used together to simulate the same system. The final contribution is than weighted as $75\%$ DFT and $25\%$ HF. Both methods sharing the same plane wave basis set.
 
 An approach based on the automatic projection of Gaussian orbitals into plane waves and vice-versa 
 %to perform some calculation with HF and some with DFT, 
 is actually under development and will be included in future releases of \QE.
 
+\subsubsection{Energy evaluation}
+At the end of every iteration step the energy of the system is always calculated. The expression used by \QE is the one in equation \eqref{eq:DFTEnergy}.
+
+Other physical properties of the system, like the forces the ions are subjected to, are calculated after self-consistency has been achieved.
+
 \subsection{Core Routines}\label{sec:CoreRoutines}
+
+In table \ref{tab:coreRoutines} we present a summary of the most important subroutines in the PWscf package, along with a brief description, the number of calls and an estimate of the computational cost.
 
 \begin{table}[h]
 \centering
