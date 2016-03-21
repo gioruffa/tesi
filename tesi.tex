@@ -1829,7 +1829,6 @@ Hence the computational cost associated to $v_{h}$ is $\bigO(N log(N))$.
 Using the definition \eqref{eq:HartreePot} would require to compute the integral for every point of the real grid . That is : for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). 
 This would lead to a complexity of $\mathcal{O}(N^2)$.
 
-\mynotes{magari quello che segue le mettiamo in appendice}
 For the sake of simplicity we can derive equation \eqref{eq:HartreePotReciprocal} in one dimension.
 
 \begin{equation} \label{eq:PossionMono}
@@ -2123,19 +2122,148 @@ Because all CPUs in a multiprocessor see the same memory image, there is only on
 Consequently, there is only one page map and one process table. 
 It is this single-system image that distinguishes a multiprocessor from a multicomputer, in which each computer has its own copy of the operating system.
 
+\subsubsection{CC-NUMA Architectures}
+One popular flavor of multiprocessor computers that has proven to be valuable in moder HPC computing is composed by NUMA machines.
+
+Each CPU, or subset of CPUs is called a \textit{NUMA node} and posses a local memory bank that is always reachable by other CPUs within the same machine.
+All NUMA machines have three key characteristics that together distinguish
+them from other multiprocessors:
+\begin{enumerate}
+	\item There is a single address space visible to all CPUs.
+	\item Access to remote memory done using LOAD and STORE instructions.
+	\item Access to remote memory is slower than access to local memory.
+\end{enumerate}
+The acronym NUMA \textit{Non Uniform Memory Access} is now justified.
+
+To improve scaling, memory caching is implemented, but, with multiple memory banks across the whole multicomputer, it is necessary to maintain coherency between different local-caches.  
+When coherent caches are present, the system is called CC-NUMA.
+
+The most popular approach for building large CC-NUMA (Cache Coherent
+NUMA) multiprocessors currently is the directory-based multiprocessor. The
+idea is to maintain a database telling where each cache line is and what its status is.
+When a cache line is referenced, the database is queried to find out where it is and
+whether it is clean or dirty (modified). Since this database must be queried on
+every single instruction that references memory, it must be kept in extremely fast
+special-purpose hardware that can respond in a fraction of a bus cycle.
+
+\mynotes{Metti immagine}
 
 \subsection{Multicomputer Architectures}
+A Multicomputer is a system composed by a range of possibly heterogeneous computers.
+Each node in a multicomputer consists of one or a few CPUs, some RAM (conceivably shared among the CPUs at that node only), a disk and/or other I/O devices, and a communication processor. 
+The communication processors are connected by a high-speed interconnection network. 
+What all multicomputers have in common is that when an application program executes the send primitive, the communication processor is notified and transmits a block of user data to the destination machine (possibly after first asking for and getting permission).
 
-\subsection{IBM NetXScale ``Galileo" Cluster Architecture}\label{galileoarch:sec}
-\subsection{SGI ALTIX UV-2000 NUMA-CC}\label{numaarch:sec}
+The \textit{de facto} standard for interprocess communication in HPC environment is the MPI \textit{Message Passing Interface} library \cite{MPI}.
+MPI has been implemented and optimized for a wide variety of systems and interconnect hardwares.
+
+
+In the following we introduce the two computational systems used in this work.
+
+
+
+\subsection{SGI ALTIX UV-2000 CC-NUMA}\label{numaarch:sec}
+Tutto sui processori e la memoria e numactl e topology.
+
+Hai tutto nelle specs.
 
 \mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
 
-\section{Discussion and Conclusion}
+
 
 \mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
 \mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
 \mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
+
+
+\subsection{IBM NetXScale CINECA ``Galileo" Cluster Architecture}\label{galileoarch:sec}
+
+The multicomputer system we had the opportunity to use is the Galileo Tier-1 cluster hosted by CINECA \cite{Galileo}.
+
+This supercomputer is among  the fastest supercomputer available to Italian industrial and public researchers. It is equipped with up-to date Intel accelerators (Intel Phi 7120p), NVIDIA accelerators (NVIDIA Tesla K80), as well as top level programming environment and a number of Application Tools required by the projects activated on it.
+
+Galileo is mainly used to develop and run applications targeted at hybrid architectures, leveraging software applications in the fields of computational fluid dynamics, material and life science, and geophysics. The computing system is also available to European researchers as a Tier-1 system of the PRACE infrastructure.
+
+Architecture: Linux Infiniband Cluster
+
+\subsubsection{Galileo Specifications}
+
+Cluster specifications: 
+\begin{itemize}
+\item \textbf{Nodes}: 516 
+\item \textbf{Processors}: 2 8-cores Intel Haswell 2.40 GHz per node
+\item \textbf{Cores}: 16 cores/node, 8256 cores in total
+\item \textbf{RAM}: 128 GB/node, 8 GB/core
+\item \textbf{Internal Network}: Infiniband with 4x QDR switches
+\item \textbf{Disk Space}: 2.000 TB of local scratch
+\item \textbf{Operating system}: CentOS 7.0
+\item \textbf{Batch system}: PBS Pro (Topology-aware)
+\end{itemize}
+
+Cpu specifications:
+\begin{itemize}
+\item \textbf{Vendor}: Intel
+\item \textbf{Processor Number}: Xeon E5-2630V3
+\item \textbf{L3 cache size}: 20MB
+\item \textbf{Instruction set}: 64-bit
+\item \textbf{Max frequency}: 3.2 GHz
+\item \textbf{Hyper-threading}: No 
+\end{itemize}
+
+
+
+\subsection{Azzeramento}
+Tutto quello fatto per azzerare il bias
+
+\subsubsection{Metodo}
+\begin{itemize}
+	\item librerie open NO -> solo il meglio. State of the art for the architecture. Makefile delle due macchine.
+	\item sempre a macchina scarica
+
+\end{itemize}
+
+
+\subsubsection{Strumenti}
+\begin{itemize}
+	\item process pinning, dlook, nodeinfo. QE si comporta bene, gestisce bene la memoria.
+	\item MPT
+	\item profiling interno di QE
+	\item scorep
+\end{itemize}
+
+
+\subsubsection{Metrics}
+\begin{itemize}
+	\item cpuTime
+	\item wallTime (diskio = None)
+	\item speedup
+\end{itemize}
+
+
+\section{Results}
+\subsection{Dichiarazione di intenti}\label{sec:dichiarazionePoetica}
+\begin{itemize}
+	\item tuning QE indip da architettura (software)
+	\item tuning QE dip da architettura 
+	\item studio delle instabilita' numeriche. (iterazioni variabili)
+\end{itemize}
+
+\subsubsection{TiOH2}
+IMPORTANTE: Spiega perche' hai usato TITANIA.
+
+\subsubsection{Plots}
+Per ogni sottosezione di sopra \ref{sec:dichiarazionePoetica} mettere da 6 a 8 grafici (AXES!) massimo.
+Metti cerchio sui grafici dove IB spacca.
+
+
+In fondo mettere i risultati per ogni molecola di size diverso.
+	
+Tutti i grafici che restano vanno a popolare l'appendice.
+
+\section{Discussion and Conclusion}
+
+Metti molecola organica.
+
 
 
 May the force be with you.
@@ -2275,6 +2403,10 @@ E. R. Davidson, ``Super-Matrix Methods", Comput. Phys. Comm., \textbf{53} 49 (19
 
 \bibitem{Johnson}
 D. D. Johnson, ``Modified Broyden’s method for accelerating convergence in self-consistent calculations", Phys. Rev. B \textbf{38}, 12807 (1988)
+
+\bibitem{Galileo}
+\url{http://www.top500.org/system/178549},
+\url{http://www.hpc.cineca.it/hardware/galileo}.
 
 \end{thebibliography}
 
