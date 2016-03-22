@@ -2112,7 +2112,7 @@ This difference permeates how they are designed, built, and programmed, as well 
 Shared memory refers to a (typically large) block of random access memory (RAM) that can be accessed simultaneously by several different CPUs with an intent to provide communication among them or avoid redundant copies.
 
 
-\subsection{Multiprocessor Architectures}
+\subsection{Multiprocessor Architectures}\label{sec:multiprocessor}
 A parallel computer in which all the CPUs share a common memory is called a multiprocessor. 
 All processes working together on a multiprocessor can share a single virtual address space mapped onto the common memory. 
 Any process can read or write a word of memory by just executing a LOAD or STORE instruction.
@@ -2163,9 +2163,53 @@ In the following we introduce the two computational systems used in this work.
 
 
 \subsection{SGI ALTIX UV-2000 CC-NUMA}\label{numaarch:sec}
-Tutto sui processori e la memoria e numactl e topology.
 
-Hai tutto nelle specs.
+The CC-NUMA system we used is an SGI Altix UV2000 machine.
+This machine is composed by four blades, each containing two NUMA nodes (e.g. one CPU 8-cores chip-set with one 128 GB local memory bank per node). 
+Each node has to be considered as an extension of the motherboard, thus appearing as an unique machine to the operative system, with an unique memory address space.
+
+\subsubsection{UV-2000 specifications}
+
+\begin{itemize}
+\item \textbf{Nodes}: 8
+\item \textbf{Blades}: 4
+\item \textbf{Processors}: 1 8-cores Intel Haswell 3.3 GHz per node
+\item \textbf{Cores}: 8 cores/node, 64 cores in total
+\item \textbf{RAM}: 128 GB/node, 8 GB/core, total 1024 GB.
+\item \textbf{Interconnect}: NUMAlink UVHub 3.0 (48 NUMAlink Ports)
+\item \textbf{Disk Space}: 1.000 TB
+\item \textbf{Operating system}: CentOS 7.0
+\item \textbf{Batch system}: Not required
+\item \textbf{Serial Number}: UV2-00000510
+\end{itemize}
+
+Cpu specifications:
+
+\begin{itemize}
+\item \textbf{Vendor}: Intel
+\item \textbf{Processor Number}: Xeon E5-4627 v2
+\item \textbf{L3 shared cache size}: 16MB
+\item \textbf{Instruction set}: 64-bit
+\item \textbf{Max frequency}: 3.3 GHz
+\item \textbf{Hyper-threading}: No 
+\end{itemize}
+
+
+\subsubsection{NUMAlink and GRU-MPT}
+As said in section \ref{sec:multiprocessor} the main feature of multiprocessor architectures is the possibility to leverage shared memory.
+In this framework the implementation of a program can be definitely easier compared with the use of MPI libraries, but \QE has abandoned a shared memory design long time ago, now being strongly based on message massing directives.
+
+To obviate this kind of problem, SGI provides the user with his own implementation of the MPI library, the so-called MPT\cite{MPT} \textit{Message Passing Toolkit library}.
+
+This library gives the user the possibility to use the capabilities of shared memory systems without the need to change their MPI-based code. 
+We can see the MPT library as shared memory wrapper for MPI calls. \footnote{The capabilities of the MPT toolkit goes wildly over the mere wrapping of MPI calls, but, in the scope of this work, this description is enough.}
+The linux kernel module responsible for the operation of shared memory wrapping and intercommunication is called GRU.
+
+In this framework all the work of intercommunication is demanded to the NUMAlink interconnect, which basically migrates pages of memory to minimize local reference misses.
+
+For tuning parameters of MPT please refer to section XXX.
+\mynotes{metti link a sezione}
+
 
 \mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
 
@@ -2194,7 +2238,7 @@ Cluster specifications:
 \item \textbf{Processors}: 2 8-cores Intel Haswell 2.40 GHz per node
 \item \textbf{Cores}: 16 cores/node, 8256 cores in total
 \item \textbf{RAM}: 128 GB/node, 8 GB/core
-\item \textbf{Internal Network}: Infiniband with 4x QDR switches
+\item \textbf{Interconnect}: Infiniband with 4x QDR switches
 \item \textbf{Disk Space}: 2.000 TB of local scratch
 \item \textbf{Operating system}: CentOS 7.0
 \item \textbf{Batch system}: PBS Pro (Topology-aware)
@@ -2204,7 +2248,7 @@ Cpu specifications:
 \begin{itemize}
 \item \textbf{Vendor}: Intel
 \item \textbf{Processor Number}: Xeon E5-2630V3
-\item \textbf{L3 cache size}: 20MB
+\item \textbf{L3 shared cache size}: 20MB
 \item \textbf{Instruction set}: 64-bit
 \item \textbf{Max frequency}: 3.2 GHz
 \item \textbf{Hyper-threading}: No 
@@ -2407,6 +2451,9 @@ D. D. Johnson, ``Modified Broyden’s method for accelerating convergence in sel
 \bibitem{Galileo}
 \url{http://www.top500.org/system/178549},
 \url{http://www.hpc.cineca.it/hardware/galileo}.
+
+\bibitem{MPT}
+Full specification of the Message Passing Toolkit can be retrieved using the command : man MPT.
 
 \end{thebibliography}
 
