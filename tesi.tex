@@ -54,7 +54,8 @@
 \newcommand\numG{n_{G}}
 \newcommand\numR{n_{R}}
 \newcommand\bigO{\mathcal{O}}
-
+\newcommand\CO{CO3 } 
+%nome del sistema CO3
 
 \begin{document}
 
@@ -2499,24 +2500,108 @@ We measure the execution time of the PWscf package compiled with different confi
 \end{itemize}
 The result are exposed in table \ref{tab:libraries}.
 
-\begin{table}[]
+\begin{table}[h]
 \centering
 \begin{tabular}{lccc}
 \textbf{cores} & \multicolumn{1}{l}{\textbf{GNU}} & \multicolumn{1}{l}{\textbf{GNU+ItelMKL}} & \multicolumn{1}{l}{\textbf{INTEL}} \\ \hline \hline
 \textbf{1}     & 1h 52m                           & 1h 50m                                   & 22m 57s                            \\
 \textbf{64}    & 6m 3s                            & 5m 58s                                   & 1m 50s                            
 \end{tabular}
-\caption{Walltime for PWscf runs on CO3 system with different compilers and libraries.}
+\caption{Execution time for PWscf runs on CO3 system with different compilers and libraries.}
 \label{tab:libraries}
 \end{table}
 
 We can see that the native Intel compilation is considerably more efficient than the open-source alternatives.
 The use of MKL library seems to have little effect on the overall result, but one must consider that for such a system the great computational complexity lies in the FFT performance.\footnote{See section XXX.}
 
-For this reason all the tests we have done were performed with the ``\textit{state of the art}" compilers and libraries available on each architecture.
+\begin{framed}
+For this reason all the tests we have done were performed using ``\textit{state of the art}" compilers and libraries available on each architecture.
+\end{framed}
 
 
 \paragraph{Node Load : }
+
+In modern HPC computing is common to share resources. Big multicomputers clusters are often used by thousands of users simultaneously.
+In this framework, if the amount of CPUs required is less than the total number of CPUs available on the node it is almost certain that the remaining CPUs will be occupied by other users' computations.
+This means dividing the size of the L3 cache among different users performing completely different calculations.
+
+As one can imagine the impact on performance is not beneficial.
+
+On the Galileo cluster we have performed a set of tests on the \CO  system both completely reserving an entire node and without this precaution.
+
+To completely reserve a single node on the Galileo cluster, one must use the following PBS \texttt{qsub} directive :
+\begin{verbatim}
+	PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
+\end{verbatim}
+\mynotes{metti link a pagina di spiega di galileo su pbs}
+Where the first number after the \texttt{select} statement is the number of nodes, \texttt{ncpus} is the number of CPUs to reserve, \texttt{mpiprocs} is the maximum number of MPI processes to be spawned and \texttt{mem} is the maximum memory required by the computation (on the single node).
+
+Finally, to occupy only a subset of cores an leave the others unused one must specify the total number of ranks to the MPI launcher :
+\begin{verbatim}
+	mpirun -np 1 pw.x
+\end{verbatim}
+where \texttt{-np 1} set the number of mpi processes to use and \texttt{pw.x} is the executable.
+Note that in case threads are used, both explicitly or using the \texttt{OMP\_NUM\_THREADS} environment variable, the real number of CPUs used will be $N_{MPI ranks} \cdot N_{OMP threads}$.
+
+On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
+
+\begin{table}[hhh!]
+\centering
+\begin{tabular}{r|cc}
+\textbf{cores} & \textbf{reserved} & \textbf{shared} \\ \hline \hline
+1              & 22m 57s           & 32m 51s         \\
+2              & 12m 15s           & 16m 58s         \\
+4              & 7m 16s            & 8m 52s          \\
+8              & 4m 1s             & 4m 25s         
+\end{tabular}
+\caption{Execution time for the \CO system on totally reserved and shared nodes.}
+\label{tab:galileoNodeLoad}
+\end{table}
+
+It is clear that sharing resources has an impact on the execution time. 
+The difference becomes less noticeable when the number of CPUs rises. 
+Unfortunately it is not possible to select the exact CPU to occupy, thus we cannot see if by reserving the first eight CPUs\footnote{Being on the same CPU-set, they share the same L3 cache.} the result would be the same on reserved and shared nodes.
+
+On the UV2000 we had the possibility to perform more extensive tests and the results are reported in figure \ref{fig:sgiLoad}.
+
+To simulate different load conditions we ran simultaneously different instances of PWscf performing the same calculation.\footnote{Of the \CO system.}. Each instance of PWscf is completely independent.
+
+In the first graph each instances was composed by a single MPI process, without threads. 
+The execution time is plotted in function of the total number of independent processes running simultaneously on the machine.
+The processes were equivalently spaced among the CPUs\footnote{Except for the first bar, the load of each node was the same.}.
+Two aspects can be clearly seen.
+
+First the execution time rises after 16 cores are simultaneously occupied, meaning at least half of the cores in each node.
+When all the CPUs are occupied the execution time is more than doubled. 
+We can say that the UV2000 performs poorly compared to the traditional cluster when multiple independent tasks have to be performed at the same time.
+
+The second observation is that the execution time of the first and second bars are very close. 
+In the first bar only a single CPU for on the whole machine is used; in the second bar a single CPU (the first one) for each node is used;
+The fact that the times are the same suggests that each node behaves almost independently.
+
+To confirm this speculation we raised the number of MPI ranks per PWscf instance to eight\footnote{The number of CPUs in a node.} and we performed three tests represented  in the second graph of figure \ref{fig:sgiLoad}.
+The first bar occupies only one node per machine, the second half of the nodes and the third all of them.
+
+The execution times are basically the same, hence we can say that every node behaves independently.
+
+\begin{framed}
+Then the UV2000 machine can be used to perform different independent calculation simultaneously, provided that each node is used separately.
+\end{framed}
+
+
+SCRIVI CHE ABBIAMO SEMPRE USATO LA MACCHINA SCARICA
+
+
+
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{sgiLoad.pdf}	
+	\caption{asd}
+	\label{fig:sgiLoad}
+\end{center}
+\end{figure}
+
+
 
 \paragraph{Process migration (UV2000) : }
 dlook, nodeifo, QE si comporta bene, gestisce bene la memoria. Usa solo chiamate all to all.
@@ -2525,7 +2610,6 @@ dlook, nodeifo, QE si comporta bene, gestisce bene la memoria. Usa solo chiamate
 
 After this considerations we decided to perform all our tests in optimal conditions.
 That are:
-\mynotes{copia la direttiva pbs}
 \begin{itemize}
 	\item ``\textit{State of the art}" libraries and compilers
 	\item Completely dedicated nodes. Meaning that on Galileo the whole node was reserved even if the computation was performed on a single CPU. This can be done using the PBS directive \texttt{select=1:ncpus:16:...}. On the UV2000 the while 64 core machine was reserved.
