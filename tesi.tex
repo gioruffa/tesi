@@ -2564,6 +2564,15 @@ Unfortunately it is not possible to select the exact CPU to occupy, thus we cann
 
 On the UV2000 we had the possibility to perform more extensive tests and the results are reported in figure \ref{fig:sgiLoad}.
 
+
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=0.7\linewidth]{sgiLoad.pdf}	
+	\caption{asd}
+	\label{fig:sgiLoad}
+\end{center}
+\end{figure}
+
 To simulate different load conditions we ran simultaneously different instances of PWscf performing the same calculation.\footnote{Of the \CO system.}. Each instance of PWscf is completely independent.
 
 In the first graph each instances was composed by a single MPI process, without threads. 
@@ -2584,22 +2593,23 @@ The first bar occupies only one node per machine, the second half of the nodes a
 
 The execution times are basically the same, hence we can say that every node behaves independently.
 
+\begin{center}
+\textit{Then the UV2000 machine can be used to perform simultaneously different independent calculations, provided that each node, or set of nodes, is used separately.}
+\end{center}
+
+The same results can be obtained with different numbers of MPI ranks per instance, see APPENDICE.
+\mynotes{metti appendice}
+
 \begin{framed}
-Then the UV2000 machine can be used to perform different independent calculation simultaneously, provided that each node is used separately.
+After these preliminary tests, we decided to run every calculation always reserving the whole resource, being it a Galileo node or the whole UV2000 machine.
 \end{framed}
 
 
-SCRIVI CHE ABBIAMO SEMPRE USATO LA MACCHINA SCARICA
 
 
 
-\begin{figure}[hhh!]
-\begin{center}
-	\includegraphics[width=0.7\linewidth]{sgiLoad.pdf}	
-	\caption{asd}
-	\label{fig:sgiLoad}
-\end{center}
-\end{figure}
+
+
 
 
 
