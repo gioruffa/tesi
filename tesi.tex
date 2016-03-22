@@ -2179,7 +2179,7 @@ Each node has to be considered as an extension of the motherboard, thus appearin
 \item \textbf{Interconnect}: NUMAlink UVHub 3.0 (48 NUMAlink Ports)
 \item \textbf{Disk Space}: 1.000 TB
 \item \textbf{Operating system}: CentOS 7.0
-\item \textbf{Batch system}: Not required
+\item \textbf{Batch system}: None. Direct access to the operative system.
 \item \textbf{Serial Number}: UV2-00000510
 \end{itemize}
 
@@ -2205,19 +2205,240 @@ This library gives the user the possibility to use the capabilities of shared me
 We can see the MPT library as shared memory wrapper for MPI calls. \footnote{The capabilities of the MPT toolkit goes wildly over the mere wrapping of MPI calls, but, in the scope of this work, this description is enough.}
 The linux kernel module responsible for the operation of shared memory wrapping and intercommunication is called GRU.
 
-In this framework all the work of intercommunication is demanded to the NUMAlink interconnect, which basically migrates pages of memory to minimize local reference misses.
+In this framework all the work of intercommunication is demanded to the NUMAlink interconnect, which basically migrates and duplicates pages of memory to minimize local reference misses.
 
 For tuning parameters of MPT please refer to section XXX.
 \mynotes{metti link a sezione}
 
+\subsubsection{Useful commands}
+On the UV2000 a set of useful commands can be used to characterize the architecture.
 
-\mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
+We report the command name and a brief description.
+
+\paragraph{cpumap} command prints information on CPU locations and characteristics within the machine.
+
+Sample Output: 
+
+\begin{verbatim}
+Sat Dec 12 18:31:26 CET 2015
+uv2000
+
+This is an SGI UV
+model name           : Intel(R) Xeon(R) CPU E5-4627 v2 @ 3.30GHz
+Architecture         : x86_64
+cpu MHz              : 3301.000
+cache size           : 16384 KB (Last Level)
+
+Total Number of Sockets             	: 8
+Total Number of Cores               	: 64	(8 per socket)
+Hyperthreading                      	: OFF
+
+UV Information
+ HUB Version: 				 UVHub  3.0
+ Number of Hubs: 			 8
+ Number of connected Hubs: 		 8
+ Number of connected NUMAlink ports: 	 48
+=============================================================================
+
+Hub-Processor Mapping
+
+  Hub Location      Processor Numbers -- HyperThreads in ()
+  --- ----------    ---------------------------------------
+    0 r001i01b00h0     0    1    2    3    4    5    6    7
+    1 r001i01b00h1     8    9   10   11   12   13   14   15
+    2 r001i01b01h0    16   17   18   19   20   21   22   23
+    3 r001i01b01h1    24   25   26   27   28   29   30   31
+    4 r001i01b02h0    32   33   34   35   36   37   38   39
+    5 r001i01b02h1    40   41   42   43   44   45   46   47
+    6 r001i01b03h0    48   49   50   51   52   53   54   55
+    7 r001i01b03h1    56   57   58   59   60   61   62   63
+
+=============================================================================
+
+Processor Numbering on Node(s)
+
+   Node    (Logical) Processors
+  ------    -------------------------
+     0      0    1    2    3    4    5    6    7
+     1      8    9   10   11   12   13   14   15
+     2     16   17   18   19   20   21   22   23
+     3     24   25   26   27   28   29   30   31
+     4     32   33   34   35   36   37   38   39
+     5     40   41   42   43   44   45   46   47
+     6     48   49   50   51   52   53   54   55
+     7     56   57   58   59   60   61   62   63
+
+=============================================================================
+
+Sharing of Last Level (3) Caches
+
+  Socket    (Logical) Processors
+  ------    -------------------------
+     0      0    1    2    3    4    5    6    7
+     1      8    9   10   11   12   13   14   15
+     2     16   17   18   19   20   21   22   23
+     3     24   25   26   27   28   29   30   31
+     4     32   33   34   35   36   37   38   39
+     5     40   41   42   43   44   45   46   47
+     6     48   49   50   51   52   53   54   55
+     7     56   57   58   59   60   61   62   63
+
+\end{verbatim}
+We can see that the L3 cache is shared within a the same node, composed by a single eight cores chip-set.
 
 
+\paragraph{numactl} is a linux tool for general configuration of any NUMA architecture.
+It can be used to print general information on memory usage and interconnect ``\textit{distances}".
 
-\mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
-\mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
-\mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
+Sample output:
+
+\begin{verbatim}
+available: 8 nodes (0-7)
+node 0 cpus: 0 1 2 3 4 5 6 7
+node 0 size: 126933 MB
+node 0 free: 124017 MB
+node 1 cpus: 8 9 10 11 12 13 14 15
+node 1 size: 126960 MB
+node 1 free: 124444 MB
+node 2 cpus: 16 17 18 19 20 21 22 23
+node 2 size: 126960 MB
+node 2 free: 124566 MB
+node 3 cpus: 24 25 26 27 28 29 30 31
+node 3 size: 126960 MB
+node 3 free: 124207 MB
+node 4 cpus: 32 33 34 35 36 37 38 39
+node 4 size: 126960 MB
+node 4 free: 124234 MB
+node 5 cpus: 40 41 42 43 44 45 46 47
+node 5 size: 126960 MB
+node 5 free: 124554 MB
+node 6 cpus: 48 49 50 51 52 53 54 55
+node 6 size: 126960 MB
+node 6 free: 124451 MB
+node 7 cpus: 56 57 58 59 60 61 62 63
+node 7 size: 126960 MB
+node 7 free: 124338 MB
+node distances:
+node   0   1   2   3   4   5   6   7 
+  0:  10  50  65  65  65  65  65  65 
+  1:  50  10  65  65  65  65  65  65 
+  2:  65  65  10  50  65  65  65  65 
+  3:  65  65  50  10  65  65  65  65 
+  4:  65  65  65  65  10  50  65  65 
+  5:  65  65  65  65  50  10  65  65 
+  6:  65  65  65  65  65  65  10  50 
+  7:  65  65  65  65  65  65  50  10
+\end{verbatim}
+
+We can see from the last lines of the command that nodes within the same blade are ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
+
+\paragraph{topology} commands prints in depth information on nodes location and CPU characteristics.
+\begin{verbatim}
+System type: UV2000
+System name: UV2000
+Serial number: UV2-00000510
+Partition number: 0
+       4 Blades
+      64 CPUs (online: 0-63)
+       8 Nodes
+  978.01 GB Memory Total
+  124.00 GB Max Memory on any Node
+       1 BASE I/O Riser
+       1 PCIe Slot
+       3 Network Controllers
+       1 Storage Controller
+       2 USB Controllers
+       1 VGA GPU
+
+Index       ID        NASID CPUS     Memory
+---------------------------------------------
+    0 r001i01b00h0      0    8     126933 MB
+    1 r001i01b00h1      2    8     126960 MB
+    2 r001i01b01h0      4    8     126960 MB
+    3 r001i01b01h1      6    8     126960 MB
+    4 r001i01b02h0      8    8     126960 MB
+    5 r001i01b02h1     10    8     126960 MB
+    6 r001i01b03h0     12    8     126960 MB
+    7 r001i01b03h1     14    8     126960 MB
+
+CPU     Location PhysID CoreID APIC-ID Family Model Speed L1(KiB) L2(KiB) L3(KiB)
+---------------------------------------------------------------------------------
+  0 r001i01b00h0     00     00       0      6    62  3299 32d/32i     256   16384
+  1 r001i01b00h0     00     01       2      6    62  3299 32d/32i     256   16384
+  2 r001i01b00h0     00     02       4      6    62  3299 32d/32i     256   16384
+  3 r001i01b00h0     00     03       6      6    62  3299 32d/32i     256   16384
+  4 r001i01b00h0     00     04       8      6    62  3299 32d/32i     256   16384
+  5 r001i01b00h0     00     05      10      6    62  3299 32d/32i     256   16384
+  6 r001i01b00h0     00     06      12      6    62  3299 32d/32i     256   16384
+  7 r001i01b00h0     00     07      14      6    62  3299 32d/32i     256   16384
+  8 r001i01b00h1     01     00      32      6    62  3299 32d/32i     256   16384
+  9 r001i01b00h1     01     01      34      6    62  3299 32d/32i     256   16384
+ 10 r001i01b00h1     01     02      36      6    62  3299 32d/32i     256   16384
+ 11 r001i01b00h1     01     03      38      6    62  3299 32d/32i     256   16384
+ 12 r001i01b00h1     01     04      40      6    62  3299 32d/32i     256   16384
+ 13 r001i01b00h1     01     05      42      6    62  3299 32d/32i     256   16384
+ 14 r001i01b00h1     01     06      44      6    62  3299 32d/32i     256   16384
+ 15 r001i01b00h1     01     07      46      6    62  3299 32d/32i     256   16384
+ 16 r001i01b01h0     02     00      64      6    62  3299 32d/32i     256   16384
+ 17 r001i01b01h0     02     01      66      6    62  3299 32d/32i     256   16384
+ 18 r001i01b01h0     02     02      68      6    62  3299 32d/32i     256   16384
+ 19 r001i01b01h0     02     03      70      6    62  3299 32d/32i     256   16384
+ 20 r001i01b01h0     02     04      72      6    62  3299 32d/32i     256   16384
+ 21 r001i01b01h0     02     05      74      6    62  3299 32d/32i     256   16384
+ 22 r001i01b01h0     02     06      76      6    62  3299 32d/32i     256   16384
+ 23 r001i01b01h0     02     07      78      6    62  3299 32d/32i     256   16384
+ 24 r001i01b01h1     03     00      96      6    62  3299 32d/32i     256   16384
+ 25 r001i01b01h1     03     01      98      6    62  3299 32d/32i     256   16384
+ 26 r001i01b01h1     03     02     100      6    62  3299 32d/32i     256   16384
+ 27 r001i01b01h1     03     03     102      6    62  3299 32d/32i     256   16384
+ 28 r001i01b01h1     03     04     104      6    62  3299 32d/32i     256   16384
+ 29 r001i01b01h1     03     05     106      6    62  3299 32d/32i     256   16384
+ 30 r001i01b01h1     03     06     108      6    62  3299 32d/32i     256   16384
+ 31 r001i01b01h1     03     07     110      6    62  3299 32d/32i     256   16384
+ 32 r001i01b02h0     04     00     128      6    62  3299 32d/32i     256   16384
+ 33 r001i01b02h0     04     01     130      6    62  3299 32d/32i     256   16384
+ 34 r001i01b02h0     04     02     132      6    62  3299 32d/32i     256   16384
+ 35 r001i01b02h0     04     03     134      6    62  3299 32d/32i     256   16384
+ 36 r001i01b02h0     04     04     136      6    62  3299 32d/32i     256   16384
+ 37 r001i01b02h0     04     05     138      6    62  3299 32d/32i     256   16384
+ 38 r001i01b02h0     04     06     140      6    62  3299 32d/32i     256   16384
+ 39 r001i01b02h0     04     07     142      6    62  3299 32d/32i     256   16384
+ 40 r001i01b02h1     05     00     160      6    62  3299 32d/32i     256   16384
+ 41 r001i01b02h1     05     01     162      6    62  3299 32d/32i     256   16384
+ 42 r001i01b02h1     05     02     164      6    62  3299 32d/32i     256   16384
+ 43 r001i01b02h1     05     03     166      6    62  3299 32d/32i     256   16384
+ 44 r001i01b02h1     05     04     168      6    62  3299 32d/32i     256   16384
+ 45 r001i01b02h1     05     05     170      6    62  3299 32d/32i     256   16384
+ 46 r001i01b02h1     05     06     172      6    62  3299 32d/32i     256   16384
+ 47 r001i01b02h1     05     07     174      6    62  3299 32d/32i     256   16384
+ 48 r001i01b03h0     06     00     192      6    62  3299 32d/32i     256   16384
+ 49 r001i01b03h0     06     01     194      6    62  3299 32d/32i     256   16384
+ 50 r001i01b03h0     06     02     196      6    62  3299 32d/32i     256   16384
+ 51 r001i01b03h0     06     03     198      6    62  3299 32d/32i     256   16384
+ 52 r001i01b03h0     06     04     200      6    62  3299 32d/32i     256   16384
+ 53 r001i01b03h0     06     05     202      6    62  3299 32d/32i     256   16384
+ 54 r001i01b03h0     06     06     204      6    62  3299 32d/32i     256   16384
+ 55 r001i01b03h0     06     07     206      6    62  3299 32d/32i     256   16384
+ 56 r001i01b03h1     07     00     224      6    62  3299 32d/32i     256   16384
+ 57 r001i01b03h1     07     01     226      6    62  3299 32d/32i     256   16384
+ 58 r001i01b03h1     07     02     228      6    62  3299 32d/32i     256   16384
+ 59 r001i01b03h1     07     03     230      6    62  3299 32d/32i     256   16384
+ 60 r001i01b03h1     07     04     232      6    62  3299 32d/32i     256   16384
+ 61 r001i01b03h1     07     05     234      6    62  3299 32d/32i     256   16384
+ 62 r001i01b03h1     07     06     236      6    62  3299 32d/32i     256   16384
+ 63 r001i01b03h1     07     07     238      6    62  3299 32d/32i     256   16384
+
+Index   Location    NASID  PCI Address       Device
+--------------------------------------------------------
+    0 r001i01b00h0      0  0000:00:1f.2   Intel SCSI Corporation C600/X79 series chipset 6-Port SATA AHCI Controller (rev 06)
+    .            .      .  0000:01:00.0   Intel I350 Gigabit Network Connection
+    .            .      .  0000:01:00.1   Intel I350 Gigabit Network Connection
+    .            .      .  0000:08:00.0   Matrox G200eR2
+    3 r001i01b01h1      6  0001:02:00.0   Intel 82572EI Gigabit Ethernet Controller
+
+\end{verbatim}
+
+From which we can also see the size of L1 and L2 caches.
 
 
 \subsection{IBM NetXScale CINECA ``Galileo" Cluster Architecture}\label{galileoarch:sec}
@@ -2257,20 +2478,73 @@ Cpu specifications:
 
 
 \subsection{Azzeramento}
-Tutto quello fatto per azzerare il bias
 
-\subsubsection{Metodo}
+There are a number of factors that can impact on the performances of a \QE simulation on the two systems analyzed.
+
+\paragraph{Libraries and compilers : }
+As specified in section \ref{sec:QE}, \QE is implemented using different libraries. 
+Besides the FFTW, which is distributed within the \QE package, the libraries for linear algebra (BLAS, LAPACK, SCALAPACK) and communication (MPI,OPENMP) are all external.
+
+A wide variety of implementation of those libraries exists each of these can be compiled with different compilers.
+There are two popular compilers used by \QE community: GNU compilers and Intel compilers \footnote{\QE is implemented using different languages (fortran, C, C++,...) }.
+
+
+\mynotes{metti una reference al paragrafo dove spieghi il sistema!}
+We performed a simple tests Galileo using both the compilers on the CO3 system. 
+We measure the execution time of the PWscf package compiled with different configurations: 
+\begin{itemize}
+	\item \textbf{GNU} : GNU compiler suite v4.9.2, OpenMPI v1.8.4, FFTW v3.3.4, BLAS v3.5.0, SCALAPACK 2.0.2\footnote{ All the libraries were compiled using the GNU suite.}.
+	\item \textbf{INTEL} : Intel CS XE 2015 compiler suite, IntelMPI v5.0.2,  FFTW v3.3.4, MKL v11.2
+	\item \textbf{GNU and MKL}  : same configuration as in the \textbf{GNU} configuration but linking against the Intel MKL package for liner algebra.
+\end{itemize}
+The result are exposed in table \ref{tab:libraries}.
+
+\begin{table}[]
+\centering
+\begin{tabular}{lccc}
+\textbf{cores} & \multicolumn{1}{l}{\textbf{GNU}} & \multicolumn{1}{l}{\textbf{GNU+ItelMKL}} & \multicolumn{1}{l}{\textbf{INTEL}} \\ \hline \hline
+\textbf{1}     & 1h 52m                           & 1h 50m                                   & 22m 57s                            \\
+\textbf{64}    & 6m 3s                            & 5m 58s                                   & 1m 50s                            
+\end{tabular}
+\caption{Walltime for PWscf runs on CO3 system with different compilers and libraries.}
+\label{tab:libraries}
+\end{table}
+
+We can see that the native Intel compilation is considerably more efficient than the open-source alternatives.
+The use of MKL library seems to have little effect on the overall result, but one must consider that for such a system the great computational complexity lies in the FFT performance.\footnote{See section XXX.}
+
+For this reason all the tests we have done were performed with the ``\textit{state of the art}" compilers and libraries available on each architecture.
+
+
+\paragraph{Node Load : }
+
+\paragraph{Process migration (UV2000) : }
+dlook, nodeifo, QE si comporta bene, gestisce bene la memoria. Usa solo chiamate all to all.
+
+
+
+After this considerations we decided to perform all our tests in optimal conditions.
+That are:
+\mynotes{copia la direttiva pbs}
+\begin{itemize}
+	\item ``\textit{State of the art}" libraries and compilers
+	\item Completely dedicated nodes. Meaning that on Galileo the whole node was reserved even if the computation was performed on a single CPU. This can be done using the PBS directive \texttt{select=1:ncpus:16:...}. On the UV2000 the while 64 core machine was reserved.
+	\item On the UV2000, process are pinned using the \texttt{omplace} command. This command will prevent the migration of a process or thread from one CPU to another.
+\end{itemize}
+
+
 \begin{itemize}
 	\item librerie open NO -> solo il meglio. State of the art for the architecture. Makefile delle due macchine.
 	\item sempre a macchina scarica
+	\item dlook, nodeinfo. QE si comporta bene, gestisce bene la memoria.
+	\item MPT
 
 \end{itemize}
 
 
 \subsubsection{Strumenti}
 \begin{itemize}
-	\item process pinning, dlook, nodeinfo. QE si comporta bene, gestisce bene la memoria.
-	\item MPT
+
 	\item profiling interno di QE
 	\item scorep
 \end{itemize}
@@ -2306,7 +2580,14 @@ Tutti i grafici che restano vanno a popolare l'appendice.
 
 \section{Discussion and Conclusion}
 
-Metti molecola organica.
+\mynotes{Metti molecola organica}.
+
+\mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
+
+\mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
+\mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
+\mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
+
 
 
 
