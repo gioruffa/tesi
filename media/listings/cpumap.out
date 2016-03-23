@@ -1,0 +1,63 @@
+Sat Dec 12 18:31:26 CET 2015
+uv2000
+
+This is an SGI UV
+model name           : Intel(R) Xeon(R) CPU E5-4627 v2 @ 3.30GHz
+Architecture         : x86_64
+cpu MHz              : 3301.000
+cache size           : 16384 KB (Last Level)
+
+Total Number of Sockets             	: 8
+Total Number of Cores               	: 64	(8 per socket)
+Hyperthreading                      	: OFF
+
+UV Information
+ HUB Version: 				 UVHub  3.0
+ Number of Hubs: 			 8
+ Number of connected Hubs: 		 8
+ Number of connected NUMAlink ports: 	 48
+=============================================================================
+
+Hub-Processor Mapping
+
+  Hub Location      Processor Numbers -- HyperThreads in ()
+  --- ----------    ---------------------------------------
+    0 r001i01b00h0     0    1    2    3    4    5    6    7
+    1 r001i01b00h1     8    9   10   11   12   13   14   15
+    2 r001i01b01h0    16   17   18   19   20   21   22   23
+    3 r001i01b01h1    24   25   26   27   28   29   30   31
+    4 r001i01b02h0    32   33   34   35   36   37   38   39
+    5 r001i01b02h1    40   41   42   43   44   45   46   47
+    6 r001i01b03h0    48   49   50   51   52   53   54   55
+    7 r001i01b03h1    56   57   58   59   60   61   62   63
+
+=============================================================================
+
+Processor Numbering on Node(s)
+
+   Node    (Logical) Processors
+  ------    -------------------------
+     0      0    1    2    3    4    5    6    7
+     1      8    9   10   11   12   13   14   15
+     2     16   17   18   19   20   21   22   23
+     3     24   25   26   27   28   29   30   31
+     4     32   33   34   35   36   37   38   39
+     5     40   41   42   43   44   45   46   47
+     6     48   49   50   51   52   53   54   55
+     7     56   57   58   59   60   61   62   63
+
+=============================================================================
+
+Sharing of Last Level (3) Caches
+
+  Socket    (Logical) Processors
+  ------    -------------------------
+     0      0    1    2    3    4    5    6    7
+     1      8    9   10   11   12   13   14   15
+     2     16   17   18   19   20   21   22   23
+     3     24   25   26   27   28   29   30   31
+     4     32   33   34   35   36   37   38   39
+     5     40   41   42   43   44   45   46   47
+     6     48   49   50   51   52   53   54   55
+     7     56   57   58   59   60   61   62   63
+

@@ -11,11 +11,14 @@
 \usepackage{enumitem}
 \usepackage{framed}
 \usepackage[width=125mm]{caption}
+\usepackage{lscape}
+\usepackage[title,titletoc,toc]{appendix}
 
 \graphicspath{{./media/images/}}
 
 \usepackage[document]{ragged2e}
 \usepackage{verbatim}
+\usepackage{listings}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -2102,6 +2105,8 @@ In table \ref{tab:coreRoutines} we present a summary of the most important subro
 \newpage
 \section{Computational Architectures} \label{sec:comparch}
 
+In this section we are going to outline the hardware and software characteristics of the two computational architectures we have used in this work.
+
 Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
 
 In any parallel computer system, CPUs working on different parts of the same job must communicate to exchange information. How precisely they should do this is the subject of much debate in the architectural community. 
@@ -2220,226 +2225,27 @@ We report the command name and a brief description.
 \paragraph{cpumap} command prints information on CPU locations and characteristics within the machine.
 
 Sample Output: 
+\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/cpumap.out}
 
-\begin{verbatim}
-Sat Dec 12 18:31:26 CET 2015
-uv2000
-
-This is an SGI UV
-model name           : Intel(R) Xeon(R) CPU E5-4627 v2 @ 3.30GHz
-Architecture         : x86_64
-cpu MHz              : 3301.000
-cache size           : 16384 KB (Last Level)
-
-Total Number of Sockets             	: 8
-Total Number of Cores               	: 64	(8 per socket)
-Hyperthreading                      	: OFF
-
-UV Information
- HUB Version: 				 UVHub  3.0
- Number of Hubs: 			 8
- Number of connected Hubs: 		 8
- Number of connected NUMAlink ports: 	 48
-=============================================================================
-
-Hub-Processor Mapping
-
-  Hub Location      Processor Numbers -- HyperThreads in ()
-  --- ----------    ---------------------------------------
-    0 r001i01b00h0     0    1    2    3    4    5    6    7
-    1 r001i01b00h1     8    9   10   11   12   13   14   15
-    2 r001i01b01h0    16   17   18   19   20   21   22   23
-    3 r001i01b01h1    24   25   26   27   28   29   30   31
-    4 r001i01b02h0    32   33   34   35   36   37   38   39
-    5 r001i01b02h1    40   41   42   43   44   45   46   47
-    6 r001i01b03h0    48   49   50   51   52   53   54   55
-    7 r001i01b03h1    56   57   58   59   60   61   62   63
-
-=============================================================================
-
-Processor Numbering on Node(s)
-
-   Node    (Logical) Processors
-  ------    -------------------------
-     0      0    1    2    3    4    5    6    7
-     1      8    9   10   11   12   13   14   15
-     2     16   17   18   19   20   21   22   23
-     3     24   25   26   27   28   29   30   31
-     4     32   33   34   35   36   37   38   39
-     5     40   41   42   43   44   45   46   47
-     6     48   49   50   51   52   53   54   55
-     7     56   57   58   59   60   61   62   63
-
-=============================================================================
-
-Sharing of Last Level (3) Caches
-
-  Socket    (Logical) Processors
-  ------    -------------------------
-     0      0    1    2    3    4    5    6    7
-     1      8    9   10   11   12   13   14   15
-     2     16   17   18   19   20   21   22   23
-     3     24   25   26   27   28   29   30   31
-     4     32   33   34   35   36   37   38   39
-     5     40   41   42   43   44   45   46   47
-     6     48   49   50   51   52   53   54   55
-     7     56   57   58   59   60   61   62   63
-
-\end{verbatim}
 We can see that the L3 cache is shared within a the same node, composed by a single eight cores chip-set.
 
 
 \paragraph{numactl} is a linux tool for general configuration of any NUMA architecture.
 It can be used to print general information on memory usage and interconnect ``\textit{distances}".
 
-Sample output:
+Output:
 
-\begin{verbatim}
-available: 8 nodes (0-7)
-node 0 cpus: 0 1 2 3 4 5 6 7
-node 0 size: 126933 MB
-node 0 free: 124017 MB
-node 1 cpus: 8 9 10 11 12 13 14 15
-node 1 size: 126960 MB
-node 1 free: 124444 MB
-node 2 cpus: 16 17 18 19 20 21 22 23
-node 2 size: 126960 MB
-node 2 free: 124566 MB
-node 3 cpus: 24 25 26 27 28 29 30 31
-node 3 size: 126960 MB
-node 3 free: 124207 MB
-node 4 cpus: 32 33 34 35 36 37 38 39
-node 4 size: 126960 MB
-node 4 free: 124234 MB
-node 5 cpus: 40 41 42 43 44 45 46 47
-node 5 size: 126960 MB
-node 5 free: 124554 MB
-node 6 cpus: 48 49 50 51 52 53 54 55
-node 6 size: 126960 MB
-node 6 free: 124451 MB
-node 7 cpus: 56 57 58 59 60 61 62 63
-node 7 size: 126960 MB
-node 7 free: 124338 MB
-node distances:
-node   0   1   2   3   4   5   6   7 
-  0:  10  50  65  65  65  65  65  65 
-  1:  50  10  65  65  65  65  65  65 
-  2:  65  65  10  50  65  65  65  65 
-  3:  65  65  50  10  65  65  65  65 
-  4:  65  65  65  65  10  50  65  65 
-  5:  65  65  65  65  50  10  65  65 
-  6:  65  65  65  65  65  65  10  50 
-  7:  65  65  65  65  65  65  50  10
-\end{verbatim}
+\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/numactl.out}
 
-We can see from the last lines of the command that nodes within the same blade are ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
+
+We can see from the last lines of the output that nodes within the same blade are ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
+
+This should be considered just as a rough estimate of communication time between the nodes.
 
 \paragraph{topology} commands prints in depth information on nodes location and CPU characteristics.
-\begin{verbatim}
-System type: UV2000
-System name: UV2000
-Serial number: UV2-00000510
-Partition number: 0
-       4 Blades
-      64 CPUs (online: 0-63)
-       8 Nodes
-  978.01 GB Memory Total
-  124.00 GB Max Memory on any Node
-       1 BASE I/O Riser
-       1 PCIe Slot
-       3 Network Controllers
-       1 Storage Controller
-       2 USB Controllers
-       1 VGA GPU
 
-Index       ID        NASID CPUS     Memory
----------------------------------------------
-    0 r001i01b00h0      0    8     126933 MB
-    1 r001i01b00h1      2    8     126960 MB
-    2 r001i01b01h0      4    8     126960 MB
-    3 r001i01b01h1      6    8     126960 MB
-    4 r001i01b02h0      8    8     126960 MB
-    5 r001i01b02h1     10    8     126960 MB
-    6 r001i01b03h0     12    8     126960 MB
-    7 r001i01b03h1     14    8     126960 MB
-
-CPU     Location PhysID CoreID APIC-ID Family Model Speed L1(KiB) L2(KiB) L3(KiB)
----------------------------------------------------------------------------------
-  0 r001i01b00h0     00     00       0      6    62  3299 32d/32i     256   16384
-  1 r001i01b00h0     00     01       2      6    62  3299 32d/32i     256   16384
-  2 r001i01b00h0     00     02       4      6    62  3299 32d/32i     256   16384
-  3 r001i01b00h0     00     03       6      6    62  3299 32d/32i     256   16384
-  4 r001i01b00h0     00     04       8      6    62  3299 32d/32i     256   16384
-  5 r001i01b00h0     00     05      10      6    62  3299 32d/32i     256   16384
-  6 r001i01b00h0     00     06      12      6    62  3299 32d/32i     256   16384
-  7 r001i01b00h0     00     07      14      6    62  3299 32d/32i     256   16384
-  8 r001i01b00h1     01     00      32      6    62  3299 32d/32i     256   16384
-  9 r001i01b00h1     01     01      34      6    62  3299 32d/32i     256   16384
- 10 r001i01b00h1     01     02      36      6    62  3299 32d/32i     256   16384
- 11 r001i01b00h1     01     03      38      6    62  3299 32d/32i     256   16384
- 12 r001i01b00h1     01     04      40      6    62  3299 32d/32i     256   16384
- 13 r001i01b00h1     01     05      42      6    62  3299 32d/32i     256   16384
- 14 r001i01b00h1     01     06      44      6    62  3299 32d/32i     256   16384
- 15 r001i01b00h1     01     07      46      6    62  3299 32d/32i     256   16384
- 16 r001i01b01h0     02     00      64      6    62  3299 32d/32i     256   16384
- 17 r001i01b01h0     02     01      66      6    62  3299 32d/32i     256   16384
- 18 r001i01b01h0     02     02      68      6    62  3299 32d/32i     256   16384
- 19 r001i01b01h0     02     03      70      6    62  3299 32d/32i     256   16384
- 20 r001i01b01h0     02     04      72      6    62  3299 32d/32i     256   16384
- 21 r001i01b01h0     02     05      74      6    62  3299 32d/32i     256   16384
- 22 r001i01b01h0     02     06      76      6    62  3299 32d/32i     256   16384
- 23 r001i01b01h0     02     07      78      6    62  3299 32d/32i     256   16384
- 24 r001i01b01h1     03     00      96      6    62  3299 32d/32i     256   16384
- 25 r001i01b01h1     03     01      98      6    62  3299 32d/32i     256   16384
- 26 r001i01b01h1     03     02     100      6    62  3299 32d/32i     256   16384
- 27 r001i01b01h1     03     03     102      6    62  3299 32d/32i     256   16384
- 28 r001i01b01h1     03     04     104      6    62  3299 32d/32i     256   16384
- 29 r001i01b01h1     03     05     106      6    62  3299 32d/32i     256   16384
- 30 r001i01b01h1     03     06     108      6    62  3299 32d/32i     256   16384
- 31 r001i01b01h1     03     07     110      6    62  3299 32d/32i     256   16384
- 32 r001i01b02h0     04     00     128      6    62  3299 32d/32i     256   16384
- 33 r001i01b02h0     04     01     130      6    62  3299 32d/32i     256   16384
- 34 r001i01b02h0     04     02     132      6    62  3299 32d/32i     256   16384
- 35 r001i01b02h0     04     03     134      6    62  3299 32d/32i     256   16384
- 36 r001i01b02h0     04     04     136      6    62  3299 32d/32i     256   16384
- 37 r001i01b02h0     04     05     138      6    62  3299 32d/32i     256   16384
- 38 r001i01b02h0     04     06     140      6    62  3299 32d/32i     256   16384
- 39 r001i01b02h0     04     07     142      6    62  3299 32d/32i     256   16384
- 40 r001i01b02h1     05     00     160      6    62  3299 32d/32i     256   16384
- 41 r001i01b02h1     05     01     162      6    62  3299 32d/32i     256   16384
- 42 r001i01b02h1     05     02     164      6    62  3299 32d/32i     256   16384
- 43 r001i01b02h1     05     03     166      6    62  3299 32d/32i     256   16384
- 44 r001i01b02h1     05     04     168      6    62  3299 32d/32i     256   16384
- 45 r001i01b02h1     05     05     170      6    62  3299 32d/32i     256   16384
- 46 r001i01b02h1     05     06     172      6    62  3299 32d/32i     256   16384
- 47 r001i01b02h1     05     07     174      6    62  3299 32d/32i     256   16384
- 48 r001i01b03h0     06     00     192      6    62  3299 32d/32i     256   16384
- 49 r001i01b03h0     06     01     194      6    62  3299 32d/32i     256   16384
- 50 r001i01b03h0     06     02     196      6    62  3299 32d/32i     256   16384
- 51 r001i01b03h0     06     03     198      6    62  3299 32d/32i     256   16384
- 52 r001i01b03h0     06     04     200      6    62  3299 32d/32i     256   16384
- 53 r001i01b03h0     06     05     202      6    62  3299 32d/32i     256   16384
- 54 r001i01b03h0     06     06     204      6    62  3299 32d/32i     256   16384
- 55 r001i01b03h0     06     07     206      6    62  3299 32d/32i     256   16384
- 56 r001i01b03h1     07     00     224      6    62  3299 32d/32i     256   16384
- 57 r001i01b03h1     07     01     226      6    62  3299 32d/32i     256   16384
- 58 r001i01b03h1     07     02     228      6    62  3299 32d/32i     256   16384
- 59 r001i01b03h1     07     03     230      6    62  3299 32d/32i     256   16384
- 60 r001i01b03h1     07     04     232      6    62  3299 32d/32i     256   16384
- 61 r001i01b03h1     07     05     234      6    62  3299 32d/32i     256   16384
- 62 r001i01b03h1     07     06     236      6    62  3299 32d/32i     256   16384
- 63 r001i01b03h1     07     07     238      6    62  3299 32d/32i     256   16384
-
-Index   Location    NASID  PCI Address       Device
---------------------------------------------------------
-    0 r001i01b00h0      0  0000:00:1f.2   Intel SCSI Corporation C600/X79 series chipset 6-Port SATA AHCI Controller (rev 06)
-    .            .      .  0000:01:00.0   Intel I350 Gigabit Network Connection
-    .            .      .  0000:01:00.1   Intel I350 Gigabit Network Connection
-    .            .      .  0000:08:00.0   Matrox G200eR2
-    3 r001i01b01h1      6  0001:02:00.0   Intel 82572EI Gigabit Ethernet Controller
-
-\end{verbatim}
-
+Output:
+\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/topology.out}
 From which we can also see the size of L1 and L2 caches.
 
 
@@ -2451,7 +2257,6 @@ This supercomputer is among  the fastest supercomputer available to Italian indu
 
 Galileo is mainly used to develop and run applications targeted at hybrid architectures, leveraging software applications in the fields of computational fluid dynamics, material and life science, and geophysics. The computing system is also available to European researchers as a Tier-1 system of the PRACE infrastructure.
 
-Architecture: Linux Infiniband Cluster
 
 \subsubsection{Galileo Specifications}
 
@@ -2480,7 +2285,7 @@ Cpu specifications:
 
 
 
-\subsection{Azzeramento}
+\subsection{Bias Factors}
 
 There are a number of factors that can impact on the performances of a \QE simulation on the two systems analyzed.
 
@@ -2492,8 +2297,8 @@ A wide variety of implementation of those libraries exists each of these can be 
 There are two popular compilers used by \QE community: GNU compilers and Intel compilers \footnote{\QE is implemented using different languages (fortran, C, C++,...) }.
 
 
-\mynotes{metti una reference al paragrafo dove spieghi il sistema!}
-We performed a simple tests Galileo using both the compilers on the CO3 system. 
+\mynotes{metti una reference al paragrafo dove spieghi il \CO}
+We performed a simple tests Galileo using both the compilers on the \CO system. 
 We measure the execution time of the PWscf package compiled with different configurations: 
 \begin{itemize}
 	\item \textbf{GNU} : GNU compiler suite v4.9.2, OpenMPI v1.8.4, FFTW v3.3.4, BLAS v3.5.0, SCALAPACK 2.0.2\footnote{ All the libraries were compiled using the GNU suite.}.
@@ -2535,7 +2340,7 @@ To completely reserve a single node on the Galileo cluster, one must use the fol
 \begin{verbatim}
 	PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
 \end{verbatim}
-\mynotes{metti link a pagina di spiega di galileo su pbs}
+
 Where the first number after the \texttt{select} statement is the number of nodes, \texttt{ncpus} is the number of CPUs to reserve, \texttt{mpiprocs} is the maximum number of MPI processes to be spawned and \texttt{mem} is the maximum memory required by the computation (on the single node).
 
 Finally, to occupy only a subset of cores an leave the others unused one must specify the total number of ranks to the MPI launcher :
@@ -2603,7 +2408,7 @@ The same results can be obtained with different numbers of MPI ranks per instanc
 \mynotes{metti appendice}
 
 \begin{framed}
-After these preliminary tests, we decided to run every calculation	 reserving the whole resource, being it a Galileo node or the whole UV2000 machine.
+After these preliminary tests, we decided to run every calculation reserving the whole resource, being it a Galileo node or the whole UV2000 machine.
 \end{framed}
 
 
@@ -2676,12 +2481,12 @@ This is a consequence of the design of \QE that makes wide use of all-to-all MPI
 
 
 
-\subsubsection{Profiling tools}
+\subsection{Profiling tools}\label{sec:profTools}
 
 To evaluate the performance of the subroutines in \QE we mainly used two tools.
 
 \paragraph{Internal PWscf metrics}: when PWscf successfully completes a run an extensive set of metrics are printed\footnote{On the stdout or the specified output file.}. 
-For each of the main subroutines the average \textit{cpu time}, \textit{wall time} and the number of calls are printed.
+For each of the main subroutines  \textit{cpu time}, \textit{wall time} and the number of calls are printed.
 See section \ref{sec:Metrics} for further detail on metrics values.
 
 \paragraph{Scorep code instrumenter}: \texttt{scorep}\cite{SCOREPManual} is a code instrumenter developed by the VI-HPS institute \cite{VH}. 
@@ -2698,20 +2503,81 @@ The ``\textit{profile.cubex}" file can be inspected using the ``\textit{cube}" g
 
 The metrics produced by these tools are compatible, obviously after rescaling \texttt{scorep}'s metrics by the total overhead factor.
 
-In this work we used mainly the internal PWscf's metrics, \texttt{scorep} was used for in-depth analysis of the call graph and to compute the percentage time spent during MPI communication.
+In this work we were able to obtain most of the useful information from internal PWscf's metrics, nevertheless \texttt{scorep} was used for in-depth analysis of the call graph and to compute the percentage time spent during MPI communication.
 
 \paragraph{Developed tools :} I have developed a set of python scripts in order to analyze and plot internal metrics with a certain flexibility. The complete source code can be found at \cite{qetools}.
 
 
-\subsubsection{Metrics}\label{sec:Metrics}
+\subsection{Metrics}\label{sec:Metrics}
+Two are the main metrics directly produced by the tools listed in section \ref{sec:profTools}.
+
+\paragraph{CPU time: } CPU time (or process time) is the amount of time for which a CPU was used for processing instructions of a computer program. CPU time does not include time in which the program was stopped by the scheduler or time spent during I/O operations. \footnote{Typically in UNIX and UNIX-like systems I/O operations are always performed using of system calls. System calls can be blocking or not-blocking but they don't contribute to CPU time.}
+
+\paragraph{WALL time: } WALL time (or wall-clock time) is the human perception of the passage of time from the start to the completion of a task. 
+In the context of a task being performed on a computer, wall-clock time is a measure of the real time that elapses from start to end, including time that passes due to programmed (artificial) delays or waiting for resources to become available (I/O operations). 
+In other words, it is the difference between the time at which a task finishes and the time at which the task started.
+
+If not explicitly specified, all considerations contained in this work refers to CPU time.
+
+To minimize the amount of I/O operations performed by PWscf we set the PW control variable \texttt{disk\_io} to \texttt{`none'}.
+This reduces the amount of I/O operations to the bare minimum.
+
+In figure \ref{fig:cpuwalltime} we can see that the difference between the two metrics is negligible for all the subroutines.
+
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=\linewidth ,height=10cm]{cpuwalltime.pdf}	
+	\caption{CPU time and WALL time with \texttt{disk\_io = `none'} for a 164 atom system scf calculation.}
+	\label{fig:cpuwalltime}
+\end{center}
+\end{figure}
+
+~
+
+The following metric is an indirect metric that can be obtained from the previous two.
+\paragraph{speedup:}  CPU time can be used to compare different runs of PWscf performed on the same architecture\footnote{Fortunately Galileo is a completely homogeneous cluster.}, but when one must compare different architecture an a-dimensional metric is needed.
+
+We introduce the ``\textit{speedup}" as defined in \cite{Tanenbaum} : 
+\begin{equation}\label{eq:speedup}
+	s = \frac{T_{1}}{T_{N}},
+\end{equation}
+where $T_{1}$ is the runtime (CPU time in our case) of the program on a single core (i.e. the serial execution of the program), while $T_{N}$ is the execution of the program performed in parallel using $N$ cores.
+Hence the speedup is ``\textit{how much faster the programs are going to run on a parallel computer than on a
+uniprocessor}"\cite[p.648]{Tanenbaum}.
+
+Speedup tels us ``\textit{how good a program scales on a defined architecture}", then it provides an useful metric to compare different computational architectures.
+
+Speedup can also be used to compare performances on the same machine while comparing different programs or different systems\footnote{e.g. changing the system we are simulating}.
+
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=0.8\linewidth]{tanenbaum_speedup.png}	
+	\caption{Speedup of three different algorithms \cite{Tanenbaum}.}
+	\label{fig:TanenbaumSpeedup}
+\end{center}
+\end{figure}
+
+An illustration taken directly from \cite{Tanenbaum} is reported in figure \ref{fig:TanenbaumSpeedup}.
+As we can see the ideal linear speedup cannot be reached by real programs, this happens because some of the components of the program would always be serial\footnote{For example any \textit{reduce} MPI call is executed on a single MPI rank.}.
+
+\subsection{Configuration summary}\label{sec:ConfSummary}
+
+The version of \QE used on both the systems was v5.2.1.
+
+Full threaded version of MKL and SCALAPACK implementations optimized for each architecture have been used.
+
+In appendix \ref{app:makefiles} the complete makefiles of \QE are reported.
+
+To summarize the configuration used for all the tests:
 \begin{itemize}
-	\item cpuTime
-	\item wallTime (diskio = None)
-	\item speedup
+	\item We used compilers and libraries at the ``\textit{state of the art}" available on each architecture.
+	\item We reserved the whole computational resource, being it a Galileo node or the whole UV2000 machine.
+	\item Every run on the UV2000 machine is performed using the \texttt{omplace} utility to ensure a correct process pinning and avoid overhead in memory allocation and/or communication.
 \end{itemize}
 
-\subsubsection{Configuration summary}\label{sec:ConfSummary}
-metti essenzialmente i make.sys dell'espresso sui due sistemi.
+
+
+
 
 \section{Results}
 \subsection{Dichiarazione di intenti}\label{sec:dichiarazionePoetica}
@@ -2743,6 +2609,19 @@ Tutti i grafici che restano vanno a popolare l'appendice.
 \mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
 \mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
 
+\newpage
+
+\begin{appendices}
+
+\section{Makefiles} \label{app:makefiles}
+\subsection{Galielo}
+\lstinputlisting[language=make,basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/make.sys.galileo}
+
+\newpage
+\subsection{UV2000}
+\lstinputlisting[language=make,basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/make.sys.numa}
+
+\end{appendices}
 
 
 
