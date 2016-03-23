@@ -2172,6 +2172,7 @@ Each node has to be considered as an extension of the motherboard, thus appearin
 \subsubsection{UV-2000 specifications}
 
 \begin{itemize}
+\item \textbf{Vendor}: SGI
 \item \textbf{Nodes}: 8
 \item \textbf{Blades}: 4
 \item \textbf{Processors}: 1 8-cores Intel Haswell 3.3 GHz per node
@@ -2456,6 +2457,7 @@ Architecture: Linux Infiniband Cluster
 
 Cluster specifications: 
 \begin{itemize}
+\item \textbf{Vendor}: IBM Lenovo
 \item \textbf{Nodes}: 516 
 \item \textbf{Processors}: 2 8-cores Intel Haswell 2.40 GHz per node
 \item \textbf{Cores}: 16 cores/node, 8256 cores in total
@@ -2607,14 +2609,45 @@ After these preliminary tests, we decided to run every calculation always reserv
 
 
 
-
-
-
-
-
-
 \paragraph{Process migration (UV2000) : }
-dlook, nodeifo, QE si comporta bene, gestisce bene la memoria. Usa solo chiamate all to all.
+
+In modern multiprocessor architecture, even in a common desktop workstations, the Linux scheduler is used to migrate active processes from one CPU to another. 
+In machine with a single shared memory controller  or with multiple controllers with uniform memory access time \footnote{UMA \textit{Uniform Memory Access} machines.}, the migration of a process doesn't have an impact on performances.
+On NUMA machines instead, where the time to access a memory page depends on the page location withing the machine topology, this could negatively influence the performance of the code.
+On the UV2000, memory allocation requested by a process is performed on the same node the process is running on. 
+If the process is then migrated to another node the access time will increase at least by a factor of five.
+The impact is mitigated by the NUMAlink behavior, which will migrate memory pages closer to the new process location (if available).
+
+Another effect one must consider is that if an MPI job is launched on a subset of cores, i.e. requesting eight ranks, the ranks are randomly spread trough the whole machine.
+Making a simple analogy, it would be equivalent to launch a single process on a different cluster node and expect the same performances.
+If we introduce threads the scenario can get increasingly worse.
+To obviate this problem a set of utilities developed by SGI can be used:
+
+\texttt{omplace} is a command that forces the scheduler to maintain a process on the selected core, this feature is called \textit{process pinning}. 
+\texttt{omplace} automatically takes care of threads placement and provides great flexibility on CPU placement.
+In order to use \texttt{omplace} it is sufficient to prepend it to the MPI call.
+
+For example:
+\begin{verbatim}
+	omplace -c 0-7 mpirun -np 8 pw.x
+\end{verbatim}
+will launch eight MPI ranks on the first eight processors.
+
+Using threads 
+\begin{verbatim}
+	export OMP_NUM_THREADS=2
+	omplace -c 0-7 mpirun -np 4 pw.x
+\end{verbatim}
+will launch an MPI rank on even cores and every rank will spawn two adjacent threads.
+\mynotes{metti esempio da man omplace}
+
+Although \texttt{omplace} can be used also with openMPI implementations, it works best with MPT.
+
+\newpage
+
+
+
+
 
 
 
