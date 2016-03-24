@@ -19,6 +19,7 @@
 \usepackage[document]{ragged2e}
 \usepackage{verbatim}
 \usepackage{listings}
+\usepackage{caption}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -2151,7 +2152,13 @@ whether it is clean or dirty (modified). Since this database must be queried on
 every single instruction that references memory, it must be kept in extremely fast
 special-purpose hardware that can respond in a fraction of a bus cycle.
 
-\mynotes{Metti immagine}
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=\linewidth]{NumaScheme.png}	
+	\caption{Simple scheme of a CC-NUMA architecture composed by two NUMA nodes.}
+	\label{fig:sgiLoad}
+\end{center}
+\end{figure}
 
 \subsection{Multicomputer Architectures}
 A Multicomputer is a system composed by a range of possibly heterogeneous computers.
@@ -2215,7 +2222,6 @@ The linux kernel module responsible for the operation of shared memory wrapping 
 In this framework all the work of intercommunication is demanded to the NUMAlink interconnect, which basically migrates and duplicates pages of memory to minimize local reference misses.
 
 %For tuning parameters of MPT please refer to section XXX.
-\mynotes{metti link a sezione}
 
 \subsubsection{Useful commands}\label{sec:UsefulCommands}
 On the UV2000 a set of useful commands can be used to characterize the architecture.
@@ -2225,7 +2231,7 @@ We report the command name and a brief description.
 \paragraph{cpumap} prints information on CPU locations and characteristics within the machine.
 
 Sample Output: 
-\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/cpumap.out}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/cpumap.out}
 
 We can see that the L3 cache is shared within a the same node, composed by a single eight cores chip-set.
 
@@ -2235,7 +2241,7 @@ It can be used to print general information on memory usage and interconnect ``\
 
 Output:
 
-\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/numactl.out}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/numactl.out}
 
 
 We can see from the last lines of the output that nodes within the same blade are slightly ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
@@ -2245,7 +2251,7 @@ This should be considered just as a rough estimate of communication latency betw
 \paragraph{topology} command prints in depth information on nodes location and CPU characteristics.
 
 Output:
-\lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/topology.out}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/topology.out}
 From which we can also see the size of L1, L2 and L3 caches.
 
 
@@ -2398,8 +2404,9 @@ On the UV2000 we had the possibility to perform more extensive tests and the res
 
 \begin{figure}[hhh!]
 \begin{center}
+	\captionsetup{justification=centering}
 	\includegraphics[width=0.7\linewidth]{sgiLoad.pdf}	
-	\caption{asd}
+	\caption{First plot: execution time of 1 rank independent PWscf process in function of the number of independent processes simultaneously running on the machine. Second Plot: execution time of 8 rank independent processes in function of the number of occupied processor on the machine.}
 	\label{fig:sgiLoad}
 \end{center}
 \end{figure}
@@ -2453,25 +2460,35 @@ If we introduce threads the scenario can get increasingly more complicated.
 To obviate this problem SGI developed a set of three utilities: \texttt{omplace}, \texttt{nodeinfo} and \texttt{dlook}.
 
 \paragraph{omplace:} \texttt{omplace} is a command that forces the scheduler to maintain a process on the selected core, this feature is called \textit{process pinning}. 
-\texttt{omplace} automatically takes care of threads placement and provides great flexibility on CPU placement.
-In order to use \texttt{omplace} it is sufficient to prepend it to the MPI call.
+\texttt{omplace} automatically takes care of threads placement and provides great flexibility on CPU selection.
+In order to use \texttt{omplace} it is sufficient to prepend it to the executable call, just after the \texttt{mpirun} call.
 
 For example:
 \begin{verbatim}
-	omplace -c 0-7 mpirun -np 8 pw.x
+	mpirun -np 8 	omplace -c 0-7 pw.x
 \end{verbatim}
 will launch eight MPI ranks on the first eight processors.
 
-Using threads 
+In case threads are used :
 \begin{verbatim}
-	export OMP_NUM_THREADS=2
-	omplace -c 0-7 mpirun -np 4 pw.x
+	export OMP_NUM_THREADS=4
+	mpirun -np 2 omplace -c 0-7 pw.x	
 \end{verbatim}
-will launch an MPI rank on even cores and every rank will spawn two adjacent threads.
+they would be placed as follows\footnote{See \texttt{man omplace}.}
+\begin{verbatim}
+    rank 0 thread 0 on CPU 0
+    rank 0 thread 1 on CPU 1
+    rank 0 thread 2 on CPU 2
+    rank 0 thread 3 on CPU 3
+    rank 1 thread 0 on CPU 4
+    rank 1 thread 1 on CPU 5
+    rank 1 thread 2 on CPU 6
+    rank 1 thread 3 on CPU 7
+\end{verbatim}
 \mynotes{metti esempio da man omplace}
 
 Although \texttt{omplace} can be used also with openMPI implementations, it has proven to be reliable only with MPT
-\footnote{\texttt{taskset} and \texttt{dplace} are two other tools to provide process pinning, but they have proven to be not reliable during some preliminary tests.}.
+\footnote{\texttt{taskset} and \texttt{dplace} are two other tools to provide process pinning, but during our preliminary test they did not appear to be reliable.}.
 
 \paragraph{nodeinfo:}\texttt{nodeinfo} is a monitoring program that provides real time statistics on memory usage.
 
@@ -2488,7 +2505,9 @@ Using these metrics one can evaluate if a program is managing poorly the memory 
 \paragraph{dlook:} \texttt{dlook} program gives in-depth information on memory allocation regarding a specific process.
 \texttt{dlook} lists all the pages allocated by the program along with their memory address and node location.
 
-\mynotes{metti output}
+A sample of \texttt{dlook} output for a PWscf process follows:
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/dlook.out}
+
 
 We used \texttt{dlook} and \texttt{nodeinfo} to evaluate if the memory allocation performed by \QE adapts properly to the NUMA architecture.
 
@@ -2531,6 +2550,10 @@ In this work we were able to obtain most of the useful information from internal
 
 
 \subsection{Metrics}\label{sec:Metrics}
+
+In this section we outline the metrics used to measure PWscf performances on both architectures.
+
+\subsubsection{Direct Metrics}
 Two are the main metrics directly produced by the tools listed in section \ref{sec:profTools}.
 
 \paragraph{CPU time: } CPU time (or process time) is the amount of time for which a CPU was used for processing instructions of a computer program. CPU time does not include time in which the program was stopped by the scheduler or time spent during I/O operations. \footnote{Typically in UNIX and UNIX-like systems I/O operations are always performed using of system calls. System calls can be blocking or not-blocking but they don't contribute to CPU time.}
@@ -2541,10 +2564,10 @@ In other words, it is the difference between the time at which a task finishes a
 
 If not explicitly specified, all considerations contained in this work refers to CPU time.
 
-To minimize the amount of I/O operations performed by PWscf we set the PW control variable \texttt{disk\_io} to \texttt{`none'}.
+To minimize the amount of I/O operations performed by PWscf we set the PW control variable \texttt{disk\_io} to \texttt{`none'}\cite{PWinput}.
 This reduces the amount of I/O operations to the bare minimum.
 
-In figure \ref{fig:cpuwalltime} we can see that the difference between the two metrics is negligible for all the subroutines.
+In figure \ref{fig:cpuwalltime} we can see that the difference between the two metrics is negligible for all the subroutines.\footnote{Note that the resource was fully reserved and no other system processes were running.}
 
 Consider also that \QE does not utilize the MPI distributed I/O directives.
 
@@ -2556,9 +2579,10 @@ Consider also that \QE does not utilize the MPI distributed I/O directives.
 \end{center}
 \end{figure}
 
-~
+\subsubsection{Indirect Metrics}
 
 The following metric is an indirect metric that can be obtained from the previous two.
+
 \paragraph{speedup:}  CPU time can be used to compare different runs of PWscf performed on the same architecture\footnote{Fortunately Galileo is a completely homogeneous cluster.}, but if one want to compare different architectures an a-dimensional metric is needed.
 
 We introduce the ``\textit{speedup}" as defined in \cite{Tanenbaum} : 
@@ -2569,10 +2593,6 @@ where $T_{1}$ is the runtime (CPU time in our case) of the program on a single c
 Hence the speedup is ``\textit{how much faster the programs are going to run on a parallel computer than on a
 uniprocessor}"\cite[p.648]{Tanenbaum}.
 
-Speedup tels us ``\textit{how good a program scales on a defined architecture}", then it provides an useful metric to compare different computational architectures.
-
-Speedup is also used to compare performances of different programs\footnote{Or different inputs of the same program.} on the same machine.
-
 \begin{figure}[hhh!]
 \begin{center}
 	\includegraphics[scale=0.5]{tanenbaum_speedup.png}	
@@ -2580,6 +2600,12 @@ Speedup is also used to compare performances of different programs\footnote{Or d
 	\label{fig:TanenbaumSpeedup}
 \end{center}
 \end{figure}
+
+Speedup tels us ``\textit{how good a program scales on a defined architecture}", then it provides an useful metric to compare different computational architectures.
+
+Speedup is also used to compare performances of different programs\footnote{Or different inputs of the same program.} on the same machine.
+
+
 
 An illustration taken directly from \cite{Tanenbaum} is reported in figure \ref{fig:TanenbaumSpeedup}.
 As we can see the ideal linear speedup cannot be reached by real programs, this happens because some of the components of the program would always be serial\footnote{For example any \textit{reduce} MPI call is executed on a single MPI rank.}.
@@ -2612,12 +2638,12 @@ To summarize the configuration used for all the tests:
 	\item studio delle instabilita' numeriche. (iterazioni variabili)
 \end{itemize}
 
-\subsubsection{TiOH2}
+\subsection{TiOH2}
 IMPORTANTE: Spiega perche' hai usato TITANIA.
 
-\subsubsection{Plots}
+\subsection{Plots}
 Per ogni sottosezione di sopra \ref{sec:dichiarazionePoetica} mettere da 6 a 8 grafici (AXES!) massimo.
-Metti cerchio sui grafici dove IB spacca.
+Metti cerchio sui grafici dove entra IB.
 
 
 In fondo mettere i risultati per ogni molecola di size diverso.
@@ -2808,6 +2834,8 @@ v1.4.2,
 \bibitem{qetools}
 qetools, ``tools to profile Quantum Espresso PWscf package", Giorgio Ruffa, \url{https://github.com/xmooner/qetools}.
 
+\bibitem{PWinput}
+PWscf input documentation, \url{http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html}.
 
 
 \end{thebibliography}

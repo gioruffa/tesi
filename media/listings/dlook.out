@@ -1,0 +1,31 @@
+Peek:  pw.x
+Pid: 60050	Thu Mar 24 15:09:00 2016
+
+Process memory map:
+  00400000-033cd000 r-xp 00000000 09:00 3935955 /home/giorgio/Ruffa/src/qe/bin/pw.x
+	[0000000000400000-0000000000401000]	       1 page   on node    3  MEMORY|SHARED
+	[0000000000401000-0000000000402000]	       1 page   on node    7  MEMORY|SHARED
+	[0000000000402000-0000000000403000]	       1 page   on node    6  MEMORY|SHARED
+	...
+	...	# Shared pages, usually libc. Randomly distributed on all the nodes
+	...
+	[000000000327b000-000000000327c000]	       1 page   on node    2  MEMORY|SHARED
+	[000000000327c000-000000000327d000]	       1 page   on node    5  MEMORY|SHARED
+	[000000000327d000-000000000327e000]	       1 page   on node    0  MEMORY|SHARED
+
+  035cd000-04373000 rw-p 02fcd000 09:00 3935955 /home/giorgio/Ruffa/src/qe/bin/pw.x
+	[00000000035cd000-00000000035ce000]	       1 page   on node    6  MEMORY|RW|DIRTY
+	[00000000035d9000-00000000035da000]	       1 page   on node    6  MEMORY|SHARED
+	[00000000035da000-00000000035db000]	       1 page   on node    6  MEMORY|SHARED
+	[00000000035db000-00000000035dc000]	       1 page   on node    6  MEMORY|SHARED
+	[00000000035dc000-00000000035dd000]	       1 page   on node    6  MEMORY|RW|DIRTY
+	[00000000035de000-00000000035e2000]	       4 pages  on node    6  MEMORY|RW|DIRTY
+	[00000000035e4000-000000000371d000]	     313 pages  on node    6  MEMORY|RW|DIRTY|SHARED
+	...
+	... # process specific pages, all on the same node
+	...
+	[000000000398d000-000000000398f000]	       2 pages  on node    6  MEMORY|RW|DIRTY
+	[0000000004335000-000000000433c000]	       7 pages  on node    6  MEMORY|RW|DIRTY
+	[000000000435c000-000000000435d000]	       1 page   on node    6  MEMORY|RW|DIRTY
+	[000000000435d000-000000000435e000]	       1 page   on node    6  MEMORY|SHARED
+	[0000000004370000-0000000004373000]	       3 pages  on node    6  MEMORY|RW|DIRTY
