@@ -2105,7 +2105,7 @@ In table \ref{tab:coreRoutines} we present a summary of the most important subro
 \newpage
 \section{Computational Architectures} \label{sec:comparch}
 
-In this section we are going to outline the hardware and software characteristics of the two computational architectures we have used in this work.
+In this section we are going to outline the hardware and software characteristics of the two computational architectures we used to perform \QE simulations.
 
 Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
 
@@ -2129,9 +2129,9 @@ Consequently, there is only one page map and one process table.
 It is this single-system image that distinguishes a multiprocessor from a multicomputer, in which each computer has its own copy of the operating system.
 
 \subsubsection{CC-NUMA Architectures}
-One popular flavor of multiprocessor computers that has proven to be valuable in moder HPC computing is composed by NUMA machines.
+One popular flavor of multiprocessor computers that has proven to be valuable in moder HPC computing is composed by NUMA multicomputers.
 
-Each CPU, or subset of CPUs is called a \textit{NUMA node} and posses a local memory bank that is always reachable by other CPUs within the same machine.
+Each CPU, or subset of CPUs is called ``\textit{NUMA node}" and posses a local memory bank that is always reachable by other CPUs within the same machine.
 All NUMA machines have three key characteristics that together distinguish
 them from other multiprocessors:
 \begin{enumerate}
@@ -2142,10 +2142,9 @@ them from other multiprocessors:
 The acronym NUMA \textit{Non Uniform Memory Access} is now justified.
 
 To improve scaling, memory caching is implemented, but, with multiple memory banks across the whole multicomputer, it is necessary to maintain coherency between different local-caches.  
-When coherent caches are present, the system is called CC-NUMA.
+When coherent caches are present, the system is called CC-NUMA(Cache Coherent NUMA).
 
-The most popular approach for building large CC-NUMA (Cache Coherent
-NUMA) multiprocessors currently is the directory-based multiprocessor. The
+The most popular approach for building large CC-NUMA  multiprocessors currently is the directory-based multiprocessor. The
 idea is to maintain a database telling where each cache line is and what its status is.
 When a cache line is referenced, the database is queried to find out where it is and
 whether it is clean or dirty (modified). Since this database must be queried on
@@ -2203,18 +2202,19 @@ Cpu specifications:
 
 
 \subsubsection{NUMAlink and GRU-MPT}
-As said in section \ref{sec:multiprocessor} the main feature of multiprocessor architectures is the possibility to leverage shared memory.
-In this framework the implementation of a program can be definitely easier compared with the use of MPI libraries, but \QE has abandoned a shared memory design long time ago, now being strongly based on message massing directives.
+As said in section \ref{sec:multiprocessor} the main feature of multiprocessor architectures is presence of shared memory.
+In this framework the implementation of a program can be definitely easier compared with the need to use MPI libraries, but \QE has abandoned a shared memory design long time ago, being now strongly based on message massing directives.
 
 To obviate this kind of problem, SGI provides the user with his own implementation of the MPI library, the so-called MPT\cite{MPT} \textit{Message Passing Toolkit library}.
 
-This library gives the user the possibility to use the capabilities of shared memory systems without the need to change their MPI-based code. 
-We can see the MPT library as shared memory wrapper for MPI calls. \footnote{The capabilities of the MPT toolkit goes wildly over the mere wrapping of MPI calls, but, in the scope of this work, this description is enough.}
+This library gives the user the possibility to leverage the features of shared memory without the need to change their MPI-based code. 
+
+We can see the MPT library as a shared memory wrapper for MPI calls. \footnote{The capabilities of the MPT toolkit goes wildly over the mere wrapping of MPI calls, but, in the scope of this work, this description is sufficient.}
 The linux kernel module responsible for the operation of shared memory wrapping and intercommunication is called GRU.
 
 In this framework all the work of intercommunication is demanded to the NUMAlink interconnect, which basically migrates and duplicates pages of memory to minimize local reference misses.
 
-For tuning parameters of MPT please refer to section XXX.
+%For tuning parameters of MPT please refer to section XXX.
 \mynotes{metti link a sezione}
 
 \subsubsection{Useful commands}
@@ -2222,7 +2222,7 @@ On the UV2000 a set of useful commands can be used to characterize the architect
 
 We report the command name and a brief description.
 
-\paragraph{cpumap} command prints information on CPU locations and characteristics within the machine.
+\paragraph{cpumap} prints information on CPU locations and characteristics within the machine.
 
 Sample Output: 
 \lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/cpumap.out}
@@ -2230,7 +2230,7 @@ Sample Output:
 We can see that the L3 cache is shared within a the same node, composed by a single eight cores chip-set.
 
 
-\paragraph{numactl} is a linux tool for general configuration of any NUMA architecture.
+\paragraph{numactl} is a linux tool for general configuration of every NUMA architecture.
 It can be used to print general information on memory usage and interconnect ``\textit{distances}".
 
 Output:
@@ -2238,15 +2238,15 @@ Output:
 \lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/numactl.out}
 
 
-We can see from the last lines of the output that nodes within the same blade are ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
+We can see from the last lines of the output that nodes within the same blade are slightly ``\textit{closer}" than nodes on different blades, but the ``\textit{distance}" between two different blades is the same.
 
-This should be considered just as a rough estimate of communication time between the nodes.
+This should be considered just as a rough estimate of communication latency between the nodes.
 
-\paragraph{topology} commands prints in depth information on nodes location and CPU characteristics.
+\paragraph{topology} command prints in depth information on nodes location and CPU characteristics.
 
 Output:
 \lstinputlisting[basicstyle=\small ,breaklines=true,tabsize=2]{media/listings/topology.out}
-From which we can also see the size of L1 and L2 caches.
+From which we can also see the size of L1, L2 and L3 caches.
 
 
 \subsection{IBM NetXScale CINECA ``Galileo" Cluster Architecture}\label{galileoarch:sec}
@@ -2298,8 +2298,8 @@ There are two popular compilers used by \QE community: GNU compilers and Intel c
 
 
 \mynotes{metti una reference al paragrafo dove spieghi il \CO}
-We performed a simple tests Galileo using both the compilers on the \CO system. 
-We measure the execution time of the PWscf package compiled with different configurations: 
+We performed a simple test on Galileo using both the compilers on the \CO system. 
+We measure the execution time\footnote{See section \ref{sec:Metrics}.} of the PWscf package compiled with different configurations: 
 \begin{itemize}
 	\item \textbf{GNU} : GNU compiler suite v4.9.2, OpenMPI v1.8.4, FFTW v3.3.4, BLAS v3.5.0, SCALAPACK 2.0.2\footnote{ All the libraries were compiled using the GNU suite.}.
 	\item \textbf{INTEL} : Intel CS XE 2015 compiler suite, IntelMPI v5.0.2,  FFTW v3.3.4, MKL v11.2
@@ -2329,7 +2329,7 @@ For this reason all the tests we have done were performed using ``\textit{state 
 \paragraph{Node Load : }
 
 In modern HPC computing is common to share resources. Big multicomputers clusters are often used by thousands of users simultaneously.
-In this framework, if the amount of CPUs required is less than the total number of CPUs available on the node it is almost certain that the remaining CPUs will be occupied by other users' computations.
+In this framework, if the amount of CPUs required by the task is less than the total number of CPUs available on the node, it is almost certain that the remaining CPUs will be occupied by other users' computations.
 This means dividing the size of the L3 cache among different users performing completely different calculations.
 
 As one can imagine the impact on performance is not beneficial.
@@ -2347,7 +2347,7 @@ Finally, to occupy only a subset of cores an leave the others unused one must sp
 \begin{verbatim}
 	mpirun -np 1 pw.x
 \end{verbatim}
-where \texttt{-np 1} set the number of mpi processes to use and \texttt{pw.x} is the executable.
+where \texttt{-np 1} sets the number of mpi processes to use and \texttt{pw.x} is the executable.
 Note that in case threads are used, both explicitly or using the \texttt{OMP\_NUM\_THREADS} environment variable, the real number of CPUs used will be $N_{MPI ranks} \cdot N_{OMP threads}$.
 
 On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
@@ -2367,7 +2367,7 @@ On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
 
 It is clear that sharing resources has an impact on the execution time. 
 The difference becomes less noticeable when the number of CPUs rises. 
-Unfortunately it is not possible to select the exact CPU to occupy, thus we cannot see if by reserving the first eight CPUs\footnote{Being on the same CPU-set, they share the same L3 cache.} the result would be the same on reserved and shared nodes.
+Unfortunately it is not possible to select the exact CPUs to occupy, thus we cannot see if reserving the first eight CPUs\footnote{Being on the same CPU-set, they share the same L3 cache.} would lead to the same result than shared nodes.
 
 On the UV2000 we had the possibility to perform more extensive tests and the results are reported in figure \ref{fig:sgiLoad}.
 
@@ -2387,7 +2387,7 @@ The execution time is plotted in function of the total number of independent pro
 The processes were equivalently spaced among the CPUs\footnote{Except for the first bar, the load of each node was the same.}.
 Two aspects can be clearly seen.
 
-First the execution time rises after 16 cores are simultaneously occupied, meaning at least half of the cores in each node.
+First the execution time rises after 16 cores are simultaneously occupied (at least half of the cores on each node).
 When all the CPUs are occupied the execution time is more than doubled. 
 We can say that the UV2000 performs poorly compared to the traditional cluster when multiple independent tasks have to be performed at the same time.
 
@@ -2426,7 +2426,7 @@ The impact is mitigated by the NUMAlink behavior, which will migrate memory page
 Another effect one must consider is that if an MPI job is launched on a subset of cores, i.e. requesting eight ranks, the ranks are randomly spread trough the whole machine.
 Making a simple analogy, it would be equivalent to launch eight MPI processes each on a different Galileo node and expect the same performances.
 If we introduce threads the scenario can get increasingly more complicated.
-To obviate this problem a SGI developed a set of three utilities: \texttt{omplace}, \texttt{nodeinfo}, \texttt{dlook}.
+To obviate this problem SGI developed a set of three utilities: \texttt{omplace}, \texttt{nodeinfo} and \texttt{dlook}.
 
 \texttt{omplace} is a command that forces the scheduler to maintain a process on the selected core, this feature is called \textit{process pinning}. 
 \texttt{omplace} automatically takes care of threads placement and provides great flexibility on CPU placement.
@@ -2446,7 +2446,8 @@ Using threads
 will launch an MPI rank on even cores and every rank will spawn two adjacent threads.
 \mynotes{metti esempio da man omplace}
 
-Although \texttt{omplace} can be used also with openMPI implementations, it has proven to be reliable only with MPT.
+Although \texttt{omplace} can be used also with openMPI implementations, it has proven to be reliable only with MPT
+\footnote{\texttt{taskset} and \texttt{dplace} are two other tools to provide process pinning, but they have proven to be not reliable during some preliminary tests.}.
 
 \texttt{nodeinfo} is a monitoring program that provides real time statistics on memory usage.
 
@@ -2471,13 +2472,11 @@ We used \texttt{dlook} and \texttt{nodeinfo} to evaluate if the memory allocatio
 The results have highlighted a very rational way of allocating memory.
 For instance memory structures that are local to the single MPI rank are allocated within the rank and not allocated outside the rank and then passed with \texttt{send/recv} directives.
 This is a consequence of the design of \QE that makes wide use of all-to-all MPI directives, which are efficiently implemented by MPT.
+Thus \QE seems to adapt well to the NUMA environment.
 
 \begin{framed}
 	Every run on the UV2000 machine is performed using the \texttt{omplace} utility to ensure a correct process pinning and avoid overhead in memory allocation and/or communication.
 \end{framed}
-
-
-\newpage
 
 
 
@@ -2485,8 +2484,8 @@ This is a consequence of the design of \QE that makes wide use of all-to-all MPI
 
 To evaluate the performance of the subroutines in \QE we mainly used two tools.
 
-\paragraph{Internal PWscf metrics}: when PWscf successfully completes a run an extensive set of metrics are printed\footnote{On the stdout or the specified output file.}. 
-For each of the main subroutines  \textit{cpu time}, \textit{wall time} and the number of calls are printed.
+\paragraph{Internal PWscf metrics}: when PWscf successfully completes a run, an extensive set of metrics are printed\footnote{On the stdout or the specified output file.}. 
+For each of the main subroutines  \textit{cpu time}, \textit{wall time} and the number of calls are reported.
 See section \ref{sec:Metrics} for further detail on metrics values.
 
 \paragraph{Scorep code instrumenter}: \texttt{scorep}\cite{SCOREPManual} is a code instrumenter developed by the VI-HPS institute \cite{VH}. 
@@ -2535,7 +2534,7 @@ In figure \ref{fig:cpuwalltime} we can see that the difference between the two m
 ~
 
 The following metric is an indirect metric that can be obtained from the previous two.
-\paragraph{speedup:}  CPU time can be used to compare different runs of PWscf performed on the same architecture\footnote{Fortunately Galileo is a completely homogeneous cluster.}, but when one must compare different architecture an a-dimensional metric is needed.
+\paragraph{speedup:}  CPU time can be used to compare different runs of PWscf performed on the same architecture\footnote{Fortunately Galileo is a completely homogeneous cluster.}, but if one want to compare different architectures an a-dimensional metric is needed.
 
 We introduce the ``\textit{speedup}" as defined in \cite{Tanenbaum} : 
 \begin{equation}\label{eq:speedup}
@@ -2547,7 +2546,7 @@ uniprocessor}"\cite[p.648]{Tanenbaum}.
 
 Speedup tels us ``\textit{how good a program scales on a defined architecture}", then it provides an useful metric to compare different computational architectures.
 
-Speedup can also be used to compare performances on the same machine while comparing different programs or different systems\footnote{e.g. changing the system we are simulating}.
+Speedup is also used to compare performances of different programs\footnote{Or different inputs of the same program.} on the same machine.
 
 \begin{figure}[hhh!]
 \begin{center}
