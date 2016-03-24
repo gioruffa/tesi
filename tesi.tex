@@ -2217,7 +2217,7 @@ In this framework all the work of intercommunication is demanded to the NUMAlink
 %For tuning parameters of MPT please refer to section XXX.
 \mynotes{metti link a sezione}
 
-\subsubsection{Useful commands}
+\subsubsection{Useful commands}\label{sec:UsefulCommands}
 On the UV2000 a set of useful commands can be used to characterize the architecture.
 
 We report the command name and a brief description.
@@ -2287,9 +2287,10 @@ Cpu specifications:
 
 \subsection{Bias Factors}
 
-There are a number of factors that can impact on the performances of a \QE simulation on the two systems analyzed.
+There are a number of factors that can impact on the performances of a \QE simulation both the systems	.
 
-\paragraph{Libraries and compilers : }
+\subsubsection{Libraries and compilers}
+
 As specified in section \ref{sec:QE}, \QE is implemented using different libraries. 
 Besides the FFTW, which is distributed within the \QE package, the libraries for linear algebra (BLAS, LAPACK, SCALAPACK) and communication (MPI,OPENMP) are all external.
 
@@ -2303,52 +2304,75 @@ We measure the execution time\footnote{See section \ref{sec:Metrics}.} of the PW
 \begin{itemize}
 	\item \textbf{GNU} : GNU compiler suite v4.9.2, OpenMPI v1.8.4, FFTW v3.3.4, BLAS v3.5.0, SCALAPACK 2.0.2\footnote{ All the libraries were compiled using the GNU suite.}.
 	\item \textbf{INTEL} : Intel CS XE 2015 compiler suite, IntelMPI v5.0.2,  FFTW v3.3.4, MKL v11.2
-	\item \textbf{GNU and MKL}  : same configuration as in the \textbf{GNU} configuration but linking against the Intel MKL package for liner algebra.
+%	\item \textbf{GNU and MKL}  : same configuration as in the \textbf{GNU} configuration but linking against the Intel MKL package for liner algebra.
 \end{itemize}
 The result are exposed in table \ref{tab:libraries}.
 
 \begin{table}[h]
 \centering
-\begin{tabular}{lccc}
-\textbf{cores} & \multicolumn{1}{l}{\textbf{GNU}} & \multicolumn{1}{l}{\textbf{GNU+ItelMKL}} & \multicolumn{1}{l}{\textbf{INTEL}} \\ \hline \hline
-\textbf{1}     & 1h 52m                           & 1h 50m                                   & 22m 57s                            \\
-\textbf{64}    & 6m 3s                            & 5m 58s                                   & 1m 50s                            
+\begin{tabular}{lcc}
+\textbf{cores} & \multicolumn{1}{l}{\textbf{GNU}}  & \multicolumn{1}{l}{\textbf{INTEL}} \\ \hline \hline
+\textbf{1}     & 1h 52m                            & 22m 57s                            \\
+\textbf{64}    & 6m 3s                            		& 1m 50s                            
 \end{tabular}
 \caption{Execution time for PWscf runs on CO3 system with different compilers and libraries.}
 \label{tab:libraries}
 \end{table}
 
+%\begin{table}[h]
+%\centering
+%\begin{tabular}{lccc}
+%\textbf{cores} & \multicolumn{1}{l}{\textbf{GNU}} & \multicolumn{1}{l}{\textbf{GNU+ItelMKL}} & \multicolumn{1}{l}{\textbf{INTEL}} \\ \hline \hline
+%\textbf{1}     & 1h 52m                           & 1h 50m                                   & 22m 57s                            \\
+%\textbf{64}    & 6m 3s                            & 5m 58s                                   & 1m 50s                            
+%\end{tabular}
+%\caption{Execution time for PWscf runs on CO3 system with different compilers and libraries.}
+%\label{tab:libraries}
+%\end{table}
+
+
 We can see that the native Intel compilation is considerably more efficient than the open-source alternatives.
-The use of MKL library seems to have little effect on the overall result, but one must consider that for such a system the great computational complexity lies in the FFT performance.\footnote{See section XXX.}
+
+The results at one core highlight that the big difference must lie in how FFT and linear algebra is performed by the two solutions. 
+
+%The use of MKL library seems to have little effect on the overall result, but one must consider that for such a system the great computational complexity lies in the FFT performance. section XXX.}
 
 \begin{framed}
 For this reason all the tests we have done were performed using ``\textit{state of the art}" compilers and libraries available on each architecture.
 \end{framed}
 
 
-\paragraph{Node Load : }
+\subsubsection{Node Load}
 
 In modern HPC computing is common to share resources. Big multicomputers clusters are often used by thousands of users simultaneously.
 In this framework, if the amount of CPUs required by the task is less than the total number of CPUs available on the node, it is almost certain that the remaining CPUs will be occupied by other users' computations.
-This means dividing the size of the L3 cache among different users performing completely different calculations.
+As a consequence the L3 cache is divided among different uncoherent processes, as one can imagine the impact on performance is cannot be beneficial.
 
-As one can imagine the impact on performance is not beneficial.
+To estimate the effect of resource sharing on \QE simulations we performed a set of tests on the \CO  system. 
 
-On the Galileo cluster we have performed a set of tests on the \CO  system both completely reserving an entire node and without this precaution.
+On Galileo we have scheduled our runs completely reserving an entire node and without this precaution.
 
-To completely reserve a single node on the Galileo cluster, one must use the following PBS \texttt{qsub} directive :
+To fully reserve a single node on the cluster one must use the following PBS \texttt{qsub} directive :
 \begin{verbatim}
 	PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
 \end{verbatim}
 
 Where the first number after the \texttt{select} statement is the number of nodes, \texttt{ncpus} is the number of CPUs to reserve, \texttt{mpiprocs} is the maximum number of MPI processes to be spawned and \texttt{mem} is the maximum memory required by the computation (on the single node).
 
-Finally, to occupy only a subset of cores an leave the others unused one must specify the total number of ranks to the MPI launcher :
+Finally, to occupy only a subset of cores and leave the others unused one must specify the total number of ranks to the MPI launcher :
 \begin{verbatim}
 	mpirun -np 1 pw.x
 \end{verbatim}
 where \texttt{-np 1} sets the number of mpi processes to use and \texttt{pw.x} is the executable.
 Note that in case threads are used, both explicitly or using the \texttt{OMP\_NUM\_THREADS} environment variable, the real number of CPUs used will be $N_{MPI ranks} \cdot N_{OMP threads}$.
+
+For example: to launch a 4 core run reserving the whole 16-core node the following submission script can be used:
+\begin{verbatim}
+#Other PBS directives
+#...
+#PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
+mpirun -np 4 pw.x -i input_file -o output_file 
+\end{verbatim}
 
 On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
 
@@ -2356,18 +2380,18 @@ On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
 \centering
 \begin{tabular}{r|cc}
 \textbf{cores} & \textbf{reserved} & \textbf{shared} \\ \hline \hline
-1              & 22m 57s           & 32m 51s         \\
-2              & 12m 15s           & 16m 58s         \\
-4              & 7m 16s            & 8m 52s          \\
-8              & 4m 1s             & 4m 25s         
+1              & 22m 57s           & 32m 51s         \\ % 70\% resever/shared
+2              & 12m 15s           & 16m 58s         \\ % 72\%
+4              & 7m 16s            & 8m 52s          \\ % 83\%
+8              & 4m 1s             & 4m 25s             % 91\%
 \end{tabular}
 \caption{Execution time for the \CO system on totally reserved and shared nodes.}
 \label{tab:galileoNodeLoad}
 \end{table}
 
 It is clear that sharing resources has an impact on the execution time. 
-The difference becomes less noticeable when the number of CPUs rises. 
-Unfortunately it is not possible to select the exact CPUs to occupy, thus we cannot see if reserving the first eight CPUs\footnote{Being on the same CPU-set, they share the same L3 cache.} would lead to the same result than shared nodes.
+The difference decreases when the number of CPUs rises. 
+Unfortunately it is not possible to select the exact CPUs to occupy, thus we cannot see if reserving the first eight CPUs\footnote{Being on the same CPU-set, they share the same L3 cache.} belonging to the same chip-set would lead to the same result than on shared nodes.
 
 On the UV2000 we had the possibility to perform more extensive tests and the results are reported in figure \ref{fig:sgiLoad}.
 
@@ -2380,14 +2404,15 @@ On the UV2000 we had the possibility to perform more extensive tests and the res
 \end{center}
 \end{figure}
 
-To simulate different load conditions we ran simultaneously different instances of PWscf performing the same calculation.\footnote{Of the \CO system.}. Each instance of PWscf is completely independent.
+To simulate different load conditions we ran simultaneously different instances of PWscf performing the same calculation\footnote{Of the \CO system.}. Each instance of PWscf is completely independent.
 
 In the first graph each instances was composed by a single MPI process, without threads. 
 The execution time is plotted in function of the total number of independent processes running simultaneously on the machine.
 The processes were equivalently spaced among the CPUs\footnote{Except for the first bar, the load of each node was the same.}.
+
 Two aspects can be clearly seen.
 
-First the execution time rises after 16 cores are simultaneously occupied (at least half of the cores on each node).
+First, the execution time rises after 16 cores are simultaneously occupied (at least half of the cores on each node).
 When all the CPUs are occupied the execution time is more than doubled. 
 We can say that the UV2000 performs poorly compared to the traditional cluster when multiple independent tasks have to be performed at the same time.
 
@@ -2398,10 +2423,10 @@ The fact that the times are the same suggests that each node behaves almost inde
 To confirm this speculation we raised the number of MPI ranks per PWscf instance to eight\footnote{The number of CPUs in a node.} and we performed three tests represented  in the second graph of figure \ref{fig:sgiLoad}.
 The first bar occupies only one node per machine, the second occupies half of the nodes and the third all of the nodes.
 
-The execution times are basically the same, hence we can say that every node behaves independently.
+The execution times are basically the same, our hypothesis is confirmed:
 
 \begin{center}
-\textit{Then the UV2000 machine can be used to perform simultaneously different independent calculations, provided that each node (or set of nodes), is dedicated to the same task.}
+\textit{the UV2000 machine can be used to perform simultaneously different independent calculations, provided that each node (or set of nodes), is dedicated to the same task.}
 \end{center}
 
 The same results can be obtained with different numbers of MPI ranks per instance, see APPENDICE.
@@ -2413,14 +2438,13 @@ After these preliminary tests, we decided to run every calculation reserving the
 
 
 
-
-\paragraph{Process migration (UV2000) : }
+\subsubsection{Process migration (UV2000)}
 
 In modern multiprocessor architecture, even in a common desktop workstations, the Linux scheduler is used to migrate active processes from one CPU to another. 
-In machine with a single shared memory controller  or with multiple controllers with uniform memory access time \footnote{UMA \textit{Uniform Memory Access} machines.}, the migration of a process doesn't have an impact on performances.
+In machines with a single shared memory controller  or with multiple controllers with uniform memory access time \footnote{UMA \textit{Uniform Memory Access} machines.}, the migration of a process doesn't have an impact on performances.
 On NUMA machines instead, where the time to access a memory page depends on the page location withing the machine topology, this could negatively influence the performance of the code.
 On the UV2000, memory allocation requested by a process is performed on the same node the process is running on. 
-If the process is then migrated to another node the access time will increase at least by a factor of five.
+If the process is then migrated to another node the memory access time will increase roughly by a factor of five.\footnote{See section \ref{sec:UsefulCommands}.}
 The impact is mitigated by the NUMAlink behavior, which will migrate memory pages closer to the new process location (if available).
 
 Another effect one must consider is that if an MPI job is launched on a subset of cores, i.e. requesting eight ranks, the ranks are randomly spread trough the whole machine.
@@ -2428,7 +2452,7 @@ Making a simple analogy, it would be equivalent to launch eight MPI processes ea
 If we introduce threads the scenario can get increasingly more complicated.
 To obviate this problem SGI developed a set of three utilities: \texttt{omplace}, \texttt{nodeinfo} and \texttt{dlook}.
 
-\texttt{omplace} is a command that forces the scheduler to maintain a process on the selected core, this feature is called \textit{process pinning}. 
+\paragraph{omplace:} \texttt{omplace} is a command that forces the scheduler to maintain a process on the selected core, this feature is called \textit{process pinning}. 
 \texttt{omplace} automatically takes care of threads placement and provides great flexibility on CPU placement.
 In order to use \texttt{omplace} it is sufficient to prepend it to the MPI call.
 
@@ -2449,7 +2473,7 @@ will launch an MPI rank on even cores and every rank will spawn two adjacent thr
 Although \texttt{omplace} can be used also with openMPI implementations, it has proven to be reliable only with MPT
 \footnote{\texttt{taskset} and \texttt{dplace} are two other tools to provide process pinning, but they have proven to be not reliable during some preliminary tests.}.
 
-\texttt{nodeinfo} is a monitoring program that provides real time statistics on memory usage.
+\paragraph{nodeinfo:}\texttt{nodeinfo} is a monitoring program that provides real time statistics on memory usage.
 
 The per-node information provided are:
 \begin{itemize}
@@ -2460,9 +2484,8 @@ The per-node information provided are:
 \end{itemize}
 
 Using these metrics one can evaluate if a program is managing poorly the memory allocation.
-\mynotes{controlla dall'help e metti un po' di output}
 
-\texttt{dlook} program gives in-depth information on memory allocation regarding a specific process.
+\paragraph{dlook:} \texttt{dlook} program gives in-depth information on memory allocation regarding a specific process.
 \texttt{dlook} lists all the pages allocated by the program along with their memory address and node location.
 
 \mynotes{metti output}
@@ -2493,14 +2516,14 @@ A code instrumenter is a compiler wrapper able to ``\textit{instrument}" each fu
 Namely, the time the subroutine is invoked and the time it exists are automatically stored.
 One of the great advantages of \texttt{scorep} is that it's a full \textit{in-memory instrumenter}, meaning that all the metrics computed are stored into the system RAM memory and are written to the disk only when the run is completed.
 This feature reduces drastically the runtime overhead during profiling runs, thus making possible to profile complex programs having tens of millions of function calls ( this is literally the case for \texttt{h\_psi}).
-Runtime overhead on the UV2000 was of the order of $25\%$ while on Galileo it could reach $50\%$; a remarkable result compared to \texttt{gprof}.
+Runtime overhead on the UV2000 is of the order of $25\%$ while on Galileo it could reach $50\%$; a remarkable result compared to \texttt{gprof}.
 
 In order to use \texttt{scorep} it is sufficient to recompile \QE prepending the \texttt{scorep} command to every compiler invocation and  \texttt{scorep}'s libraries must be used during linking time; see section \ref{sec:ConfSummary} for more details on \QE compilation.
 
 To profile the code it is sufficient to run the PWscf executable compiled in the step above, this produces a ``\textit{profile.cubex}" binary file with an incredibly small disk footprint\footnote{For a run on 64 cores of a 160 atom system with 70 scf iterations the result file is around 20MB.}.
 The ``\textit{profile.cubex}" file can be inspected using the ``\textit{cube}" gui program, which is distributed together with \texttt{scorep}. As an alternative one can also use the ``\textit{paraprof}" suite.
 
-The metrics produced by these tools are compatible, obviously after rescaling \texttt{scorep}'s metrics by the total overhead factor.
+The metrics produced by these tools are compatible.\footnote{ Obviously after rescaling \texttt{scorep}'s metrics by the total overhead factor.}
 
 In this work we were able to obtain most of the useful information from internal PWscf's metrics, nevertheless \texttt{scorep} was used for in-depth analysis of the call graph and to compute the percentage time spent during MPI communication.
 
@@ -2522,6 +2545,8 @@ To minimize the amount of I/O operations performed by PWscf we set the PW contro
 This reduces the amount of I/O operations to the bare minimum.
 
 In figure \ref{fig:cpuwalltime} we can see that the difference between the two metrics is negligible for all the subroutines.
+
+Consider also that \QE does not utilize the MPI distributed I/O directives.
 
 \begin{figure}[hhh!]
 \begin{center}
@@ -2550,7 +2575,7 @@ Speedup is also used to compare performances of different programs\footnote{Or d
 
 \begin{figure}[hhh!]
 \begin{center}
-	\includegraphics[width=0.8\linewidth]{tanenbaum_speedup.png}	
+	\includegraphics[scale=0.5]{tanenbaum_speedup.png}	
 	\caption{Speedup of three different algorithms \cite{Tanenbaum}.}
 	\label{fig:TanenbaumSpeedup}
 \end{center}
@@ -2572,6 +2597,7 @@ To summarize the configuration used for all the tests:
 	\item We used compilers and libraries at the ``\textit{state of the art}" available on each architecture.
 	\item We reserved the whole computational resource, being it a Galileo node or the whole UV2000 machine.
 	\item Every run on the UV2000 machine is performed using the \texttt{omplace} utility to ensure a correct process pinning and avoid overhead in memory allocation and/or communication.
+	\item The PWscf's parameter \texttt{disk\_io} was set to `\texttt{none}' to minimize I/O operations and avoid differences between CPU time and WALL time.
 \end{itemize}
 
 
