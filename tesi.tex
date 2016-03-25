@@ -2553,7 +2553,7 @@ In this work we were able to obtain most of the useful information from internal
 
 In this section we outline the metrics used to measure PWscf performances on both architectures.
 
-\subsubsection{Direct Metrics}
+\subsubsection{Direct Metrics}\label{sec:DirectMetrics}
 Two are the main metrics directly produced by the tools listed in section \ref{sec:profTools}.
 
 \paragraph{CPU time: } CPU time (or process time) is the amount of time for which a CPU was used for processing instructions of a computer program. CPU time does not include time in which the program was stopped by the scheduler or time spent during I/O operations. \footnote{Typically in UNIX and UNIX-like systems I/O operations are always performed using of system calls. System calls can be blocking or not-blocking but they don't contribute to CPU time.}
@@ -2626,17 +2626,57 @@ To summarize the configuration used for all the tests:
 	\item The PWscf's parameter \texttt{disk\_io} was set to `\texttt{none}' to minimize I/O operations and avoid differences between CPU time and WALL time.
 \end{itemize}
 
+\newpage
 
 
 
 
 \section{Results}
-\subsection{Dichiarazione di intenti}\label{sec:dichiarazionePoetica}
+This section consists of a very deep insight into all the components of the PWscf package and their interaction with the computational architecture used.
+
+Therefore what follows can be considered as a very technical section, both for the tools used and for the observations made.
+
+Nevertheless we will try to expose the results from two points of views :
 \begin{itemize}
-	\item tuning QE indip da architettura (software)
-	\item tuning QE dip da architettura 
-	\item studio delle instabilita' numeriche. (iterazioni variabili)
+	\item a technical point of view, focused on the factors that can improve the performance of each PWscf's component;
+	\item a pragmatic point of view, focused on the factors that can improve the performance of the overall simulation.
 \end{itemize}
+Although at first the distinction can seem subtle, it will be clear in the following that a great difference exists between them.
+
+We remind the reader that each PWscf run is performed following the directives outlined in section \ref{sec:ConfSummary}.
+
+If not reported explicitly, all the time metrics exposed have to be considered as CPU time, see section \ref{sec:DirectMetrics} for further details.
+
+\newpage
+
+\subsection{Goals}\label{sec:Goals}
+We can divide the goals of this work in three main categories:
+
+
+\subsubsection{In depth analysis of critical components}
+What are the most computational intensive subroutines and what kind of calculation is performed?
+
+Where the interprocess communication happens and what is his weight in function of the number of cores used?
+
+What is the dynamic of the SCF iteration?
+\mynotes{AKA : un modo politicamente corretto per parlare delle instabilita' numeriche}
+
+
+\subsubsection{Architecture Dependent Tuning}
+What are the components that performs best on each architecture?
+
+What is the overall performance on each architecture?
+
+What architecture has the best implementation of interprocess communication?
+
+\subsubsection{Architecture Independent Tuning}
+
+What is the impact of second level thread parallelization on each component?
+
+What is the overall impact of thread parallelization?
+
+What is the overall behavior of \QE in function of the scale of the physical system?
+\newpage
 
 \subsection{TiOH2}
 IMPORTANTE: Spiega perche' hai usato TITANIA.
@@ -2781,8 +2821,8 @@ Cambridge University Press,
 \bibitem{Manini}
 N. Manini, 
 Introduction to the Physics of Matter,
-2006,
-\url{http://materia.fisica.unimi.it/manini/dida/Struttura_della_Materia_1.html}.
+Springer,
+2014.
 
 
 \bibitem{QE}
