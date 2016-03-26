@@ -2661,6 +2661,13 @@ Where the interprocess communication happens and what is his weight in function 
 What is the dynamic of the SCF iteration?
 \mynotes{AKA : un modo politicamente corretto per parlare delle instabilita' numeriche}
 
+\subsubsection{Architecture Independent Tuning}
+
+What is the impact of second level thread parallelization on each component?
+
+What is the overall impact of thread parallelization?
+
+What is the overall behavior of \QE in function of the scale of the physical system?
 
 \subsubsection{Architecture Dependent Tuning}
 What are the components that performs best on each architecture?
@@ -2669,20 +2676,69 @@ What is the overall performance on each architecture?
 
 What architecture has the best implementation of interprocess communication?
 
-\subsubsection{Architecture Independent Tuning}
 
-What is the impact of second level thread parallelization on each component?
-
-What is the overall impact of thread parallelization?
-
-What is the overall behavior of \QE in function of the scale of the physical system?
 \newpage
 
 \subsection{TiOH2}
 IMPORTANTE: Spiega perche' hai usato TITANIA.
 
 \subsection{Plots}
-Per ogni sottosezione di sopra \ref{sec:dichiarazionePoetica} mettere da 6 a 8 grafici (AXES!) massimo.
+
+\subsubsection{In depth analysis of critical components}
+
+\begin{figure}[hhh!]
+\begin{center}
+	\includegraphics[width=\linewidth]{main_subroutines.pdf}	
+	\caption{Percentage of total PWscf CPU time per routine sorted by descending value. 
+	In parenthesis you find the root(caller), subroutine. 	
+	"gen" refers to subroutines called by different subroutines, they belong to external \QE modules. }
+	\label{fig:mainSubroutines}
+\end{center}
+\end{figure}
+
+Figure \ref{fig:mainSubroutines} :
+\begin{itemize}
+	\item not every function is in the plot
+ 	\item \texttt{init\_run} is negligible (as said above)
+ 	\item 99\% is in the electronic problem (as expected)
+	\item beware of the caller!
+	\item \texttt{cegterg} is the whole davidson diag, evaluation of the matrix included
+	\item \texttt{h\_psi} is an old friend
+	\item \texttt{cdiaghg} is the diagonalization of the dense matrix
+	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
+\end{itemize}
+
+metti plot tempi fftw fftwscalar per la comunicazione
+
+metti screenshots da cube
+
+
+
+\subsubsection{Architecture Independent Tuning}
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.3\linewidth]{relevant_subroutines.pdf}	}
+	\caption{tio sgi}
+	\label{fig:relevantSubroutines}
+
+\end{figure}
+
+da qui parte il discorso sui threads
+
+
+\subsubsection{Architecture Dependent Tuning}
+prima tutte le figaggini sui tempi generali
+
+compara tutte le relevant con i fixed
+
+percentuali mpi da scorep perche' siamo pezzettoni
+
+ma quanto e' bella la SGI
+
+
+
+
+Per ogni sottosezione di sopra \ref{sec:Goals} mettere da 6 a 8 grafici (AXES!) massimo.
 Metti cerchio sui grafici dove entra IB.
 
 
