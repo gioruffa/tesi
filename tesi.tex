@@ -20,6 +20,7 @@
 \usepackage{verbatim}
 \usepackage{listings}
 \usepackage{caption}
+\usepackage{booktabs}
 
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -2708,16 +2709,6 @@ Figure \ref{fig:mainSubroutines} :
 	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
 \end{itemize}
 
-\newpage
-
-metti plot tempi fftw fftwscalar per la comunicazione
-\begin{figure}[hhh!]
-	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
-	\caption{ stima rozza dell'impatto della comunicazione
-	}
-	\label{fig:fftwvsfftscatter}
-\end{figure}
-
 
 \newpage
 
@@ -2748,12 +2739,46 @@ metti screenshots da cube
 \end{figure}
 
 
+\newpage
+
+metti plot tempi fftw fftwscalar per la comunicazione
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
+	\caption{ stima rozza dell'impatto della comunicazione
+	}
+	\label{fig:fftwvsfftscatter}
+\end{figure}
+
 
 \newpage
 
+DINAMICA SCF
+\begin{center}
+\begin{tabular}{rcccc}
+\toprule
+cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%) &   number of iterations \\
+\midrule
+1  &  676 &  201 &  29 &  43 \\
+2  &  363 &  118 &  32 &  42 \\
+4  &  207 &   68 &  33 &  70 \\
+8  &  204 &  102 &  50 &  86 \\
+16 &  154 &  109 &  71 &  55 \\
+32 &   80 &   44 &  55 &  36 \\
+64 &   58 &   35 &  60 &  50 \\
+\bottomrule
 
+\end{tabular}
+\end{center}
 
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{iterstats.pdf}}
+	\caption{ iter stats
+	}
+	\label{fig:iterstats}
+\end{figure}
+C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. In fatti i pezzottini fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
 
+La scala logaritmica e' li' solo perche' e' piu' bello per vedere come vanno gli errori.
 
 \subsubsection{Architecture Independent Tuning}
 
