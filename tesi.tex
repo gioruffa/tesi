@@ -2708,9 +2708,50 @@ Figure \ref{fig:mainSubroutines} :
 	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
 \end{itemize}
 
+\newpage
+
 metti plot tempi fftw fftwscalar per la comunicazione
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
+	\caption{ stima rozza dell'impatto della comunicazione
+	}
+	\label{fig:fftwvsfftscatter}
+\end{figure}
+
+
+\newpage
 
 metti screenshots da cube
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[scale=0.5]{cube_MPI.png}}
+	\caption{Mean percentage of bytes sent per routine. 
+	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower lasting energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
+	On the right we explored the content of \texttt{c\_bands} showing that the great majority of the communication is performed by the \texttt{h\_psi} subroutine. Tool: cube on scorep metrics.
+	}
+	\label{fig:cubeMPI}
+\end{figure}
+
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[scale=0.5]{mpi_inclusive_bytes_sent.png}}
+	\caption{ INCLUSIVE confirm all said above. This is an inclusive metrics, meaning that the value of a single function comprehends the values of the called functions. Tool: paraprof on scorep metrics.
+	}
+	\label{fig:MPIinclusive}
+\end{figure}
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[scale=0.5]{mpi_exclusive_bytes_sent.png}}
+	\caption{ EXCLUSIVE. PWscf uses mainly \texttt{MPI\_Allreduce} subroutine to implement interprocess communication. Tool: paraprof on scorep metrics.
+	}
+	\label{fig:MPIinclusive}
+\end{figure}
+
+
+
+\newpage
+
+
 
 
 
