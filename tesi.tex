@@ -2717,7 +2717,7 @@ metti screenshots da cube
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{cube_MPI.png}}
 	\caption{Mean percentage of bytes sent per routine. 
-	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower lasting energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
+	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
 	On the right we explored the content of \texttt{c\_bands} showing that the great majority of the communication is performed by the \texttt{h\_psi} subroutine. Tool: cube on scorep metrics.
 	}
 	\label{fig:cubeMPI}
@@ -2754,7 +2754,7 @@ metti plot tempi fftw fftwscalar per la comunicazione
 
 DINAMICA SCF
 \begin{center}
-\begin{tabular}{rcccc}
+\begin{tabular}{r|cccc}
 \toprule
 cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%) &   number of iterations \\
 \midrule
@@ -2766,9 +2766,9 @@ cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%)
 32 &   80 &   44 &  55 &  36 \\
 64 &   58 &   35 &  60 &  50 \\
 \bottomrule
-
 \end{tabular}
 \end{center}
+
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{iterstats.pdf}}
@@ -2780,6 +2780,59 @@ C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. In fatti i pezzo
 
 La scala logaritmica e' li' solo perche' e' piu' bello per vedere come vanno gli errori.
 
+
+\newpage
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
+	\caption{ iter stats
+	}
+	\label{fig:fixedvsvariable}
+\end{figure}
+
+FIXED ha 20 iterazioni.
+
+Lo shape e' diverso. Del bump a pochi core ne parliamo dopo.
+
+Non si possono comparare i tempi perche' uno usa meno iterazioni dell'altro.
+
+E' palese che la differenza sia dovuta al numero di iterazioni, metto tabella:
+
+TABELLA
+
+
+Spiego perche' servono due punti di vista, spiego che nelle comparazioni delle componenti useremo sempre le run fissate, mentre per comparazioni generali useremo entrambe.
+
+%[(43, 1), (42, 2), (70, 4), (86, 8), (55, 16), (36, 32), (50, 64)]
+%[(47, 1), (42, 2), (70, 4), (83, 8), (55, 16), (36, 32), (50, 64)]
+\begin{center}
+\begin{tabular}{r|ccccccc}
+\toprule
+cores 	 &  1  &  2  &  4  &  8  &  16  &  32  &  64 \\
+\midrule
+Galileo	 & 43  & 42  & 70  & 86  &  55  &  36  &  50 \\ 
+UV2000	 & 43  & 42  & 72  & 83  &  55  &  36  &  50 \\ 
+\bottomrule
+\end{tabular}
+\end{center}
+
+
+Il numero di iterazioni varia molto ma almeno tra le architetture e' abbastanza coerente, tranne a 4 e 8 cores.
+
+Se si vuole comparare si puo' usare lo speedup. 
+
+Risultato segue:
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=0.6\linewidth]{fixed_vs_variable_speedup.pdf}}
+	\caption{ iter stats
+	}
+	\label{fig:fixedvsvariablespeedup}
+\end{figure}
+
+Ha davvero poco senso, mi sa che ti metto in appendice
+
+
 \subsubsection{Architecture Independent Tuning}
 
 \begin{figure}[hhh!]
@@ -2789,7 +2842,7 @@ La scala logaritmica e' li' solo perche' e' piu' bello per vedere come vanno gli
 
 \end{figure}
 
-da qui parte il discorso sui threads
+da qui parte il discorso sui threads, come tirare giu' il bubbone
 
 
 \subsubsection{Architecture Dependent Tuning}
