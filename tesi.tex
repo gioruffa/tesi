@@ -2668,7 +2668,6 @@ What is the impact of second level thread parallelization on each component?
 
 What is the overall impact of thread parallelization?
 
-What is the overall behavior of \QE in function of the scale of the physical system?
 
 \subsubsection{Architecture Dependent Tuning}
 What are the components that performs best on each architecture?
@@ -2677,6 +2676,7 @@ What is the overall performance on each architecture?
 
 What architecture has the best implementation of interprocess communication?
 
+What is the overall behavior of \QE in function of the scale of the physical system?
 
 \newpage
 
@@ -2825,15 +2825,21 @@ Risultato segue:
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=0.6\linewidth]{fixed_vs_variable_speedup.pdf}}
-	\caption{ iter stats
+	\caption{ ha davvero poco senso, meglio mettere in appendice.
 	}
 	\label{fig:fixedvsvariablespeedup}
 \end{figure}
 
 Ha davvero poco senso, mi sa che ti metto in appendice
 
-
+\newpage
 \subsubsection{Architecture Independent Tuning}
+
+
+%What is the impact of second level thread parallelization on each component?
+
+%What is the overall impact of thread parallelization?
+
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.3\linewidth]{relevant_subroutines.pdf}	}
@@ -2842,9 +2848,21 @@ Ha davvero poco senso, mi sa che ti metto in appendice
 
 \end{figure}
 
-da qui parte il discorso sui threads, come tirare giu' il bubbone
+Il bubbone e' ovviamente un problema. 
+
+Per trovare quale sia il problema, vediamo i dati a iterazioni fissate (macchina SGI,stessi risulati su CINECA) :
+
+Da figura \ref{fig:relevantSubroutines} abbiamo che il bubbone e' evidentemente dovuto alla routine di diagonalizzazione.
+Infatti a destra vediamo come la routine con il peggior scaling sia quella dell'algebra lineare.
 
 
+
+
+
+
+
+
+\newpage
 \subsubsection{Architecture Dependent Tuning}
 prima tutte le figaggini sui tempi generali
 
