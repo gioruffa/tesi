@@ -2704,7 +2704,7 @@ Figure \ref{fig:mainSubroutines} :
  	\item 99\% is in the electronic problem (as expected)
 	\item beware of the caller!
 	\item \texttt{cegterg} is the whole davidson diag, evaluation of the matrix included
-	\item \texttt{h\_psi} is an old friend
+	\item \texttt{h\_psi} is the evaluation of the matrix
 	\item \texttt{cdiaghg} is the diagonalization of the dense matrix
 	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
 \end{itemize}
@@ -2712,7 +2712,7 @@ Figure \ref{fig:mainSubroutines} :
 
 \newpage
 
-metti screenshots da cube
+COMMUNICATION
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{cube_MPI.png}}
@@ -2723,7 +2723,7 @@ metti screenshots da cube
 	\label{fig:cubeMPI}
 \end{figure}
 
-
+\newpage
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{mpi_inclusive_bytes_sent.png}}
 	\caption{ INCLUSIVE confirm all said above. This is an inclusive metrics, meaning that the value of a single function comprehends the values of the called functions. Tool: paraprof on scorep metrics.
@@ -2741,7 +2741,7 @@ metti screenshots da cube
 
 \newpage
 
-metti plot tempi fftw fftwscalar per la comunicazione
+Comparazione routine di comunicazione vs comunicazione
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
 	\caption{ stima rozza dell'impatto della comunicazione
@@ -2776,9 +2776,10 @@ cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%)
 	}
 	\label{fig:iterstats}
 \end{figure}
-C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. In fatti i pezzottini fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
+C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. 
+I benchmark industriali fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
 
-La scala logaritmica e' li' solo perche' e' piu' bello per vedere come vanno gli errori.
+La scala logaritmica e' per far vedere che la variazione percentuale e' importante
 
 
 \newpage
@@ -2798,10 +2799,9 @@ Non si possono comparare i tempi perche' uno usa meno iterazioni dell'altro.
 
 E' palese che la differenza sia dovuta al numero di iterazioni, metto tabella:
 
-TABELLA
 
 
-Spiego perche' servono due punti di vista, spiego che nelle comparazioni delle componenti useremo sempre le run fissate, mentre per comparazioni generali useremo entrambe.
+
 
 %[(43, 1), (42, 2), (70, 4), (86, 8), (55, 16), (36, 32), (50, 64)]
 %[(47, 1), (42, 2), (70, 4), (83, 8), (55, 16), (36, 32), (50, 64)]
@@ -2816,10 +2816,12 @@ UV2000	 & 43  & 42  & 72  & 83  &  55  &  36  &  50 \\
 \end{tabular}
 \end{center}
 
+Spiego perche' servono due punti di vista, spiego che nelle comparazioni delle componenti useremo sempre le run fissate, mentre per comparazioni generali useremo entrambe.
 
 Il numero di iterazioni varia molto ma almeno tra le architetture e' abbastanza coerente, tranne a 4 e 8 cores.
 
-Se vuoi comparazione su speedup, che vuol dire niente \ref{app:IterationDynamic}.
+L'instabilita' si ha perche' $\Delta \rho$ viene usato per fissare la convergenza della Davidson!
+
 
 \newpage
 \subsubsection{Architecture Independent Tuning}
@@ -2837,20 +2839,14 @@ Se vuoi comparazione su speedup, che vuol dire niente \ref{app:IterationDynamic}
 \end{figure}
 
 
+\begin{itemize}
+	\item Parlare un po' di scaling delle varie funzioni.
+	\item cdiagh e' ovviamente IL problema.
+	\item vediamo se introduzione dei thread cambia qualcosa.
+\end{itemize}
 
+\newpage
 
-Parlare un po' di scaling delle varie funzioni.
-
-Il bubbone e' ovviamente un problema. 	
-
-Per trovare quale sia il problema, vediamo i dati a iterazioni fissate (macchina SGI,stessi risulati su CINECA) :
-
-Da figura \ref{fig:relevantSubroutines} abbiamo che il bubbone e' evidentemente dovuto alla routine di diagonalizzazione.
-Infatti a destra vediamo come la routine con il peggior scaling sia quella dell'algebra lineare.
-
-Introduciamo quindi i thread e facciamo tutte le prove possibili con tutti i threads.
-
-I threads alterano il tipo di algoritmo utilizzato.
 
 In base ai risultati in appendice \ref{app:Threads} decidiamo di prendere la striscia migliore, sia a run fissati che a run variabili.
 
@@ -2865,10 +2861,13 @@ I risultati sono in figura
 
 \mynotes{ forse e' meglio mettere graffe invece di frecce per far vedere l'intervallo di scalapack e serial}
 
-A 8 core c'e' efficenza del 60 \%. Molto bello per chi fa high throughtput.
-Sia la letteratua che i benchmark industriali (iterazioni fissate) non mettono in luce questo perche' o sono fissate le iterazioni, oppure partono a profilare dai 64 core in su.
+I threads forzano la diagonalizzazione seriale, ma threaddata (mkl threaded).
 
-Questo risultato e' molto interessante per chi fa high throughput.
+A 16 core il guadagno in realta' e' dato tutto dalla velocizzazione di hpsi perche' la diagonalizzazione seriale e' la stessa di 8 core.
+
+A 8 core c'e' efficenza del 60 \%. Molto bello per chi fa high throughtput.
+
+Sia la letteratua che i benchmark industriali (iterazioni fissate) non mettono in luce questo perche' o sono fissate le iterazioni, oppure partono a profilare dai 64 core in su.
 
 Si puo' dire che come regola generale vale la pena prendere tanti threads quanti ce ne sono sul chipset.
 Sharing totale della cache L3.
@@ -2887,23 +2886,25 @@ MPI + Threads &  47  &  42  &  43  &  43  &  42  &  36  &  36 \\
 \end{center}
 
 
-Tutto questo succede perche' $\Delta \rho$ viene usato per fissare la convergenza della Davidson!
 
 Pero' possiamo dire lo stesso per le run fissate e in questo caso analizzare i risultati.
+
+
 Quali sono le componenti che migliorano (comparazione solo su run fissate):
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=\linewidth]{threads_subroutines.pdf}	}
-	\caption{Il guadagno sta in cdiaghg, cegterg va su meglio ma contiene anche hpsi, conviene perdere su hpsi e guadagnare sulla diag. hpsi e sumband scalano come le fftw perche' quello fanno. In piu' hanno la parte di somma che si fa con le alltoall a stecca.}
+	\caption{Il guadagno sta in cdiaghg, cegterg va su meglio ma contiene anche hpsi, conviene perdere su hpsi e guadagnare sulla diag. hpsi e sumband scalano come le fftw perche' quello fanno. In piu' hanno la parte di somma che si fa con le allreduce che scala molto bene su entrambe le arch.}
 	\label{fig:threadsSubroutines}
 
 \end{figure}
 
+\newpage
 
 Per fare un confronto con figura \ref{fig:relevantSubroutines} basta guardare figura \ref{fig:threadsRelevantSubroutines};
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=0.7\linewidth]{threads_relevant_subroutines.pdf}	}
-	\caption{Il bump e' sparito}
+	\caption{Abbiamo eliminato il rallentamento dato dalla diagonalizzazione inefficiente (Iterazioni fissate)!}
 	\label{fig:threadsRelevantSubroutines}
 \end{figure}
 
@@ -2921,31 +2922,75 @@ Per fare un confronto con figura \ref{fig:relevantSubroutines} basta guardare fi
 figure \ref{fig:archCompareIterations}. SGI va piu' piano ma gia' dal comportamento dei tempi medi di iterazione (quindi indipendenti dal numero di iterazioni) si vede come scala meglio. Addirittura a 64 core e' piu' veloce, pur partendo in svantaggio.
 
 
+\newpage
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{arch_global.pdf}	}
+	\caption{tempo totale}
+	\label{fig:archGlobal}
+\end{figure}
+
+
+figure \ref{fig:archGlobal}: 
+\begin{itemize}
+	\item Lo scaling e' lontano dal lineare
+	\item in ambedue i casi la numa scala meglio
+	\item sembra che il distacco avvenga prevalentemente quando piu' nodi devono comunicare
+	\item lo scaling del cluster tradizionale resta competitivo fino a quando si resta sullo stesso nodo
+	\item il numero di iterazioni a 64 core e' lo stesso, quindi la macchina numa e' davvero piu' performante.
+\end{itemize}
+
+\mynotes{annotare il numero di nodi}
+
+\newpage
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=0.7\linewidth]{arch_mpi_perc.pdf}	}
+	\caption{tempo totale}
+	\label{fig:archMpiPerc}
+\end{figure}
+
+
+figure \ref{fig:archMpiPerc}: 
+\begin{itemize}
+	\item dopo i 16 core la differenza aumenta
+	\item non si puo' giustificare un speedup di 2x solo con questo grafico
+	\item bisogna considerare pero' che questo profiling non comprende la comunicazione MPI fatta internamente dalla scalapack! questo perche' avremmo dovuto ricompilarla e sarebbe stato difficile visto che non abbiamo i sorgenti delle librerie intel/SGI
+	\item e' una indicazione di come la comunicazione sia migliore con MPT ma non e' un dato "assoluto"
+	
+\end{itemize}
+
+\newpage
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{arch_subroutines.pdf}	}
+	\caption{tempo totale}
+	\label{fig:archSubroutines}
+\end{figure}
+
+figure \ref{fig:archSubroutines}
+
+\begin{itemize}
+	\item tutte le routine scalano meglio
+	\item l'andamento dell'fft scatter ci dice bene come la comunicazione sia di fatti migliore sulla macchina SGI
+	\item cdiagh permane ad avere un pessimo speedup
+	\item hpsi e' in assoluto la funzione che scala meglio, infatti il suo peso a livello computazionale scende di molto nei
+	contronti della diagonalizzazione.
+	\item sumband e hpsi hanno stesso scaling perche' di fatto fanno la stessa cosa, come spiegato nei capitoli sopra.
+	\item e' evidente che la macchina numa e' piu' performante su queste dimensionalita'.
+\end{itemize}
+
+
+\section{Discussion and Conclusion}
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{concl_titania.pdf}	}
+	\caption{}
+	\label{fig:conclTitania}
+\end{figure}
 
 
 
-
-prima tutte le figaggini sui tempi generali
-
-compara tutte le relevant con i fixed
-
-percentuali mpi da scorep perche' siamo pezzettoni
-
-ma quanto e' bella la SGI
-
-
-
-
-
-Metti cerchio sui grafici dove entra IB.
 
 
 In fondo mettere i risultati per ogni molecola di size diverso.
-	
-
-Tutti i grafici che restano vanno a popolare l'appendice.
-
-\section{Discussion and Conclusion}
 
 \mynotes{Metti molecola organica}.
 
