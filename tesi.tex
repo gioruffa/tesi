@@ -1887,7 +1887,7 @@ In fact we have that
 \end{equation}
 
 
-\subsection{Diagonalization (Step 2)}
+\subsection{Diagonalization (Step 2)}\label{sec:Diagonalization}
 The diagonalization of $\mf{H}^{KS}$ is the core problem of any SCF implementation.
 
 As specified in \cite[Appendix A.2]{QE}, the strategy adopted by \QE is to use the \textit{Davidson method}\cite{Davidson}\footnote{\QE has also an alternative algorithm, called the \textit{conjugate gradient} method.}.
@@ -1945,7 +1945,7 @@ Since \texttt{h\_psi} is called once over all the $\{u_{kj}\}$, the total comple
 
 Note that this is the complexity of a single Davidson iteration, the number of iterations required to solve the eigenvalue problem cannot be predicted beforehand but the computational cost of the whole Davidson diagonalization\footnote{Excluding the evaluation of $\mf{H}^{KS}$} goes as $\bigO(N_{b}^3)$ and is usually accounted as the global computational complexity of the whole DFT-SCF computation.
 
-\subsubsection{FFT implementation}
+\subsubsection{FFT implementation}\label{sec:FFT}
 Given their central role, it is convenient to outline how FFT transformations are performed inside \QE .
 We can explicitly rewrite equation \eqref{eq:FFTDef} for an IFFT from reciprocal to real grid.
 
@@ -2693,7 +2693,7 @@ What we aim to know is :
 	\item What is the overall behavior of \QE in function of the scale of the physical system?
 \end{itemize}
 
-This section will underline the strength of each architecture and support clear conclusions on the possible scenarios of employment, depending on the kind of computation performed.
+This section will underline the strength of each architecture and support clear conclusions on the possible scenarios of employment.
 
 \newpage
 
@@ -2709,9 +2709,8 @@ What are the most computational intensive subroutines and what kind of calculati
 \begin{center}
 	\includegraphics[width=\linewidth]{main_subroutines.pdf}	
 	\caption{Percentage of total PWscf CPU time per routine sorted by descending value. 
-	\\Run at 4 cores.
-	\\In parenthesis you find the root(caller), subroutine. 	
-	\\"gen" refers to subroutines called by different subroutines, they belong to external \QE modules. }
+	\\In parenthesis you find the root(caller), subroutine. Subroutines with the same caller are plotted with the same color. 	
+	\\``gen" refers to subroutines belonging to external \QE modules, hence called in different subroutines. }
 	\label{fig:mainSubroutines}
 \end{center}
 \end{figure}
@@ -2727,6 +2726,37 @@ Figure \ref{fig:mainSubroutines} :
 	\item \texttt{cdiaghg} is the diagonalization of the dense matrix
 	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
 \end{itemize}
+
+
+In figure \ref{fig:mainSubroutines} we have plotted the subroutines consuming the most CPU time. 
+The data were obtained by a run at 4 MPI ranks, to have an average indication of the behavior of the code.
+
+The CPU time is compared to the CPU time of the whole PWscf's run in form of percentage.
+This is an inclusive metric, meaning that the CPU time of each subroutine includes the CPU time spent in every subroutine called.
+We have color-coded the subroutines that are called by the same caller.
+
+We can outline a series of information.
+
+PWscf calls mainly two subroutines: \texttt{init\_run} and \texttt{electrons}.
+Approximately 99\% of the total run time is occupied by \texttt{electrons}, which is the subroutine implementing the whole SCF iteration.
+
+\texttt{Electrons} calls \texttt{c\_bands} to obtain the Kohn-Sham orbitals\footnote{The eigenvectors of $\mf{H}^{KS}$.} and \texttt{sum\_band} combines them to obtain the electronic density.
+
+\texttt{c\_bands} is basically a wrapper for \texttt{c\_egterg}, which implements the Davidson diagonalization, in fact it calls two functions :
+\texttt{h\_psi} to evaluate the $\mf{H}^{KS}$ matrix; \texttt{cdiaghg} to diagonalize the obtained matrix.
+Please see section \ref{sec:Diagonalization} for further details.
+
+\texttt{Fft\_scatter} which is a subroutine that distribute the grid among all the MPI ranks, hence it is mainly dedicated to communication, while \texttt{fftw} is the routine that actually computes the FFT and IFFT transformations (see section \ref{sec:FFT}.
+
+We can outline a list of the most important subroutines that we will keep under consideration in the followings:
+
+\begin{center}
+\texttt{cegterg, h\_psi, cdiaghg, sum\_band, fftw, fft\_scatter}
+\end{center}
+
+
+
+
 
 
 \newpage
