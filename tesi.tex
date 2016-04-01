@@ -2651,48 +2651,67 @@ If not reported explicitly, all the time metrics exposed have to be considered a
 \newpage
 
 \subsection{Goals}\label{sec:Goals}
-We can divide the goals of this work in three main categories:
+We found appropriate to divide the results we obtained in three main categories.
+
+\paragraph{Highlight of critical components} 
+In section \ref{sec:resCriticalComponents} we will perform an in-depth analysis of what are the most important components of PWscf.
+
+We aim to find an answer to the following questions :
+\begin{itemize}
+	\item What are the most computational intensive subroutines and what kind of calculation is performed?
+	\item Where the interprocess communication happens and what are the main MPI subroutines used? Is it possible to have a rough estimate of the weight of communication over computation?
+	\item What is the dynamic of the SCF iteration? 	
+\end{itemize}
+
+This section will highlight what components should be considered while profiling PWscf and what are the critical behaviors of the code. 
+Therefore it serves as an important introduction to section \ref{sec:resArchIndependent} and \ref{sec:resArchDependent}. The difference between the two points of view exposed in \ref{sec:Goals} will be cleared here.
 
 
-\subsubsection{In depth analysis of critical components}
-What are the most computational intensive subroutines and what kind of calculation is performed?
 
-Where the interprocess communication happens and what is his weight in function of the number of cores used?
+\paragraph{Architecture Independent Tuning}
+In section \ref{sec:resArchIndependent} we'll focus on the factors that can improve PWscf's performance regardless of the memory access architecture.
 
-What is the dynamic of the SCF iteration?
-\mynotes{AKA : un modo politicamente corretto per parlare delle instabilita' numeriche}
+We focused mainly on the effects of second level thread parallelization because it is the easiest way to alter the behavior of PWscf without the need to tune complex runtime parameters.
 
-\subsubsection{Architecture Independent Tuning}
+Hence the question we want to answer:
+\begin{itemize}
+	\item What is the impact of second level thread parallelization on each component?
+	\item What is the overall impact of thread parallelization?
+	\item How threads parallelization behaves in function of the number of cores used?
+\end{itemize}
 
-What is the impact of second level thread parallelization on each component?
+This section will give all the tools necessary to tune the performance of the code in a workstation-scale environment, very familiar to researchers of the field.
 
-What is the overall impact of thread parallelization?
+\paragraph{Architecture Dependent Tuning}
+Finally, in section \ref{sec:resArchDependent} we will make an in-depth investigation on the performance of the two computation architecture exposed in section \ref{sec:comparch}.
 
+What we aim to know is :
+\begin{itemize}
+	\item What are the components that performs best on each architecture?
+	\item What is the overall performance on each architecture?
+	\item What architecture has the best implementation of interprocess communication?
+	\item What is the overall behavior of \QE in function of the scale of the physical system?
+\end{itemize}
 
-\subsubsection{Architecture Dependent Tuning}
-What are the components that performs best on each architecture?
-
-What is the overall performance on each architecture?
-
-What architecture has the best implementation of interprocess communication?
-
-What is the overall behavior of \QE in function of the scale of the physical system?
+This section will underline the strength of each architecture and support clear conclusions on the possible scenarios of employment, depending on the kind of computation performed.
 
 \newpage
 
 \subsection{TiOH2}
 IMPORTANTE: Spiega perche' hai usato TITANIA.
 
-\subsection{Plots}
+\newpage
+\subsection{Highlight of critical components}\label{sec:resCriticalComponents}
 
-\subsubsection{In depth analysis of critical components}
+What are the most computational intensive subroutines and what kind of calculation is performed?
 
 \begin{figure}[hhh!]
 \begin{center}
 	\includegraphics[width=\linewidth]{main_subroutines.pdf}	
 	\caption{Percentage of total PWscf CPU time per routine sorted by descending value. 
-	In parenthesis you find the root(caller), subroutine. 	
-	"gen" refers to subroutines called by different subroutines, they belong to external \QE modules. }
+	\\Run at 4 cores.
+	\\In parenthesis you find the root(caller), subroutine. 	
+	\\"gen" refers to subroutines called by different subroutines, they belong to external \QE modules. }
 	\label{fig:mainSubroutines}
 \end{center}
 \end{figure}
@@ -2711,6 +2730,7 @@ Figure \ref{fig:mainSubroutines} :
 
 
 \newpage
+Where the interprocess communication happens and what is his weight in function of the number of cores used?
 
 COMMUNICATION
 
@@ -2719,6 +2739,7 @@ COMMUNICATION
 	\caption{Mean percentage of bytes sent per routine. 
 	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
 	On the right we explored the content of \texttt{c\_bands} showing that the great majority of the communication is performed by the \texttt{h\_psi} subroutine. Tool: cube on scorep metrics.
+	\\NOTE:  internal scalapack mpi is not profiled (see below).
 	}
 	\label{fig:cubeMPI}
 \end{figure}
@@ -2733,7 +2754,10 @@ COMMUNICATION
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{mpi_exclusive_bytes_sent.png}}
-	\caption{ EXCLUSIVE. PWscf uses mainly \texttt{MPI\_Allreduce} subroutine to implement interprocess communication. Tool: paraprof on scorep metrics.
+	\caption{ EXCLUSIVE. 
+	\\ What are the most used MPI subroutines ? 
+	\\ PWscf uses mainly \texttt{MPI\_Allreduce} subroutine to implement interprocess communication. Tool: paraprof on scorep metrics.
+	\\ NOTE: sent/received bytes are the same because all directives are all-to-all
 	}
 	\label{fig:MPIinclusive}
 \end{figure}
@@ -2741,7 +2765,8 @@ COMMUNICATION
 
 \newpage
 
-Comparazione routine di comunicazione vs comunicazione
+Comparazione routine di comunicazione vs computazione.
+Stima rozza. Dati sulle architetture in sezione dedicata.
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
 	\caption{ stima rozza dell'impatto della comunicazione
@@ -2751,7 +2776,7 @@ Comparazione routine di comunicazione vs comunicazione
 
 
 \newpage
-
+What is the dynamic of the SCF iteration?
 DINAMICA SCF
 \begin{center}
 \begin{tabular}{r|cccc}
@@ -2780,6 +2805,8 @@ C'e' variabilita', non ha senso fare benchmark su 2 iterazioni.
 I benchmark industriali fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
 
 La scala logaritmica e' per far vedere che la variazione percentuale e' importante
+
+Il tempo medio di iterazione e' un buon indicatore di quali siano le performance della macchina ma non e' molto preciso.
 
 
 \newpage
@@ -2824,7 +2851,7 @@ L'instabilita' si ha perche' $\Delta \rho$ viene usato per fissare la convergenz
 
 
 \newpage
-\subsubsection{Architecture Independent Tuning}
+\subsection{Architecture Independent Tuning}\label{sec:resArchIndependent}
 
 
 %What is the impact of second level thread parallelization on each component?
@@ -2859,7 +2886,8 @@ I risultati sono in figura
 
 \end{figure}
 
-\mynotes{ forse e' meglio mettere graffe invece di frecce per far vedere l'intervallo di scalapack e serial}
+\mynotes{ forse e' meglio mettere graffe invece di frecce per far vedere l'intervallo di scalapack e serial.
+Disegnare con matplotlib non e' proprio immediato. Se il grafico va bene metto le in postproduzione.}
 
 I threads forzano la diagonalizzazione seriale, ma threaddata (mkl threaded).
 
@@ -2901,7 +2929,7 @@ Quali sono le componenti che migliorano (comparazione solo su run fissate):
 
 \newpage
 
-Per fare un confronto con figura \ref{fig:relevantSubroutines} basta guardare figura \ref{fig:threadsRelevantSubroutines};
+Per vedere il risultato basta tra figura \ref{fig:relevantSubroutines} e figura \ref{fig:threadsRelevantSubroutines};
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=0.7\linewidth]{threads_relevant_subroutines.pdf}	}
 	\caption{Abbiamo eliminato il rallentamento dato dalla diagonalizzazione inefficiente (Iterazioni fissate)!}
@@ -2911,7 +2939,7 @@ Per fare un confronto con figura \ref{fig:relevantSubroutines} basta guardare fi
 
 
 \newpage
-\subsubsection{Architecture Dependent Tuning}
+\subsection{Architecture Dependent Tuning}\label{sec:resArchDependent}
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{arch_compare_iterations.pdf}	}
