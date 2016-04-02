@@ -2007,7 +2007,7 @@ The IFFT transform constitute the major computational cost, and it's comparable 
 The procedure is implemented inside the routine \texttt{sum\_band}, which is also responsible for the computation of occupations and the sum of eigenvalues.
 
 
-\subsection{Convergence criteria (Step 4)}
+\subsection{Convergence criteria (Step 4)}\label{sec:SCFConvergence}
 As explained in \ref{sec:SCF-DFT} a set of convergence test can be performed on $\densout$ and $E[\densout]$.
 \QE uses a refined methods that estimates the impact of the difference between $\densout$ and $\densin$ on the energy of the system.
 First we define the difference between $\densout$ and $E[\densout]$ as 
@@ -2104,6 +2104,7 @@ In table \ref{tab:coreRoutines} we present a summary of the most important subro
 \label{tab:coreRoutines}
 \end{table}
 
+\newpage
 \newpage
 \section{Computational Architectures} \label{sec:comparch}
 
@@ -2839,14 +2840,40 @@ We now have a clear view on where the communication happens and what kind of MPI
 We can also get an estimate on the weight of communication over calculation by comparing the CPU time spent in \texttt{fftw} (calculation) and \texttt{fft\_scatter} (communication) subroutines.
 
 In the left graph of figure \ref{fig:fftwvsfftscatter} we plotted the CPU time of the two subroutines in function of the number of cores. 
-\texttt{fft\_scatter} time seems rather constant but his value compared to the one of \texttt{fftw} increases with the number of core used. 
-In fact, as plotted in the graph on the right, we can see that CPU time ratio of \texttt{fft\_scatter} over \texttt{fftw} rises over 16 cores, when more than two Galileo nodes, and more than four NUMA nodes on two different blades, have to communicate.
+\texttt{Fft\_scatter} CPU time is subject to little variation, but if we compare its value with \texttt{fftw}'s one we can see that communication gradually earns an increasing weight. 
+In fact, as plotted in the graph on the right, we can see that CPU time ratio of \texttt{fft\_scatter} over \texttt{fftw} rises over sixteen cores, when more than two Galileo nodes, and more than four NUMA nodes on two different blades, have to communicate.
 A more in-depth analysis about this trend is exposed in section \ref{sec:resArchDependent}.
 
 
 \newpage
+\begin{framed}
+\begin{center}
 What is the dynamic of the SCF iteration?
-DINAMICA SCF
+\end{center}
+\end{framed}
+
+Although the question can seem undoubtedly vague, it is of capital importance in order to understand the critical aspects that rise  when trying to profile the behavior of a self consistent calculation.
+
+As we have explained id section \ref{sec:SCF-DFT} and section \ref{sec:SCFConvergence} an SCF calculation is an iterative process that terminates only when self-consistency is achieved.
+The number of iterations needed to reach self-consistency is not fixed nor predictable beforehand.
+Hence the time necessary to obtain a physically accountable result can vary in function of an incredible series of factors: size of the physical system, quality of the initial density guess, precision requested, algorithm used, number of cores employed, ... .
+
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{iterstats.pdf}}
+	\caption{ iter stats
+	}
+	\label{fig:iterstats}
+\end{figure}
+
+Even the time necessary to perform a single iteration step can vary considerably.
+In figure \ref{fig:iterstats} we have plotted the value of mean iteration CPU time in function of the number of cores used, the error bar is the standard deviation.
+
+We can see that the iteration time is far from being constant and can varies sensibly. In the plot on the right we have the same data plotted in logarithmic scale to highlight the fact that that the relative variation of iteration time grows with the number of cores.
+In fact, by looking at the data reported in table \ref{tab:iterations} we can see that the relative error is always above the 50\% when more than eight cores are used.
+
+
+\begin{table}[hhh!]
 \begin{center}
 \begin{tabular}{r|cccc}
 \toprule
@@ -2862,14 +2889,40 @@ cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%)
 \bottomrule
 \end{tabular}
 \end{center}
+\caption{Iterations statistics.}
+\label{tab:iterations}
+\end{table}
+
+Another important factor exposed in table \ref{tab:iterations} is that the number of iterations varies quite drastically depending on the number of cores used. 
+The cause of this behavior is that the quantity $\Delta E$ used to check self-consistency (see section \ref{sec:SCFConvergence}) is used as a parameter to control the convergence of the Davidson diagonalization.
+This introduces a certain amount of numerical instability that makes the number of iterations required unpredictable.
+
+It now appears clear why in section \ref{sec:Goals} we introduced two point of views.
+In order to profile and compare the performances of PWscf and its subroutines in function of the number of cores we need to fix the number of SCF iterations performed. Otherwise the computations between two runs at different cores could be considered different.
+We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
+reasonable run time\footnote{The time we had at disposal for profiling was limited and the number of tries performed was considerable, hence the need to contain the total run time.}.
+
+We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state community.
+
+This is why from now on we will report the results with both with fixed and variable iterations.
 
 
 \begin{figure}[hhh!]
-	\centerline{\includegraphics[width=1.2\linewidth]{iterstats.pdf}}
+	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
 	\caption{ iter stats
 	}
-	\label{fig:iterstats}
+	\label{fig:fixedvsvariable}
 \end{figure}
+
+In figure \ref{fig:fixedvsvariable} we plotted the iteration time of PWscf with variable number of iterations\footnote{i.e. until self-consistency is reached.} and fixed (twenty) number of iterations.
+
+
+
+~
+
+~
+
+
 C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. 
 I benchmark industriali fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
 
@@ -2880,12 +2933,7 @@ Il tempo medio di iterazione e' un buon indicatore di quali siano le performance
 
 \newpage
 
-\begin{figure}[hhh!]
-	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
-	\caption{ iter stats
-	}
-	\label{fig:fixedvsvariable}
-\end{figure}
+
 
 FIXED ha 20 iterazioni.
 
