@@ -2766,18 +2766,13 @@ Is it possible to have a rough estimate of the weight of communication over comp
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{cube_MPI.png}}
-	\caption{Percentage of bytes sent/received per routine. The percentage is calculated against the total amount of bytes sent/received.  
-	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
-	On the right we explored the content of \texttt{c\_bands} showing that the great majority of the communication is performed by the \texttt{h\_psi} subroutine. Tool: cube on scorep metrics.
-	\\NOTE:  internal scalapack mpi is not profiled (see below).
+	\caption{Percentage of bytes sent/received per routine. The percentage is calculated against the total amount of bytes sent/received.  Tool: \texttt{cube} on \texttt{scorep}'s metrics.
 	}
 	\label{fig:cubeMPI}
 \end{figure}
 
 In figure \ref{fig:cubeMPI} we have two screenshots taken directly from \texttt{cube}, the \texttt{scorep} visualization tool (see section \ref{sec:profTools}).
 As one can see the subroutines are represented in a call tree.
-On the left frame we explored the content of \texttt{electrons} and, as said above, we can see that \texttt{c\_bands} and \texttt{sum\_bands} are called.
-In the right frame we explored \texttt{pcegterg}, which is the parallelized version of \texttt{cegterg}, containing the the important subroutines \texttt{h\_psi} and \texttt{p\_cdiaghg\_} (the SCALAPACK parallelized version of \texttt{cdiaghg}).
 
 The number on the left of each subroutine is the percentage of bytes sent using MPI communication library inside the subroutine. 
 The percentage is calculated over the total number of bytes sent in the whole execution, i.e. an absolute metric.
@@ -2786,38 +2781,67 @@ Please note also that, as we will see below, the MPI subroutines used are very s
 
 The color box on the left is an ``\textit{heat map}" representing the metric's value, blue is 0\% and red is 100\%\footnote{Since we are using absolute percentage values for the metric, the color box is redundant. Nonetheless it can be incredibly useful when non-absolute metrics are investigated.}.
 
+On the left frame we explored the content of \texttt{electrons} and, as said above, we can see that \texttt{c\_bands} and \texttt{sum\_bands} are called.
+It is clear that 69\% of the overall communication is performed to find the Kohn-Sham orbitals in \texttt{c\_bands}, this is expected since the evaluation of the matrix and its diagonalization is wildly parallelized.
+Another 25\% of the communication is performed inside \texttt{sum\_band}, this important amount is due to the fact that \texttt{sum\_band} needs all the grid values of the eigenvectors obtained from the diagonalization to perform the final superposition and compute the electronic density.
 
 
 
-\newpage
+In the right frame we explored \texttt{pcegterg}, which is the parallelized version of \texttt{cegterg}, containing the the important subroutines \texttt{h\_psi} and \texttt{p\_cdiaghg\_} (the SCALAPACK parallelized version of \texttt{cdiaghg}).
+It is evident that a significant amount of communication is performed by \texttt{h\_psi}, this is because an high number of distributed FFT and IFFT must be performed. On the contrary the distributed diagonalization has a lower impact on communication. 
+
+Note that it was not possible to collect metrics on the communication performed inside each ScaLAPACK function\footnote{The communication part of the ScaLAPACK library is performed within the BLACS(Basic Linear Algebra Communication Subprograms) library.} because we would have to recompile the linear algebra libraries, which on both of the architectures are closed source.
+
+
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{mpi_inclusive_bytes_sent.png}}
-	\caption{ INCLUSIVE confirm all said above. This is an inclusive metrics, meaning that the value of a single function comprehends the values of the called functions. Tool: paraprof on scorep metrics.
+	\caption{ Inclusive percentage of bytes sent/received by subroutines called inside \texttt{electrons}. The percentage is calculated over the total amount of bytes sent/received. Tool: \texttt{paraprof} on \texttt{scorep} metrics.
 	}
 	\label{fig:MPIinclusive}
 \end{figure}
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{mpi_exclusive_bytes_sent.png}}
-	\caption{ EXCLUSIVE. 
-	\\ What are the most used MPI subroutines ? 
-	\\ PWscf uses mainly \texttt{MPI\_Allreduce} subroutine to implement interprocess communication. Tool: paraprof on scorep metrics.
-	\\ NOTE: sent/received bytes are the same because all directives are all-to-all
+	\caption{ Exclusive percentage of bytes sent/received by subroutines. 
+	The percentage is calculated over the total amount of bytes sent/received. 
+	As a result, the most important MPI subroutines are listed.
+	Tool: \texttt{paraprof} on \texttt{scorep} metrics.
 	}
-	\label{fig:MPIinclusive}
+	\label{fig:MPIexclusive}
 \end{figure}
 
+In figure \ref{fig:MPIinclusive} is reported an extract of the same data exposed in figure \ref{fig:cubeMPI} in a tabular view (also called a ``\textit{flat}" view).
 
-\newpage
+In figure \ref{fig:MPIexclusive} the metrics reported is the same but is computed as an exclusive metric: for each root subroutine the metrics (bytes in this case) produced by inner subroutines are not considered.
 
-Comparazione routine di comunicazione vs computazione.
-Stima rozza. Dati sulle architetture in sezione dedicata.
+As a result only the final communication subroutines (MPI, in this case) have non-zero amount of sent/received bytes.
+
+We can clearly see that 88\% of the bytes sent/received are exchanged using the \texttt{MPI\_Allreduce} subroutine.
+This subroutine is an all-to-all function that performs a reduce operation\footnote{Applies a function on a subset of data and yields the result, in parallel.} and broadcasts the result of the computation to all the MPI ranks in the communicator. An MPI communicator is a well defined group of MPI ranks.
+
+In the design of \QE's communication layer, the developers have favored all-to-all directives. 
+This kind of approach is very popular because it provides a cleaner design and a less error-prone implementation.
+The popularity of all-to-all directives have induced interconnect vendors and MPI developers to particularly optimize this kind of communication, which in architecture with vast topologies can constitute a scalability problem.
+To mitigate this effect \QE provides a series of nested communicators, which size can be modified according to the computational infrastructure. 
+Note that the tuning of the size of the communicators is effective only on massively parallelized infrastructure (i.e. at least a couple hundreds of cores, well beyond the scope and the resources of this work) where it is important to keep communicating ranks as closed as possible\cite{QE}.
+
+
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{fftw_vs_fft_scatter.pdf}}
-	\caption{ stima rozza dell'impatto della comunicazione
+	\caption{ On the left: CPU time of \texttt{fftw} and \texttt{fft\_scatter} in function of total number of core used.
+	\\On the right: ratio between \texttt{fftw} and \texttt{fft\_scatter} CPU time expressed in percentage, highlighting the rising weight of communication over computation.
 	}
 	\label{fig:fftwvsfftscatter}
 \end{figure}
+
+We now have a clear view on where the communication happens and what kind of MPI subroutines are used.
+
+We can also get an estimate on the weight of communication over calculation by comparing the CPU time spent in \texttt{fftw} (calculation) and \texttt{fft\_scatter} (communication) subroutines.
+
+In the left graph of figure \ref{fig:fftwvsfftscatter} we plotted the CPU time of the two subroutines in function of the number of cores. 
+\texttt{fft\_scatter} time seems rather constant but his value compared to the one of \texttt{fftw} increases with the number of core used. 
+In fact, as plotted in the graph on the right, we can see that CPU time ratio of \texttt{fft\_scatter} over \texttt{fftw} rises over 16 cores, when more than two Galileo nodes, and more than four NUMA nodes on two different blades, have to communicate.
+A more in-depth analysis about this trend is exposed in section \ref{sec:resArchDependent}.
 
 
 \newpage
