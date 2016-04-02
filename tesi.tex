@@ -2703,7 +2703,11 @@ IMPORTANTE: Spiega perche' hai usato TITANIA.
 \newpage
 \subsection{Highlight of critical components}\label{sec:resCriticalComponents}
 
+\begin{center}
+\begin{framed}
 What are the most computational intensive subroutines and what kind of calculation is performed?
+\end{framed}
+\end{center}
 
 \begin{figure}[hhh!]
 \begin{center}
@@ -2715,38 +2719,25 @@ What are the most computational intensive subroutines and what kind of calculati
 \end{center}
 \end{figure}
 
-Figure \ref{fig:mainSubroutines} :
-\begin{itemize}
-	\item not every function is in the plot
- 	\item \texttt{init\_run} is negligible (as said above)
- 	\item 99\% is in the electronic problem (as expected)
-	\item beware of the caller!
-	\item \texttt{cegterg} is the whole davidson diag, evaluation of the matrix included
-	\item \texttt{h\_psi} is the evaluation of the matrix
-	\item \texttt{cdiaghg} is the diagonalization of the dense matrix
-	\item subroutines we are going to keep : \texttt{cegterg,h\_psi,cdiaghg},\texttt{fftw,fft\_scatter,sum\_band}
-\end{itemize}
-
-
 In figure \ref{fig:mainSubroutines} we have plotted the subroutines consuming the most CPU time. 
-The data were obtained by a run at 4 MPI ranks, to have an average indication of the behavior of the code.
+The data were obtained from a run at 4 MPI ranks, to have an average indication of the behavior of the code.
 
-The CPU time is compared to the CPU time of the whole PWscf's run in form of percentage.
+The CPU time of the single subroutine is compared to the CPU time of the whole PWscf's run in form of percentage.
 This is an inclusive metric, meaning that the CPU time of each subroutine includes the CPU time spent in every subroutine called.
 We have color-coded the subroutines that are called by the same caller.
 
-We can outline a series of information.
+We remind the reader that an analysis of the operations performed by the most important subroutines can be found in section \ref{sec:QE}.
+
 
 PWscf calls mainly two subroutines: \texttt{init\_run} and \texttt{electrons}.
 Approximately 99\% of the total run time is occupied by \texttt{electrons}, which is the subroutine implementing the whole SCF iteration.
 
 \texttt{Electrons} calls \texttt{c\_bands} to obtain the Kohn-Sham orbitals\footnote{The eigenvectors of $\mf{H}^{KS}$.} and \texttt{sum\_band} combines them to obtain the electronic density.
 
-\texttt{c\_bands} is basically a wrapper for \texttt{c\_egterg}, which implements the Davidson diagonalization, in fact it calls two functions :
+\texttt{C\_bands} is basically a wrapper for \texttt{c\_egterg}, which implements the Davidson diagonalization (see section \ref{sec:Diagonalization}), in fact it calls two functions:
 \texttt{h\_psi} to evaluate the $\mf{H}^{KS}$ matrix; \texttt{cdiaghg} to diagonalize the obtained matrix.
-Please see section \ref{sec:Diagonalization} for further details.
 
-\texttt{Fft\_scatter} which is a subroutine that distribute the grid among all the MPI ranks, hence it is mainly dedicated to communication, while \texttt{fftw} is the routine that actually computes the FFT and IFFT transformations (see section \ref{sec:FFT}.
+\texttt{Fft\_scatter} is a subroutine that distribute Kohn-Sham orbitals values on the grid among all the MPI ranks, hence it is mainly dedicated to communication, while \texttt{fftw} is the routine that actually computes the FFT and IFFT transformations (see section \ref{sec:FFT}).
 
 We can outline a list of the most important subroutines that we will keep under consideration in the followings:
 
@@ -2754,25 +2745,49 @@ We can outline a list of the most important subroutines that we will keep under 
 \texttt{cegterg, h\_psi, cdiaghg, sum\_band, fftw, fft\_scatter}
 \end{center}
 
+\texttt{Cegterg} will be used as an indicator of the behavior of the whole SCF iteration;
+\texttt{h\_psi} and \texttt{cdiaghg} will tell us respectively how the evaluation and the diagonalization of the matrix performs, which are two completely different kind of calculations;
+by comparing \texttt{fftw} and \texttt{fft\_scatter} we can obtain a rough estimate of the relative weight of computation against communication in function of the cores used; 
+finally we expect \texttt{h\_psi} and \texttt{sum\_bands} to behave similarly because the calculation performed are very alike.
 
 
 
 
 
 \newpage
-Where the interprocess communication happens and what is his weight in function of the number of cores used?
+\begin{center}
+\begin{framed}
+Where the interprocess communication happens and what are the main MPI subroutines used? 
 
-COMMUNICATION
+Is it possible to have a rough estimate of the weight of communication over computation?
+\end{framed}
+\end{center}
+
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[scale=0.5]{cube_MPI.png}}
-	\caption{Mean percentage of bytes sent per routine. 
+	\caption{Percentage of bytes sent/received per routine. The percentage is calculated against the total amount of bytes sent/received.  
 	On the left we can see that in \texttt{electrons\_scf} roughly two thirds of the data are sent/received inside \texttt{c\_bands} subroutine, which purpose is to find the lower energy bands (e.g. diagonalization of $\mf{H}^{KS}$ using Davidson's algorithm). The remaining part of the communication is performed in \texttt{sum\_band\_} subroutine.
 	On the right we explored the content of \texttt{c\_bands} showing that the great majority of the communication is performed by the \texttt{h\_psi} subroutine. Tool: cube on scorep metrics.
 	\\NOTE:  internal scalapack mpi is not profiled (see below).
 	}
 	\label{fig:cubeMPI}
 \end{figure}
+
+In figure \ref{fig:cubeMPI} we have two screenshots taken directly from \texttt{cube}, the \texttt{scorep} visualization tool (see section \ref{sec:profTools}).
+As one can see the subroutines are represented in a call tree.
+On the left frame we explored the content of \texttt{electrons} and, as said above, we can see that \texttt{c\_bands} and \texttt{sum\_bands} are called.
+In the right frame we explored \texttt{pcegterg}, which is the parallelized version of \texttt{cegterg}, containing the the important subroutines \texttt{h\_psi} and \texttt{p\_cdiaghg\_} (the SCALAPACK parallelized version of \texttt{cdiaghg}).
+
+The number on the left of each subroutine is the percentage of bytes sent using MPI communication library inside the subroutine. 
+The percentage is calculated over the total number of bytes sent in the whole execution, i.e. an absolute metric.
+This is a cumulative metric between all the MPI ranks, hence the number of sent bytes and received bytes is the same.
+Please note also that, as we will see below, the MPI subroutines used are very symmetric between the ranks, hence the cumulative metric is a valid way to measure the overall communication weight.
+
+The color box on the left is an ``\textit{heat map}" representing the metric's value, blue is 0\% and red is 100\%\footnote{Since we are using absolute percentage values for the metric, the color box is redundant. Nonetheless it can be incredibly useful when non-absolute metrics are investigated.}.
+
+
+
 
 \newpage
 \begin{figure}[hhh!]
