@@ -2743,7 +2743,7 @@ Approximately 99\% of the total run time is occupied by \texttt{electrons}, whic
 We can outline a list of the most important subroutines that we will keep under consideration in the followings:
 
 \begin{center}
-\texttt{cegterg, h\_psi, cdiaghg, sum\_band, fftw, fft\_scatter}
+\texttt{cegterg, h\_psi, cdiaghg, sum\_band, fftw, fft\_scatter} \label{asd:relevantFunctions}
 \end{center}
 
 \texttt{Cegterg} will be used as an indicator of the behavior of the whole SCF iteration;
@@ -2824,7 +2824,7 @@ In the design of \QE's communication layer, the developers have favored all-to-a
 This kind of approach is very popular because it provides a cleaner design and a less error-prone implementation.
 The popularity of all-to-all directives have induced interconnect vendors and MPI developers to particularly optimize this kind of communication, which in architecture with vast topologies can constitute a scalability problem.
 To mitigate this effect \QE provides a series of nested communicators, which size can be modified according to the computational infrastructure. 
-Note that the tuning of the size of the communicators is effective only on massively parallelized infrastructure (i.e. at least a couple hundreds of cores, well beyond the scope and the resources of this work) where it is important to keep communicating ranks as closed as possible\cite{QE}.
+Note that the tuning of the size of the communicators is effective only on massively parallelized infrastructure (i.e. at least a couple hundreds of cores, well beyond the scope and the resources of this work) where it is important to keep communicating ranks as closed as possible\cite{QE},\cite{QE2}.
 
 
 \begin{figure}[hhh!]
@@ -2852,11 +2852,11 @@ What is the dynamic of the SCF iteration?
 \end{center}
 \end{framed}
 
-Although the question can seem undoubtedly vague, it is of capital importance in order to understand the critical aspects that rise  when trying to profile the behavior of a self consistent calculation.
+Although the question can seem undoubtedly vague, it is of capital importance in order to understand the critical aspects that rise  while profiling the behavior of a self consistent calculation.
 
-As we have explained id section \ref{sec:SCF-DFT} and section \ref{sec:SCFConvergence} an SCF calculation is an iterative process that terminates only when self-consistency is achieved.
+As we have explained in section \ref{sec:SCF-DFT} and section \ref{sec:SCFConvergence} an SCF calculation is an iterative process that terminates only when self-consistency is achieved.
 The number of iterations needed to reach self-consistency is not fixed nor predictable beforehand.
-Hence the time necessary to obtain a physically accountable result can vary in function of an incredible series of factors: size of the physical system, quality of the initial density guess, precision requested, algorithm used, number of cores employed, ... .
+Hence the time necessary to obtain a physically reliable result can vary in function of a wide series of factors: size of the physical system, quality of the initial density guess, precision requested, algorithm used, number of cores employed, ... .
 
 
 \begin{figure}[hhh!]
@@ -2869,7 +2869,7 @@ Hence the time necessary to obtain a physically accountable result can vary in f
 Even the time necessary to perform a single iteration step can vary considerably.
 In figure \ref{fig:iterstats} we have plotted the value of mean iteration CPU time in function of the number of cores used, the error bar is the standard deviation.
 
-We can see that the iteration time is far from being constant and can varies sensibly. In the plot on the right we have the same data plotted in logarithmic scale to highlight the fact that that the relative variation of iteration time grows with the number of cores.
+We can see that the iteration time is far from being constant and varies sensibly. In the plot on the right we have the same data plotted in logarithmic scale to highlight the fact that that the relative variation of iteration time grows with the number of cores.
 In fact, by looking at the data reported in table \ref{tab:iterations} we can see that the relative error is always above the 50\% when more than eight cores are used.
 
 
@@ -2889,66 +2889,17 @@ cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%)
 \bottomrule
 \end{tabular}
 \end{center}
-\caption{Iterations statistics.}
+\caption{Iterations statistics for self consistent calculation on variable number of cores.}
 \label{tab:iterations}
 \end{table}
 
 Another important factor exposed in table \ref{tab:iterations} is that the number of iterations varies quite drastically depending on the number of cores used. 
 The cause of this behavior is that the quantity $\Delta E$ used to check self-consistency (see section \ref{sec:SCFConvergence}) is used as a parameter to control the convergence of the Davidson diagonalization.
-This introduces a certain amount of numerical instability that makes the number of iterations required unpredictable.
+This introduces a certain amount of numerical instability that makes the number of iterations required variable.
 
-It now appears clear why in section \ref{sec:Goals} we introduced two point of views.
-In order to profile and compare the performances of PWscf and its subroutines in function of the number of cores we need to fix the number of SCF iterations performed. Otherwise the computations between two runs at different cores could be considered different.
-We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
-reasonable run time\footnote{The time we had at disposal for profiling was limited and the number of tries performed was considerable, hence the need to contain the total run time.}.
+It is somewhat reassuring that the number of iteration does not varies significantly on the two architectures we used, as exposed in table \ref{tab:architectureIterations}.
 
-We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state community.
-
-This is why from now on we will report the results with both with fixed and variable iterations.
-
-
-\begin{figure}[hhh!]
-	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
-	\caption{ iter stats
-	}
-	\label{fig:fixedvsvariable}
-\end{figure}
-
-In figure \ref{fig:fixedvsvariable} we plotted the iteration time of PWscf with variable number of iterations\footnote{i.e. until self-consistency is reached.} and fixed (twenty) number of iterations.
-
-
-
-~
-
-~
-
-
-C'e' variabilita', non ha senso fare benchmark su 2 iterazioni. 
-I benchmark industriali fissano il tempo e contano iterazioni, peccato che poi non puoi profilare le singole componenti in maniera sensata ma solo l'andamento generale.
-
-La scala logaritmica e' per far vedere che la variazione percentuale e' importante
-
-Il tempo medio di iterazione e' un buon indicatore di quali siano le performance della macchina ma non e' molto preciso.
-
-
-\newpage
-
-
-
-FIXED ha 20 iterazioni.
-
-Lo shape e' diverso. Del bump a pochi core ne parliamo dopo.
-
-Non si possono comparare i tempi perche' uno usa meno iterazioni dell'altro.
-
-E' palese che la differenza sia dovuta al numero di iterazioni, metto tabella:
-
-
-
-
-
-%[(43, 1), (42, 2), (70, 4), (86, 8), (55, 16), (36, 32), (50, 64)]
-%[(47, 1), (42, 2), (70, 4), (83, 8), (55, 16), (36, 32), (50, 64)]
+\begin{table}[hhh!]
 \begin{center}
 \begin{tabular}{r|ccccccc}
 \toprule
@@ -2959,35 +2910,88 @@ UV2000	 & 43  & 42  & 72  & 83  &  55  &  36  &  50 \\
 \bottomrule
 \end{tabular}
 \end{center}
+\caption{Number of iteration requested to reach self consistency using different cores on two different computational architectures.}
+\label{tab:architectureIterations}
+\end{table}
 
-Spiego perche' servono due punti di vista, spiego che nelle comparazioni delle componenti useremo sempre le run fissate, mentre per comparazioni generali useremo entrambe.
 
-Il numero di iterazioni varia molto ma almeno tra le architetture e' abbastanza coerente, tranne a 4 e 8 cores.
 
-L'instabilita' si ha perche' $\Delta \rho$ viene usato per fissare la convergenza della Davidson!
+It now appears clear why in section \ref{sec:Goals} we introduced two points of view.
+In order to profile and compare the performances of PWscf and its subroutines in function of the number of cores we need to fix the number of SCF iterations performed. Otherwise the computations between two runs at different cores could be considered different.
+We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
+reasonable run time\footnote{The time we had at disposal for profiling was limited and the number of tries performed was considerable, hence the need to contain the total run time.}.
+
+We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state community.
+
+This is why from now on we will report the results with both with fixed and variable iterations.
+
+An alternative approach, which is mainly used in industry benchmarks, is to fix the WALL time dedicated to computation and count the number of iterations performed.
+This approach has two main downsides: 
+first we will lose the data provided by the internal metrics, which are accountable and do not implies any form of overhead; 
+second, for the data to be reliable, a reasonable number of iterations at a single core will be requested. 
+In our case, for a twenty step iteration the execution time is six hours, which will imply to reserve the computational resource for that amount of time for every test performed.
+Since the time we had available was not indefinite and the resources, especially the UV2000, had to be shared without the help of a batch scheduler, we decided to fix the number of iterations and use the CPU time as a metric.
+
+This gave us the possibility to perform many more tests and investigate more aspects of \QE scalability.
+
+Using the mean iteration time can also be an alternative, but, as exposed in figure \ref{fig:iterstats}, it would introduce a generous amount of relative error.
+Nevertheless the mean iteration time can be used as a general indicator of the dynamic of the SCF calculation.
+
+\newpage
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
+	\caption{ iter stats
+	}
+	\label{fig:fixedvsvariable}
+\end{figure}
+
+In figure \ref{fig:fixedvsvariable} we plotted the CPU time of PWscf with variable number of iterations\footnote{i.e. until self-consistency is reached.} and fixed (twenty) number of iterations.
+
+We can see how the CPU time is, obviously, different, since the number of iterations is not the same.
+Also the shape of the two curves is clearly different.
+It is clear that the excessive number of iterations reported in table \ref{tab:iterations} causes a rise on the execution time of the left plot.
+Nevertheless in the right plot it appears that the decreasing trend slows at eight and sixteen cores. This means that even excluding the bias of variable iterations, the computation does not performs efficiently in that range of the core scale.
+The analysis of this behavior and one possible way to optimize the code efficiency is reported in section \ref{sec:resArchIndependent}.
+
 
 
 \newpage
 \subsection{Architecture Independent Tuning}\label{sec:resArchIndependent}
 
-
-%What is the impact of second level thread parallelization on each component?
-
-%What is the overall impact of thread parallelization?
-
+To investigate the behavior exposed in figure \ref{fig:fixedvsvariable} we can plot the CPU time and speedup for the relevant functions listed in section \ref{sec:resCriticalComponents}.
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.3\linewidth]{relevant_subroutines.pdf}	}
-	\caption{tio sgi}
+	\caption{CPU time (left) and speedup (right) for relevant subroutines listed in section \ref{sec:resCriticalComponents}. Data from runs at fixed number of SCF steps.}
 	\label{fig:relevantSubroutines}
 \end{figure}
 
+As said in section \ref{sec:resCriticalComponents}), \texttt{cegterg} has the same behavior of PWscf, we can use it a reference for PWscf execution time.
 
-\begin{itemize}
-	\item Parlare un po' di scaling delle varie funzioni.
-	\item cdiagh e' ovviamente IL problema.
-	\item vediamo se introduzione dei thread cambia qualcosa.
-\end{itemize}
+\texttt{H\_psi}, which is one of the two main actors in \texttt{cegterg} scales remarkably well. Its speedup is close to linear and the efficiency\footnote{Speedup over number of cores.} is always above the 70\%. 
+So does \texttt{sum\_band}, as expected for what we said in section \ref{sec:resCriticalComponents}.
+It is clear that the scalability problem must lies withing \texttt{cdiaghg}.
+
+In fact we can see that its CPU time remains the same at one and two cores, increases lightly at four cores and almost doubles at eight and sixteen cores. 
+Its behavior is far from being efficient and its speedup its practically flat compared to the others functions.
+
+First of all we need to understand what is happening and how \QE performs the diagonalization in function of the number of cores when threads are not used.
+
+The first thing to notice is that at one and two cores the diagonalization is performed serially, only by the first MPI rank. This is why the CPU time of \texttt{cdiaghg} is the same at one and two cores.
+
+Starting at four cores a different approach is used: a parallel and full memory distributed ScaLAPACK diagonalization is performed \cite{QE2}.
+\mynotes{how ranks are picked}
+
+%core/core diagonalizzazione
+%8/4
+%16/4 -> perche' non ne usa 9! 3x3! -> basta dirgli -ndiag 9
+%32/16
+%64/25
+%
+
+It is clear that on a relatively low number of cores the distributed diagonalization is counterproductive.
+
+The easiest way to affect the algorithm used for diagonalization and optimize the performance is to introduce the use of threads. 
 
 \newpage
 
@@ -3334,6 +3338,12 @@ qetools, ``tools to profile Quantum Espresso PWscf package", Giorgio Ruffa, \url
 
 \bibitem{PWinput}
 PWscf input documentation, \url{http://www.quantum-espresso.org/wp-content/uploads/Doc/INPUT_PW.html}.
+
+\bibitem{QE2}
+P. Giannozzi, C. Cavazzoni,
+``Large-scale computing with \QE",
+IL NUOVO CIMENTO, Vol. \textbf{32 C}, N. 2, (2009).
+
 
 
 \end{thebibliography}
