@@ -2676,9 +2676,9 @@ We focused mainly on the effects of second level thread parallelization because 
 
 Hence the question we want to answer:
 \begin{itemize}
-	\item What is the impact of second level thread parallelization on each component?
 	\item What is the overall impact of thread parallelization?
-	\item How threads parallelization behaves in function of the number of cores used?
+	\item What is the impact of thread parallelization on each component?
+	\item In which scenario is convenient to use thread parallelization?
 \end{itemize}
 
 This section will give all the tools necessary to tune the performance of the code in a workstation-scale environment, very familiar to researchers of the field.
@@ -2824,7 +2824,7 @@ In the design of \QE's communication layer, the developers have favored all-to-a
 This kind of approach is very popular because it provides a cleaner design and a less error-prone implementation.
 The popularity of all-to-all directives have induced interconnect vendors and MPI developers to particularly optimize this kind of communication, which in architecture with vast topologies can constitute a scalability problem.
 To mitigate this effect \QE provides a series of nested communicators, which size can be modified according to the computational infrastructure. 
-Note that the tuning of the size of the communicators is effective only on massively parallelized infrastructure (i.e. at least a couple hundreds of cores, well beyond the scope and the resources of this work) where it is important to keep communicating ranks as closed as possible\cite{QE},\cite{QE2}.
+Note that the tuning of the size of the communicators is effective only on massively parallelized infrastructure (i.e. at least a couple hundreds of cores, well beyond the scope and the resources of this work) where it is important to keep communicating ranks as closed as possible\cite{QE},\cite{QE2},\cite{prace}.
 
 
 \begin{figure}[hhh!]
@@ -2961,7 +2961,7 @@ The analysis of this behavior and one possible way to optimize the code efficien
 To investigate the behavior exposed in figure \ref{fig:fixedvsvariable} we can plot the CPU time and speedup for the relevant functions listed in section \ref{sec:resCriticalComponents}.
 
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=1.3\linewidth]{relevant_subroutines.pdf}	}
+\centerline{ \includegraphics[width=1.2\linewidth]{relevant_subroutines.pdf}	}
 	\caption{CPU time (left) and speedup (right) for relevant subroutines listed in section \ref{sec:resCriticalComponents}. Data from runs at fixed number of SCF steps.}
 	\label{fig:relevantSubroutines}
 \end{figure}
@@ -2991,14 +2991,44 @@ Starting at four cores a different approach is used: a parallel and full memory 
 
 It is clear that on a relatively low number of cores the distributed diagonalization is counterproductive.
 
-The easiest way to affect the algorithm used for diagonalization and optimize the performance is to introduce the use of threads. 
-
-\newpage
+The easiest way to affect diagonalization performance, especially in the low cores range, is to introduce the use of threads.
 
 
-In base ai risultati in appendice \ref{app:Threads} decidiamo di prendere la striscia migliore, sia a run fissati che a run variabili.
+Threads are a second level of parallelization that operates within a single MPI rank.
 
-I risultati sono in figura 
+The main difference between thread parallelization and MPI is that MPI is a message passing protocol, it must perform communication to distribute data between different processes, while threads works in a shared memory environment and do not need to communicate explicitly between each others. 
+Threads usually operates concurrently on separated chunks of memory, performing the same operation on different data at the same time.
+
+
+\QE implements threads using the OpenMP (OMP) standard interface\cite{OMP}.
+Note that not all the subroutines in \QE uses this kind of parallelization, hence some sections of the code remain still serial.
+This is the main reason why the use of threads can lead to different behavior and, in general, their tuning must be performed carefully.
+
+Speaking of threads distribution, what the user can do is to assign a number of threads to each MPI rank.
+This is done setting the \texttt{OMP\_NUM\_THREADS} environmental variable to the desired number of threads.
+
+In general it is suggested that to total number of threads must not exceed the number of physical cores the resource has (see section XXX).
+
+The total number of threads can be obtained easily by multiplying the number of threads per MPI rank times the number of MPI ranks.
+For example if we have a 64 core resource and we want to use 16 MPI ranks, the number of threads per MPI rank should not be more than 4.
+
+This flexibility generates a wide range of possible combinations, especially when the number of core increases.
+
+In appendix \ref{app:Threads} we reported the results of our tests for all the possible combinations, both for fixed and variable number of SCF iterations.
+
+From the data exposed in \ref{app:Threads} we have composed two optimal set of runs for fixed and variable iterations\footnote{The difference is only at 32 cores.} number of iterations.
+The ratio was to keep the best result per total number of cores employed, that is number of MPI ranks times number of threads per rank.
+
+The results, compared to the runs without threads, are exposed in figure \ref{fig:threadsOverall}.
+
+\newpage 
+
+\begin{center}
+\begin{framed}
+What is the overall impact of thread parallelization?
+\end{framed}
+\end{center}
+
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.3\linewidth]{threads_overall.pdf}	}
@@ -3007,22 +3037,16 @@ I risultati sono in figura
 
 \end{figure}
 
-\mynotes{ forse e' meglio mettere graffe invece di frecce per far vedere l'intervallo di scalapack e serial.
-Disegnare con matplotlib non e' proprio immediato. Se il grafico va bene metto le in postproduzione.}
+On the x axis we have reported the total number of cores and, in parenthesis, the number of threads per MPI rank (see above).
+To obtain the number of MPI ranks used just divide the number of cores for the number in parenthesis.
 
-I threads forzano la diagonalizzazione seriale, ma threaddata (mkl threaded).
+Starting from the plot on the left we can see that at variable number of iterations threads have a clear, and positive, impact on the overall performance.
+The spike at eight cores is completely disappeared and the descending trend of the CPU time is much more regular, hence efficient.
 
-A 16 core il guadagno in realta' e' dato tutto dalla velocizzazione di hpsi perche' la diagonalizzazione seriale e' la stessa di 8 core.
+The result can be directly imputed to a reduction of the number of iterations needed to reach self-consistency.
+In fact, we can see in table \ref{tab:threadsIterations} that the number of iterations is reduced up to 50\% ( at eight cores).
 
-A 8 core c'e' efficenza del 60 \%. Molto bello per chi fa high throughtput.
-
-Sia la letteratua che i benchmark industriali (iterazioni fissate) non mettono in luce questo perche' o sono fissate le iterazioni, oppure partono a profilare dai 64 core in su.
-
-Si puo' dire che come regola generale vale la pena prendere tanti threads quanti ce ne sono sul chipset.
-Sharing totale della cache L3.
-
-Il guadagno e' chiaramente da imputarsi a una convergenza piu' veloce.
-
+\begin{table}[hhh!]
 \begin{center}
 \begin{tabular}{r|ccccccc}
 \toprule
@@ -3033,31 +3057,98 @@ MPI + Threads &  47  &  42  &  43  &  43  &  42  &  36  &  36 \\
 \bottomrule
 \end{tabular}
 \end{center}
+\caption{Number of iterations needed to reach self-consistency for threaded and not threaded PWscf runs.}
+\label{tab:threadsIterations}
+\end{table}
 
 
 
-Pero' possiamo dire lo stesso per le run fissate e in questo caso analizzare i risultati.
+This improved numerical stability can be attributed to the different algorithm used to diagonalize the Hamiltonian. 
+In fact, on such a low number of cores, the use of threads forces PWscf to permorm a serial diagonalization instead of the distributed one, granting a faster convergence.
+
+We have annotated when distributed diagonalization starts on MPI only runs and when serial diagonalization ends on threaded runs.
+
+But the benefits of threads are not restricted to numerical stability.
+In fact, by looking at to plot at fixed number of iterations on the right of figure \ref{fig:threadsOverall}, we see that, especially at eight core the advantage is still substantial.
+
+Note that the gain obtained from eight to sixteen cores cannot be ascribed to the effect of threads because the number of threads used is the same and the algorithm is serial.
+
+To get a deeper understanding on what routines benefit from threads we need to investigate our metrics at fixed number of iterations.
 
 
-Quali sono le componenti che migliorano (comparazione solo su run fissate):
+\newpage
+
+\begin{center}
+\begin{framed}
+What is the impact of thread parallelization on each component?
+\end{framed}
+\end{center}
+
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=\linewidth]{threads_subroutines.pdf}	}
-	\caption{Il guadagno sta in cdiaghg, cegterg va su meglio ma contiene anche hpsi, conviene perdere su hpsi e guadagnare sulla diag. hpsi e sumband scalano come le fftw perche' quello fanno. In piu' hanno la parte di somma che si fa con le allreduce che scala molto bene su entrambe le arch.}
+	\caption{Speedup of relevant subroutines at fixed number of iterations for threaded and not threaded PWscf's runs.}
 	\label{fig:threadsSubroutines}
 
 \end{figure}
 
-\newpage
 
-Per vedere il risultato basta tra figura \ref{fig:relevantSubroutines} e figura \ref{fig:threadsRelevantSubroutines};
+The plot of \texttt{cdiaghg}'s speedup in figure \ref{fig:threadsSubroutines} tells us that threads mainly benefits diagonalization\footnote{The fact that speedup does not change from eight to sixteen cores confirm what we have said above.}.
+While, on the contrary, the impacts on \texttt{h\_psi} and \texttt{fftw} performance is counterproductive.
+
+This means that a loss in performance of \texttt{h\_psi} in exchange of a more efficient diagonalization can sensibly improve the overall performance of the SCF cycle when a low number of core is used (as reported in \texttt{cegterg} plot).
+
+A very important note: remember that PWscf was always compiled with full support of threaded mkl libraries \footnote{Linear algebra package for Intel compilers.}, otherwise threads would have no effects on diagonalization's performance because PWscf don't explicitly use threads for serial diagonalization.
+
+
+\begin{center}
+\begin{framed}
+In which scenario is convenient to use thread parallelization?
+\end{framed}
+\end{center}
+
+From the results exposed in in figure \ref{fig:threadsOverall} and \ref{fig:threadsSubroutines} the straightforward conclusion is that threads are appealing when a low\footnote{Comparable to the number of cores on the chipset} number of cores is used.
+
+This opens two possible scenarios of interest.
+
+\paragraph{High throughput computing (HTC):} 
+When the time needed to perform a particular simulation loses importance in front of the necessity to complete a large number of simulations, threads can be very appealing, especially when studying systems with similar dimensions and atomic species.
+To optimize the number of simulations completed one could perform a set of tests on a trial system and determine the right number of threads to obtain a reasonable efficiency.
+
+From the data reported in figure \ref{fig:threadsOverall} and appendix \ref{app:Threads} we can extract a simple ``rule of thumb" to find the best number of cores:
+it seems reasonable to fill the chipset with the maximum number of threads, that is to use a single MPI rank for chipset and as many threads as the cores on the chipset.
+For example, in our case we would have chosen one MPI rank spawning eight threads\footnote{Both the architectures have an eight core chipset.}, obtaining an efficiency of 60\%\footnote{Efficiency is defined as speedup over number of cores.}.
+
+Then schedule a massive submit of jobs to the preferred batch system. 
+This approach can also be very appealing since large HTC pools with batch schedulers like Condor\cite{Condor} are increasing in popularity and can be adopted with little cost by universities and institutions.
+
+\paragraph{Owned resources instead of shared clusters:}
+Nowadays multi-core personal computers are very popular among researchers. 
+It is also common for research groups to have a small cluster with multi-core nodes.
+Given the price of high performance communication hardware, it is often preferred to have cluster nodes with a generous number of cores rather than an high performance interconnect.
+We know also that on big shared multicomputers (like Galileo), job queues can get very long when hundreds of users are using it. Also the amount of CPU time is often parceled, hence it must be spent carefully.
+For this reasons it could be more convenient to tune threads usage and perform the calculation in house rather than wait for the job to be scheduled on an overloaded cluster.
+
+
+~
+
+It is difficult to find both in literature (\cite{QE},\cite{QE2}) and in industrial benchmarks\cite{HPC}, that threads can have a meaningful impact on \QE performances.
+
+This is because all these benchmarks focuses on large scale computing, typically starting at least from 64 cores, up to thousands of cores.
+Although these data are of great interest, not all the scientific community operates on such a large scale.
+
+One must also consider that a great optimization effort was dedicated to increase the performance of the evaluation of $\mf{H}^{KS}$, which translates in a more efficient FFT calculation (see section \ref{sec:QE}). 
+Threads in this case have proven to be of little, if none, benefit. 
+See \cite{FFTPAPER} for an detailed analysis.
+See section \ref{sec:resArchDependent} for a clear view of \texttt{h\_psi} and \texttt{fftw} speedup on different architectures.
+
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=0.7\linewidth]{threads_relevant_subroutines.pdf}	}
-	\caption{Abbiamo eliminato il rallentamento dato dalla diagonalizzazione inefficiente (Iterazioni fissate)!}
-	\label{fig:threadsRelevantSubroutines}
+\centerline{ \includegraphics[width=1.2\linewidth]{threads_comparison.pdf}	}
+	\caption{CPU time of relevant subroutines at fixed number of iterations with (right) and without (left) thread parallelization.}
+	\label{fig:threadsComparison}
 \end{figure}
 
-
+As a final point we re-propose in figure \ref{fig:threadsComparison} the same metrics of figure \ref{fig:relevantSubroutines} with and without threads parallelization.
 
 \newpage
 \subsection{Architecture Dependent Tuning}\label{sec:resArchDependent}
@@ -3343,6 +3434,27 @@ PWscf input documentation, \url{http://www.quantum-espresso.org/wp-content/uploa
 P. Giannozzi, C. Cavazzoni,
 ``Large-scale computing with \QE",
 IL NUOVO CIMENTO, Vol. \textbf{32 C}, N. 2, (2009).
+
+\bibitem{Condor}
+Condor project homepage, \url{https://research.cs.wisc.edu/htcondor/}
+
+\bibitem{FFTPAPER}
+D. Stankovi, P. Jovanovi, A. Jovi, V. Slavni, D. Vudragovi, A. Bala,
+``High-Performance Computing Infrastructure for South East Europe's Research Communities: Results of the HP-SEE User Forum 2012",
+Springer,
+2014.
+
+\bibitem{prace}
+I. Girotto, N. Varini, F. Spiga, C. Cavazzoni, D. Ceresoli, L. Martin-Samos, T. Gorni,
+``Enabling of Quantum ESPRESSO to Petascale Scientific Challenges",
+PRACE Whitepapers,
+PRACE,
+2012.
+
+\bibitem{HPC}
+HPC Advisory council,
+``Quantum ESPRESSO Performance Benchmark and Profiling",
+\url{http://www.hpcadvisorycouncil.com/}.
 
 
 
