@@ -1993,7 +1993,6 @@ See section XXX for an test case analysis of this scenario.
 Not all the ranks will be used: depending on the total number of ranks or on user setting, a number ranging from one-forth to one-half of ranks will be used. 
 These ranks will be equally spaced and distributed over the whole computational resource, this is done to prevent the overload of the memory controller of a single machine.
 Thread parallelization can still be performed, as noted above.
-\mynotes{Se riusciamo proviamo a vedere cosa succede sulla numa se gli mettiamo i rank vicini, sulla stessa piastra. Bisogna patchare il codice.}
 
 
 \subsection{Calculation of the electronic density (Step 3)}
@@ -2487,7 +2486,6 @@ they would be placed as follows\footnote{See \texttt{man omplace}.}
     rank 1 thread 2 on CPU 6
     rank 1 thread 3 on CPU 7
 \end{verbatim}
-\mynotes{metti esempio da man omplace}
 
 Although \texttt{omplace} can be used also with openMPI implementations, it has proven to be reliable only with MPT
 \footnote{\texttt{taskset} and \texttt{dplace} are two other tools to provide process pinning, but during our preliminary test they did not appear to be reliable.}.
@@ -2688,8 +2686,8 @@ Finally, in section \ref{sec:resArchDependent} we will make an in-depth investig
 
 What we aim to know is :
 \begin{itemize}
-	\item What are the components that performs best on each architecture?
 	\item What is the overall performance on each architecture?
+	\item What are the components that performs best on each architecture?
 	\item What architecture has the best implementation of interprocess communication?
 	\item What is the overall behavior of \QE in function of the scale of the physical system?
 \end{itemize}
@@ -2846,11 +2844,11 @@ A more in-depth analysis about this trend is exposed in section \ref{sec:resArch
 
 
 \newpage
-\begin{framed}
 \begin{center}
+\begin{framed}
 What is the dynamic of the SCF iteration?
-\end{center}
 \end{framed}
+\end{center}
 
 Although the question can seem undoubtedly vague, it is of capital importance in order to understand the critical aspects that rise  while profiling the behavior of a self consistent calculation.
 
@@ -3134,7 +3132,7 @@ For this reasons it could be more convenient to tune threads usage and perform t
 
 It is difficult to find both in literature (\cite{QE},\cite{QE2}) and in industrial benchmarks\cite{HPC}, that threads can have a meaningful impact on \QE performances.
 
-This is because all these benchmarks focuses on large scale computing, typically starting at least from 64 cores, up to thousands of cores.
+This is because all these benchmarks focus on large scale computing, typically starting at least from 64 cores, up to thousands of cores.
 Although these data are of great interest, not all the scientific community operates on such a large scale.
 
 One must also consider that a great optimization effort was dedicated to increase the performance of the evaluation of $\mf{H}^{KS}$\footnote{The remarkable scaling of \texttt{h\_psi} described at the beginning of this section proves the results of this optimization effort.}, which translates in a more efficient FFT calculation (see section \ref{sec:QE}). 
@@ -3152,83 +3150,191 @@ As a final point we re-propose in figure \ref{fig:threadsComparison} the same me
 
 \newpage
 \subsection{Architecture Dependent Tuning}\label{sec:resArchDependent}
+\begin{center}
+\begin{framed}
+	What is the overall performance on each architecture?
+\end{framed}
+\end{center}
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{arch_compare_iterations.pdf}	}
-	\caption{mean iter times}
+	\caption{Mean iteration time and its speedup on Galielo and UV2000 architectures.}
 	\label{fig:archCompareIterations}
 \end{figure}
 
-figure \ref{fig:archCompareIterations}. SGI va piu' piano ma gia' dal comportamento dei tempi medi di iterazione (quindi indipendenti dal numero di iterazioni) si vede come scala meglio. Addirittura a 64 core e' piu' veloce, pur partendo in svantaggio.
+To begin we analyze the mean iteration time of PWscf on both architectures in order to have a general idea (see section \ref{sec:resCriticalComponents} to understand the validity of mean iteration time study).
 
+At first sight, looking at the left plot of figure \ref{fig:archCompareIterations}, one will conclude that Galileo is better suited to perform \QE simulations because its CPU time is lower in a wider range of the curve.
+This is true,but note that the x axis is not on a linear scale, more on a logarithmic scale (in base 2)\footnote{Given the presence of error bars, this kind of display was favored since it does not overcrowd the left part of the plot.}.
 
-\newpage
+Note also that the time gap between the two architectures lowers as the number of core rises. 
+At 32 cores we have the same performance and at 64 cores the UV2000 outperforms Galileo.
+
+By comparing the speedup (right plot of figure \ref{fig:archCompareIterations}) we can get a picture on what architecture is scaling the best.
+
+As we were suspecting the speedup of UV2000 marks a sensible improvement after eight cores.
+To get a more precise idea it is convenient to look at the PWscf execution CPU time.
+
 
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=1.2\linewidth]{arch_global.pdf}	}
-	\caption{tempo totale}
+\centerline{ \includegraphics[width=1.2\linewidth]{arch_global_2.pdf}	}
+	\caption{CPU time speedup at variable (left) and fixed (right) number of iterations on both architectures. The number of NUMA nodes is annotated in green, while the number of cluster nodes is in blue.}
 	\label{fig:archGlobal}
 \end{figure}
 
-
-figure \ref{fig:archGlobal}: 
-\begin{itemize}
-	\item Lo scaling e' lontano dal lineare
-	\item in ambedue i casi la numa scala meglio
-	\item sembra che il distacco avvenga prevalentemente quando piu' nodi devono comunicare
-	\item lo scaling del cluster tradizionale resta competitivo fino a quando si resta sullo stesso nodo
-	\item il numero di iterazioni a 64 core e' lo stesso, quindi la macchina numa e' davvero piu' performante.
-\end{itemize}
-
-\mynotes{annotare il numero di nodi}
-
-\newpage
-\begin{figure}[hhh!]
-\centerline{ \includegraphics[width=0.7\linewidth]{arch_mpi_perc.pdf}	}
-	\caption{tempo totale}
-	\label{fig:archMpiPerc}
-\end{figure}
+In figure \ref{fig:archGlobal} it's reported the speedup on both architectures\footnote{Which, we remind, is the correct way to compare different architectures.}
 
 
-figure \ref{fig:archMpiPerc}: 
-\begin{itemize}
-	\item dopo i 16 core la differenza aumenta
-	\item non si puo' giustificare un speedup di 2x solo con questo grafico
-	\item bisogna considerare pero' che questo profiling non comprende la comunicazione MPI fatta internamente dalla scalapack! questo perche' avremmo dovuto ricompilarla e sarebbe stato difficile visto che non abbiamo i sorgenti delle librerie intel/SGI
-	\item e' una indicazione di come la comunicazione sia migliore con MPT ma non e' un dato "assoluto"
-	
-\end{itemize}
 
-\newpage
+The first thing to note is that on the left plot the speedup from 32 core to 64 is flat for Galileo, while still increases for the UV2000. 
+This means that the extra number of iterations reported in table \ref{tab:architectureIterations} completely voids the improvement given by the increased number of cores. 
+Hence the UV2000 is clearly outperforming Galileo because the number of iterations are the same for both architectures for a given number of cores.
+
+The plot at fixed iterations confirms this impression. 
+The difference in scaling starts at sixteen cores and rises steadily with the number of cores.
+
+Considering also the topology of the architecture we can find a first explanation on the nature of this difference.
+In figure \ref{fig:archGlobal} we have marked in green the number of NUMA nodes used and in blue the number of cluster nodes employed.
+
+It is evident that when PWscf leaves the borders of a single Galileo machine (32 cores), and Infiniband interconnect is necessary for communication, the impact on performance is negative.
+On the contrary, on the UV2000, communication between nodes starts at sixteen cores, exactly when the speedup difference starts to increase.
+The difference continues to increase from 32 to 64 cores, when the number of Galileo nodes communicating is four.
+
+This happens both at fixed and variable iterations, excluding the difference in iteration numbers from the possible causes of bias.
+
+Following the same steps of the previous section, we analyze the performance of the relevant subroutines.
+
+
+\begin{center}
+\begin{framed}
+What are the components that performs best on each architecture?
+\end{framed}
+\end{center}
+
+
+
+
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{arch_subroutines.pdf}	}
 	\caption{tempo totale}
 	\label{fig:archSubroutines}
 \end{figure}
 
-figure \ref{fig:archSubroutines}
 
-\begin{itemize}
-	\item tutte le routine scalano meglio
-	\item l'andamento dell'fft scatter ci dice bene come la comunicazione sia di fatti migliore sulla macchina SGI
-	\item cdiagh permane ad avere un pessimo speedup
-	\item hpsi e' in assoluto la funzione che scala meglio, infatti il suo peso a livello computazionale scende di molto nei
-	contronti della diagonalizzazione.
-	\item sumband e hpsi hanno stesso scaling perche' di fatto fanno la stessa cosa, come spiegato nei capitoli sopra.
-	\item e' evidente che la macchina numa e' piu' performante su queste dimensionalita'.
-\end{itemize}
+In figure \ref{fig:archSubroutines} is plotted the speedup at fixed number of iterations for all the relevant subroutines listed in section \ref{sec:resCriticalComponents}.
+As expected, the two main actors, \texttt{h\_psi} and \texttt{cdiaghg} starts to improve on the UV2000 when more than one NUMA node is needed.
+
+While \texttt{c\_diag} mantains a low speedup, at least on the UV2000 the performance rises above the sixteen cores.
+
+The speedup of \texttt{h\_psi} and \texttt{sum\_band} are very similar, as expected from what said in section \ref{sec:QE}, and incredibly linear (compared with \texttt{c\_diagh}). 
+This highlights a very efficient parallelization of matrix evaluation.
+
+This is confirmed by the speedup of \texttt{fftw}, that constitutes a considerable part of matrix evaluation(see section \ref{sec:Diagonalization}).
+
+Finally, the plot of \texttt{fft\_scatter}\footnote{We remind that \texttt{fft\_scatter} is a subroutine that performs manily communication.} strongly suggests that the difference in performances can be attributed to the difference in communication performance.
 
 
-\section{Discussion and Conclusion}
+It seems time to investigate at a deeper level the role of communication in PWscf calculations.
+
+\newpage
+~
+\newpage
+
+\begin{center}
+\begin{framed}
+What architecture has the best implementation of interprocess communication?
+\end{framed}
+\end{center}
+
+
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=0.7\linewidth]{arch_mpi_perc.pdf}	}
+	\caption{Percentage of time spent in MPI communication. Metrics provided by \texttt{scorep} and analyzed with \texttt{scorep-score}.}
+	\label{fig:archMpiPerc}
+\end{figure}
+
+
+figure \ref{fig:archMpiPerc} reports the total percentage of time (calculated over PWscf CPU time), spent in MPI communication.
+
+We can see that the number increases particularly after 16 cores, as expected, and that it is a remarkably high percentage.
+
+On both architecture more than 40\% of the CPU time is spent in communication when the number of cores is more than sixteen, this is a remarkably high number and points out that communication plays a central role in tuning the architecture performance.
+
+We can see also that Galileo spends more time in communication compared to the UV2000, and the gap increases with the number of cores.
+
+It is important to note that this plot cannot justify a 2x speedup difference between the two architectures, as exposed in figure \ref{fig:archGlobal}.
+
+Keep also in mind that ScaLAPACK internal communication is not profiled\footnote{See section \ref{sec:resCriticalComponents}} and, according to \cite{QE} and \cite {QE2}, it is considered to have a very high impact communication volume.
+
+Nevertheless figure \ref{fig:archMpiPerc} tells us that UV2000 has a better implementation of the MPI library and constitutes a valid indication that communication as an important impact on PWscf performances.
+
+\newpage
+\begin{center}
+\begin{framed}
+	How diagonalization distribution impacts on PWscf performance on both architectures?
+\end{framed}
+\end{center}
+
+All the data we have analyzed so far points out an important information.
+Matrix diagonalization constitutes a major bottleneck in this kind of simulations.
+
+Obviously this observation is true considering also that matrix evaluation has been finely optimized by \QE developers.
+
+We still have one way on how diagonalization is performed, but this way is effective only on a sufficiently high number of cores.
+To be more clear we need to explain how matrix multiplication is perfomed by \QE when four cores or more are used.
+
+\QE uses the Cannon's algorithm\cite{Cannon} for parallel matrices multiplication\cite{QE2}. 
+This algorithm needs to distribute the matrices\footnote{Which in our case are always squared!} in a bi-dimensional grid of actors, in our case actors is a synonym of MPI rank.
+This implies that the number of ranks dedicated to the matrix diagonalization is $n^2$ where $n$ is a natural number.
+Hence, given our resources, the possible values are as follows:
+\begin{equation*}
+	n_{diag} = n^2 = 4 , 9 , 16 , 25 , 49 , 64 .
+\end{equation*}
+Obviously $n_{diag}$ cannot exceed the total number of cores destinated to PWscf.
+
+In appendix \ref{app:ndiag} we reported the results for PWscf's CPU time at fixed number of iterations in function of $n_{diag}$.
+
+We can see that the behavior of the two architecture is different.
+
+Starting from Galileo we can clearly see that increasing $n_{diag}$ is very convenient when one cluster node is used, i.e. at sixteen cores.
+
+On the contrary it is convenient to reduce the number of cores to sixteen when two or more cluster nodes are used.
+This behavior is consistent on what reported in \cite{QE} and \cite{QE2}.
+
+What is really interesting is that the UV2000 seems to follow a very different rule: the higher $n_{diag}$ is, the lower the execution time will be.
+An this is true regardless of the total number of cores\footnote{It is only interesting to vary the $n_{diag}$ when 16 or more core are used since the only value possible for 8 cores is four. Remember that we have already found a good tuning approach on 8 cores in section \ref{sec:resArchDependent}}.
+
+
+\mynotes{speedup complessivo, hai anche i dati variabili sull'SGI}
+
+\newpage
+\begin{center}
+\begin{framed}
+	What is the overall behavior of Quantum ESPRESSO in function of the scale of the physical system?
+\end{framed}
+\end{center}
+
+
+
+
+
+\newpage
+
+
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{concl_titania.pdf}	}
 	\caption{}
 	\label{fig:conclTitania}
 \end{figure}
 
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=0.7\linewidth]{concl_oled.pdf}	}
+	\caption{}
+	\label{fig:conclOled}
+\end{figure}
 
-
-
+\section{Discussion and Conclusion}
 
 In fondo mettere i risultati per ogni molecola di size diverso.
 
@@ -3254,7 +3360,6 @@ In fondo mettere i risultati per ogni molecola di size diverso.
 
 
 \newpage
-\section{Results}
 \subsection{Iterations Dynamic} \label{app:IterationDynamic}
 Se si vuole comparare si puo' usare lo speedup. 
 
@@ -3267,7 +3372,6 @@ Risultato segue:
 	\label{fig:fixedvsvariablespeedup}
 \end{figure}
 
-Ha davvero poco senso, mi sa che ti metto in appendice
 \subsection{Threads}\label{app:Threads}
 
 \begin{figure}[hhh!]
@@ -3282,7 +3386,21 @@ Ha davvero poco senso, mi sa che ti metto in appendice
 On rescaled runs figure \ref{fig:A_threads};
 \mynotes{Spiega rescaling}
 
+\newpage
+\subsection{Ndiag}\label{app:ndiag}
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
+	\caption{
+	}
 
+\end{figure}
+
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=1.2\linewidth]{cineca_ndiag.pdf}}
+	\caption{
+	}
+
+\end{figure}
 
 \end{appendices}
 
@@ -3456,6 +3574,11 @@ HPC Advisory council,
 ``Quantum ESPRESSO Performance Benchmark and Profiling",
 \url{http://www.hpcadvisorycouncil.com/}.
 
+\bibitem{Cannon}
+L. E. Cannon, 
+``A Cellular Computer to Implement the Kalman Filter Algorithm",
+Montana State University,
+1969.
 
 
 \end{thebibliography}
