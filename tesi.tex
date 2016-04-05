@@ -2962,15 +2962,15 @@ To investigate the behavior exposed in figure \ref{fig:fixedvsvariable} we can p
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{relevant_subroutines.pdf}	}
-	\caption{CPU time (left) and speedup (right) for relevant subroutines listed in section \ref{sec:resCriticalComponents}. Data from runs at fixed number of SCF steps.}
+	\caption{CPU time (left) and speedup (right) for relevant subroutines listed in section \ref{sec:resCriticalComponents}. Data from runs at fixed number of SCF iterations.}
 	\label{fig:relevantSubroutines}
 \end{figure}
 
-As said in section \ref{sec:resCriticalComponents}), \texttt{cegterg} has the same behavior of PWscf, we can use it a reference for PWscf execution time.
+As said in section \ref{sec:resCriticalComponents}, we can use \texttt{cegterg}  as a reference for PWscf execution time.
 
-\texttt{H\_psi}, which is one of the two main actors in \texttt{cegterg} scales remarkably well. Its speedup is close to linear and the efficiency\footnote{Speedup over number of cores.} is always above the 70\%. 
+\texttt{H\_psi}, which is one of the two main actors in \texttt{cegterg}, scales remarkably well. Its speedup is close to linear and the efficiency\footnote{Speedup over number of cores.} is always above the 70\%. 
 So does \texttt{sum\_band}, as expected for what we said in section \ref{sec:resCriticalComponents}.
-It is clear that the scalability problem must lies withing \texttt{cdiaghg}.
+It is clear that the scalability problem must lie withing \texttt{cdiaghg}.
 
 In fact we can see that its CPU time remains the same at one and two cores, increases lightly at four cores and almost doubles at eight and sixteen cores. 
 Its behavior is far from being efficient and its speedup its practically flat compared to the others functions.
@@ -3007,7 +3007,7 @@ This is the main reason why the use of threads can lead to different behavior an
 Speaking of threads distribution, what the user can do is to assign a number of threads to each MPI rank.
 This is done setting the \texttt{OMP\_NUM\_THREADS} environmental variable to the desired number of threads.
 
-In general it is suggested that to total number of threads must not exceed the number of physical cores the resource has (see section XXX).
+In general it is suggested that the total number of threads must not exceed the number of physical cores on the resource (see section XXX).
 
 The total number of threads can be obtained easily by multiplying the number of threads per MPI rank times the number of MPI ranks.
 For example if we have a 64 core resource and we want to use 16 MPI ranks, the number of threads per MPI rank should not be more than 4.
@@ -3016,10 +3016,10 @@ This flexibility generates a wide range of possible combinations, especially whe
 
 In appendix \ref{app:Threads} we reported the results of our tests for all the possible combinations, both for fixed and variable number of SCF iterations.
 
-From the data exposed in \ref{app:Threads} we have composed two optimal set of runs for fixed and variable iterations\footnote{The difference is only at 32 cores.} number of iterations.
-The ratio was to keep the best result per total number of cores employed, that is number of MPI ranks times number of threads per rank.
+From the data exposed in \ref{app:Threads} we have composed two optimal set of runs for fixed and variable \footnote{The difference is only at 32 cores.} number of iterations.
+The \textit{ratio} was to keep the best result per total number of cores employed.\footnote{ The total number of cores is the number of MPI ranks times the number of threads per rank.}
 
-The results, compared to the runs without threads, are exposed in figure \ref{fig:threadsOverall}.
+The results, compared with the runs without threads, are exposed in figure \ref{fig:threadsOverall}.
 
 \newpage 
 
@@ -3031,8 +3031,8 @@ What is the overall impact of thread parallelization?
 
 
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=1.3\linewidth]{threads_overall.pdf}	}
-	\caption{Threads performance, right 20 iterations, Blue is really fixes, green is rescaled}
+\centerline{ \includegraphics[width=1.2\linewidth]{threads_overall.pdf}	}
+	\caption{PWscf's CPU time at variable number of iterations (left) and fixed number of iterations (right). Both threaded (``MPI + Threads") and not threaded (``MPI Only") runs are plotted. On the x axis are reported the total number of cores and the number of threads per MPI rank for the threaded run.}
 	\label{fig:threadsOverall}
 
 \end{figure}
@@ -3041,7 +3041,7 @@ On the x axis we have reported the total number of cores and, in parenthesis, th
 To obtain the number of MPI ranks used just divide the number of cores for the number in parenthesis.
 
 Starting from the plot on the left we can see that at variable number of iterations threads have a clear, and positive, impact on the overall performance.
-The spike at eight cores is completely disappeared and the descending trend of the CPU time is much more regular, hence efficient.
+The spike at eight cores disappears completely and the descending trend of the CPU time is much more regular, hence efficient.
 
 The result can be directly imputed to a reduction of the number of iterations needed to reach self-consistency.
 In fact, we can see in table \ref{tab:threadsIterations} that the number of iterations is reduced up to 50\% ( at eight cores).
@@ -3066,12 +3066,12 @@ MPI + Threads &  47  &  42  &  43  &  43  &  42  &  36  &  36 \\
 This improved numerical stability can be attributed to the different algorithm used to diagonalize the Hamiltonian. 
 In fact, on such a low number of cores, the use of threads forces PWscf to permorm a serial diagonalization instead of the distributed one, granting a faster convergence.
 
-We have annotated when distributed diagonalization starts on MPI only runs and when serial diagonalization ends on threaded runs.
+We have annotated in figure \ref{fig:threadsOverall} when distributed diagonalization starts on MPI only runs and when serial diagonalization ends on threaded runs.
 
 But the benefits of threads are not restricted to numerical stability.
 In fact, by looking at to plot at fixed number of iterations on the right of figure \ref{fig:threadsOverall}, we see that, especially at eight core the advantage is still substantial.
 
-Note that the gain obtained from eight to sixteen cores cannot be ascribed to the effect of threads because the number of threads used is the same and the algorithm is serial.
+Note that the gain obtained from eight to sixteen cores cannot be ascribed to the effect of threads because the number of threads used is the same and the diagonalization algorithm is serial.
 
 To get a deeper understanding on what routines benefit from threads we need to investigate our metrics at fixed number of iterations.
 
@@ -3087,13 +3087,13 @@ What is the impact of thread parallelization on each component?
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=\linewidth]{threads_subroutines.pdf}	}
-	\caption{Speedup of relevant subroutines at fixed number of iterations for threaded and not threaded PWscf's runs.}
+	\caption{Speedup of relevant subroutines at fixed number of iterations for threaded and not threaded PWscf's runs from one to sixteen cores.}
 	\label{fig:threadsSubroutines}
 
 \end{figure}
 
 
-The plot of \texttt{cdiaghg}'s speedup in figure \ref{fig:threadsSubroutines} tells us that threads mainly benefits diagonalization\footnote{The fact that speedup does not change from eight to sixteen cores confirm what we have said above.}.
+The plot of \texttt{cdiaghg}'s speedup in figure \ref{fig:threadsSubroutines} tells us that threads benefit mainly diagonalization\footnote{The fact that speedup does not change from eight to sixteen cores confirm what we have said above.}.
 While, on the contrary, the impacts on \texttt{h\_psi} and \texttt{fftw} performance is counterproductive.
 
 This means that a loss in performance of \texttt{h\_psi} in exchange of a more efficient diagonalization can sensibly improve the overall performance of the SCF cycle when a low number of core is used (as reported in \texttt{cegterg} plot).
@@ -3113,7 +3113,7 @@ This opens two possible scenarios of interest.
 
 \paragraph{High throughput computing (HTC):} 
 When the time needed to perform a particular simulation loses importance in front of the necessity to complete a large number of simulations, threads can be very appealing, especially when studying systems with similar dimensions and atomic species.
-To optimize the number of simulations completed one could perform a set of tests on a trial system and determine the right number of threads to obtain a reasonable efficiency.
+To maximize the number of simulations completed one could perform a set of tests on a trial system and determine the right number of threads to obtain a reasonable efficiency.
 
 From the data reported in figure \ref{fig:threadsOverall} and appendix \ref{app:Threads} we can extract a simple ``rule of thumb" to find the best number of cores:
 it seems reasonable to fill the chipset with the maximum number of threads, that is to use a single MPI rank for chipset and as many threads as the cores on the chipset.
@@ -3137,7 +3137,7 @@ It is difficult to find both in literature (\cite{QE},\cite{QE2}) and in industr
 This is because all these benchmarks focuses on large scale computing, typically starting at least from 64 cores, up to thousands of cores.
 Although these data are of great interest, not all the scientific community operates on such a large scale.
 
-One must also consider that a great optimization effort was dedicated to increase the performance of the evaluation of $\mf{H}^{KS}$, which translates in a more efficient FFT calculation (see section \ref{sec:QE}). 
+One must also consider that a great optimization effort was dedicated to increase the performance of the evaluation of $\mf{H}^{KS}$\footnote{The remarkable scaling of \texttt{h\_psi} described at the beginning of this section proves the results of this optimization effort.}, which translates in a more efficient FFT calculation (see section \ref{sec:QE}). 
 Threads in this case have proven to be of little, if none, benefit. 
 See \cite{FFTPAPER} for an detailed analysis.
 See section \ref{sec:resArchDependent} for a clear view of \texttt{h\_psi} and \texttt{fftw} speedup on different architectures.
