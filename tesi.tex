@@ -3305,8 +3305,15 @@ This behavior is consistent on what reported in \cite{QE} and \cite{QE2}.
 What is really interesting is that the UV2000 seems to follow a very different rule: the higher $n_{diag}$ is, the lower the execution time will be.
 An this is true regardless of the total number of cores\footnote{It is only interesting to vary the $n_{diag}$ when 16 or more core are used since the only value possible for 8 cores is four. Remember that we have already found a good tuning approach on 8 cores in section \ref{sec:resArchDependent}}.
 
+We can also see that the default choice of $n_{diag}$ performed by \QE is the optimal one only in the case of 32 cores on Galileo.
 
-\mynotes{speedup complessivo, hai anche i dati variabili sull'SGI}
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{ndiag_speedup.pdf}	}
+	\caption{}
+	\label{fig:conclTitania}
+\end{figure}
+
 
 \newpage
 \begin{center}
