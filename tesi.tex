@@ -2631,7 +2631,7 @@ To summarize the configuration used for all the tests:
 
 
 
-\section{Results}
+\section{Results}\label{sec:results}
 This section consists of a very deep insight into all the components of the PWscf package and their interaction with the computational architecture used.
 
 Therefore what follows can be considered as a very technical section, both for the tools used and for the observations made.
@@ -2663,7 +2663,7 @@ We aim to find an answer to the following questions :
 \end{itemize}
 
 This section will highlight what components should be considered while profiling PWscf and what are the critical behaviors of the code. 
-Therefore it serves as an important introduction to section \ref{sec:resArchIndependent} and \ref{sec:resArchDependent}. The difference between the two points of view exposed in \ref{sec:Goals} will be cleared here.
+Therefore it serves as an important introduction to section \ref{sec:resArchIndependent} and \ref{sec:resArchDependent}. The difference between the two points of view exposed in section \ref{sec:results} will be cleared here.
 
 
 
@@ -2689,10 +2689,11 @@ What we aim to know is :
 	\item What is the overall performance on each architecture?
 	\item What are the components that performs best on each architecture?
 	\item What architecture has the best implementation of interprocess communication?
+	\item How diagonalization distribution impacts PWscf performance on both architectures?
 	\item What is the overall behavior of \QE in function of the scale of the physical system?
 \end{itemize}
 
-This section will underline the strength of each architecture and support clear conclusions on the possible scenarios of employment.
+This section will underline the differences between the two architectures and propose a simple method to enhance PWscf performance on both of them.
 
 \newpage
 
@@ -2712,7 +2713,8 @@ What are the most computational intensive subroutines and what kind of calculati
 \begin{center}
 	\includegraphics[width=\linewidth]{main_subroutines.pdf}	
 	\caption{Percentage of total PWscf CPU time per routine sorted by descending value. 
-	\\In parenthesis you find the root(caller), subroutine. Subroutines with the same caller are plotted with the same color. 	
+	\\In parenthesis the caller(root) subroutine is reported. 
+	Subroutines with the same caller are plotted with the same color. 	
 	\\``gen" refers to subroutines belonging to external \QE modules, hence called in different subroutines. }
 	\label{fig:mainSubroutines}
 \end{center}
@@ -2729,12 +2731,12 @@ We remind the reader that an analysis of the operations performed by the most im
 
 
 PWscf calls mainly two subroutines: \texttt{init\_run} and \texttt{electrons}.
-Approximately 99\% of the total run time is occupied by \texttt{electrons}, which is the subroutine implementing the whole SCF iteration.
+Approximately 99\% of the total run time is occupied by \texttt{electrons}, which is the subroutine implementing the whole SCF iteration \footnote{Obviously if only one SCF step is performend the percentage would be different, remember also that 30 steps is a reasonable average for the number of iterations to reach self-consistency. }.
 
 \texttt{Electrons} calls \texttt{c\_bands} to obtain the Kohn-Sham orbitals\footnote{The eigenvectors of $\mf{H}^{KS}$.} and \texttt{sum\_band} combines them to obtain the electronic density.
 
 \texttt{C\_bands} is basically a wrapper for \texttt{c\_egterg}, which implements the Davidson diagonalization (see section \ref{sec:Diagonalization}), in fact it calls two functions:
-\texttt{h\_psi} to evaluate the $\mf{H}^{KS}$ matrix; \texttt{cdiaghg} to diagonalize the obtained matrix.
+\texttt{h\_psi} to evaluate the $\mf{H}^{KS}$ matrix and \texttt{cdiaghg} to diagonalize the obtained matrix.
 
 \texttt{Fft\_scatter} is a subroutine that distribute Kohn-Sham orbitals values on the grid among all the MPI ranks, hence it is mainly dedicated to communication, while \texttt{fftw} is the routine that actually computes the FFT and IFFT transformations (see section \ref{sec:FFT}).
 
@@ -2778,7 +2780,7 @@ The percentage is calculated over the total number of bytes sent in the whole ex
 This is a cumulative metric between all the MPI ranks, hence the number of sent bytes and received bytes is the same.
 Please note also that, as we will see below, the MPI subroutines used are very symmetric between the ranks, hence the cumulative metric is a valid way to measure the overall communication weight.
 
-The color box on the left is an ``\textit{heat map}" representing the metric's value, blue is 0\% and red is 100\%\footnote{Since we are using absolute percentage values for the metric, the color box is redundant. Nonetheless it can be incredibly useful when non-absolute metrics are investigated.}.
+The color box on the left is an ``\textit{heat map}" representing the metric's value, blue is 0\% and red is 100\%\footnote{Since we are using absolute percentage values as metric, the color box is redundant. Nonetheless it can be incredibly useful when non-absolute metrics (metrics referring to the local root) are investigated.}.
 
 On the left frame we explored the content of \texttt{electrons} and, as said above, we can see that \texttt{c\_bands} and \texttt{sum\_bands} are called.
 It is clear that 69\% of the overall communication is performed to find the Kohn-Sham orbitals in \texttt{c\_bands}, this is expected since the evaluation of the matrix and its diagonalization is wildly parallelized.
@@ -2786,7 +2788,7 @@ Another 25\% of the communication is performed inside \texttt{sum\_band}, this i
 
 
 
-In the right frame we explored \texttt{pcegterg}, which is the parallelized version of \texttt{cegterg}, containing the the important subroutines \texttt{h\_psi} and \texttt{p\_cdiaghg\_} (the SCALAPACK parallelized version of \texttt{cdiaghg}).
+In the right frame we explored \texttt{pcegterg}, which is the parallelized version of \texttt{cegterg}, containing the well known subroutines \texttt{h\_psi} and \texttt{p\_cdiaghg} (the ScaLAPACK parallelized version of \texttt{cdiaghg}).
 It is evident that a significant amount of communication is performed by \texttt{h\_psi}, this is because an high number of distributed FFT and IFFT must be performed. On the contrary the distributed diagonalization has a lower impact on communication. 
 
 Note that it was not possible to collect metrics on the communication performed inside each ScaLAPACK function\footnote{The communication part of the ScaLAPACK library is performed within the BLACS(Basic Linear Algebra Communication Subprograms) library.} because we would have to recompile the linear algebra libraries, which on both of the architectures are closed source.
@@ -2838,8 +2840,8 @@ We now have a clear view on where the communication happens and what kind of MPI
 We can also get an estimate on the weight of communication over calculation by comparing the CPU time spent in \texttt{fftw} (calculation) and \texttt{fft\_scatter} (communication) subroutines.
 
 In the left graph of figure \ref{fig:fftwvsfftscatter} we plotted the CPU time of the two subroutines in function of the number of cores. 
-\texttt{Fft\_scatter} CPU time is subject to little variation, but if we compare its value with \texttt{fftw}'s one we can see that communication gradually earns an increasing weight. 
-In fact, as plotted in the graph on the right, we can see that CPU time ratio of \texttt{fft\_scatter} over \texttt{fftw} rises over sixteen cores, when more than two Galileo nodes, and more than four NUMA nodes on two different blades, have to communicate.
+\texttt{Fft\_scatter}'s CPU time is subject to little variation, but if we compare its value with \texttt{fftw}'s one we can see that communication gradually earns an increasing weight. 
+In fact, as plotted in the graph on the right, we can see that CPU time ratio of \texttt{fft\_scatter} over \texttt{fftw} rises over sixteen cores, when more than two Galileo nodes, and more than four NUMA nodes ( composing two different blades), have to communicate.
 A more in-depth analysis about this trend is exposed in section \ref{sec:resArchDependent}.
 
 
@@ -2867,7 +2869,8 @@ Hence the time necessary to obtain a physically reliable result can vary in func
 Even the time necessary to perform a single iteration step can vary considerably.
 In figure \ref{fig:iterstats} we have plotted the value of mean iteration CPU time in function of the number of cores used, the error bar is the standard deviation.
 
-We can see that the iteration time is far from being constant and varies sensibly. In the plot on the right we have the same data plotted in logarithmic scale to highlight the fact that that the relative variation of iteration time grows with the number of cores.
+We can see that the iteration time is far from being constant and varies sensibly. 
+In the plot on the right we have the same data plotted in logarithmic scale to highlight the fact that the relative variation of iteration's time grows with the number of cores.
 In fact, by looking at the data reported in table \ref{tab:iterations} we can see that the relative error is always above the 50\% when more than eight cores are used.
 
 
@@ -2917,17 +2920,18 @@ UV2000	 & 43  & 42  & 72  & 83  &  55  &  36  &  50 \\
 It now appears clear why in section \ref{sec:Goals} we introduced two points of view.
 In order to profile and compare the performances of PWscf and its subroutines in function of the number of cores we need to fix the number of SCF iterations performed. Otherwise the computations between two runs at different cores could be considered different.
 We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
-reasonable run time\footnote{The time we had at disposal for profiling was limited and the number of tries performed was considerable, hence the need to contain the total run time.}.
+reasonable run time\footnote{Read below for a more precise justification of this choice.}.
 
 We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state community.
+Hence the need for a more ``pragmatical" point of view.
 
 This is why from now on we will report the results with both with fixed and variable iterations.
 
-An alternative approach, which is mainly used in industry benchmarks, is to fix the WALL time dedicated to computation and count the number of iterations performed.
+An alternative approach, which is mainly used in industry benchmarks\cite{HPC}, is to fix the WALL time dedicated to computation and count the number of iterations performed.
 This approach has two main downsides: 
 first we will lose the data provided by the internal metrics, which are accountable and do not implies any form of overhead; 
 second, for the data to be reliable, a reasonable number of iterations at a single core will be requested. 
-In our case, for a twenty step iteration the execution time is six hours, which will imply to reserve the computational resource for that amount of time for every test performed.
+In our case, for a twenty step iteration, the execution time is six hours, which will imply to reserve the computational resource for that amount of time for every test performed.
 Since the time we had available was not indefinite and the resources, especially the UV2000, had to be shared without the help of a batch scheduler, we decided to fix the number of iterations and use the CPU time as a metric.
 
 This gave us the possibility to perform many more tests and investigate more aspects of \QE scalability.
@@ -2967,7 +2971,7 @@ To investigate the behavior exposed in figure \ref{fig:fixedvsvariable} we can p
 As said in section \ref{sec:resCriticalComponents}, we can use \texttt{cegterg}  as a reference for PWscf execution time.
 
 \texttt{H\_psi}, which is one of the two main actors in \texttt{cegterg}, scales remarkably well. Its speedup is close to linear and the efficiency\footnote{Speedup over number of cores.} is always above the 70\%. 
-So does \texttt{sum\_band}, as expected for what we said in section \ref{sec:resCriticalComponents}.
+So does \texttt{sum\_band}, as expected for what we said in section \ref{sec:QE}.
 It is clear that the scalability problem must lie withing \texttt{cdiaghg}.
 
 In fact we can see that its CPU time remains the same at one and two cores, increases lightly at four cores and almost doubles at eight and sixteen cores. 
@@ -3005,7 +3009,7 @@ This is the main reason why the use of threads can lead to different behavior an
 Speaking of threads distribution, what the user can do is to assign a number of threads to each MPI rank.
 This is done setting the \texttt{OMP\_NUM\_THREADS} environmental variable to the desired number of threads.
 
-In general it is suggested that the total number of threads must not exceed the number of physical cores on the resource (see section XXX).
+In general it is suggested that the total number of threads must not exceed the number of physical cores on the resource (see appendix \ref{app:Threads}).
 
 The total number of threads can be obtained easily by multiplying the number of threads per MPI rank times the number of MPI ranks.
 For example if we have a 64 core resource and we want to use 16 MPI ranks, the number of threads per MPI rank should not be more than 4.
@@ -3015,7 +3019,7 @@ This flexibility generates a wide range of possible combinations, especially whe
 In appendix \ref{app:Threads} we reported the results of our tests for all the possible combinations, both for fixed and variable number of SCF iterations.
 
 From the data exposed in \ref{app:Threads} we have composed two optimal set of runs for fixed and variable \footnote{The difference is only at 32 cores.} number of iterations.
-The \textit{ratio} was to keep the best result per total number of cores employed.\footnote{ The total number of cores is the number of MPI ranks times the number of threads per rank.}
+The general rule was to keep the best result per total number of cores employed.\footnote{ The total number of cores is the number of MPI ranks times the number of threads per rank.}
 
 The results, compared with the runs without threads, are exposed in figure \ref{fig:threadsOverall}.
 
@@ -3038,7 +3042,7 @@ What is the overall impact of thread parallelization?
 On the x axis we have reported the total number of cores and, in parenthesis, the number of threads per MPI rank (see above).
 To obtain the number of MPI ranks used just divide the number of cores for the number in parenthesis.
 
-Starting from the plot on the left we can see that at variable number of iterations threads have a clear, and positive, impact on the overall performance.
+Starting from the plot on the left we can see that, at variable number of iterations, threads have a clear and positive impact on the overall performance.
 The spike at eight cores disappears completely and the descending trend of the CPU time is much more regular, hence efficient.
 
 The result can be directly imputed to a reduction of the number of iterations needed to reach self-consistency.
@@ -3067,7 +3071,7 @@ In fact, on such a low number of cores, the use of threads forces PWscf to permo
 We have annotated in figure \ref{fig:threadsOverall} when distributed diagonalization starts on MPI only runs and when serial diagonalization ends on threaded runs.
 
 But the benefits of threads are not restricted to numerical stability.
-In fact, by looking at to plot at fixed number of iterations on the right of figure \ref{fig:threadsOverall}, we see that, especially at eight core the advantage is still substantial.
+In fact, by looking at to plot at fixed number of iterations, on the right of figure \ref{fig:threadsOverall}, we see that (especially at eight cores) the advantage is still substantial.
 
 Note that the gain obtained from eight to sixteen cores cannot be ascribed to the effect of threads because the number of threads used is the same and the diagonalization algorithm is serial.
 
@@ -3113,9 +3117,9 @@ This opens two possible scenarios of interest.
 When the time needed to perform a particular simulation loses importance in front of the necessity to complete a large number of simulations, threads can be very appealing, especially when studying systems with similar dimensions and atomic species.
 To maximize the number of simulations completed one could perform a set of tests on a trial system and determine the right number of threads to obtain a reasonable efficiency.
 
-From the data reported in figure \ref{fig:threadsOverall} and appendix \ref{app:Threads} we can extract a simple ``rule of thumb" to find the best number of cores:
-it seems reasonable to fill the chipset with the maximum number of threads, that is to use a single MPI rank for chipset and as many threads as the cores on the chipset.
-For example, in our case we would have chosen one MPI rank spawning eight threads\footnote{Both the architectures have an eight core chipset.}, obtaining an efficiency of 60\%\footnote{Efficiency is defined as speedup over number of cores.}.
+From the data reported in figure \ref{fig:threadsOverall} and appendix \ref{app:Threads} we can extract a simple ``rule of thumb" to find the best number of threads and cores:
+it seems convenient to fill the chipset with the maximum number of threads, that is to use a single MPI rank for chipset and as many threads as the cores on the chipset.
+For example: in our case we would have chosen one MPI rank spawning eight threads\footnote{Both the architectures have an eight core chipset.}, obtaining an efficiency of 60\%\footnote{Efficiency is defined as speedup over number of cores.}.
 
 Then schedule a massive submit of jobs to the preferred batch system. 
 This approach can also be very appealing since large HTC pools with batch schedulers like Condor\cite{Condor} are increasing in popularity and can be adopted with little cost by universities and institutions.
@@ -3162,10 +3166,10 @@ As a final point we re-propose in figure \ref{fig:threadsComparison} the same me
 	\label{fig:archCompareIterations}
 \end{figure}
 
-To begin we analyze the mean iteration time of PWscf on both architectures in order to have a general idea (see section \ref{sec:resCriticalComponents} to understand the validity of mean iteration time study).
+To begin we analyze the mean iteration time of PWscf on both architectures in order to have a general idea (see section \ref{sec:resCriticalComponents} to understand the validity of mean iteration time).
 
 At first sight, looking at the left plot of figure \ref{fig:archCompareIterations}, one will conclude that Galileo is better suited to perform \QE simulations because its CPU time is lower in a wider range of the curve.
-This is true,but note that the x axis is not on a linear scale, more on a logarithmic scale (in base 2)\footnote{Given the presence of error bars, this kind of display was favored since it does not overcrowd the left part of the plot.}.
+This is true, but note that the x axis is not on a linear scale, but on a logarithmic scale (in base 2)\footnote{Given the presence of error bars, this kind of display was favored since it does not overcrowd the left part of the plot.}.
 
 Note also that the time gap between the two architectures lowers as the number of core rises. 
 At 32 cores we have the same performance and at 64 cores the UV2000 outperforms Galileo.
@@ -3224,17 +3228,17 @@ What are the components that performs best on each architecture?
 In figure \ref{fig:archSubroutines} is plotted the speedup at fixed number of iterations for all the relevant subroutines listed in section \ref{sec:resCriticalComponents}.
 As expected, the two main actors, \texttt{h\_psi} and \texttt{cdiaghg} starts to improve on the UV2000 when more than one NUMA node is needed.
 
-While \texttt{c\_diag} mantains a low speedup, at least on the UV2000 the performance rises above the sixteen cores.
+While \texttt{c\_diag} mantains a low speedup, at least on the UV2000 the performance rises above sixteen cores.
 
 The speedup of \texttt{h\_psi} and \texttt{sum\_band} are very similar, as expected from what said in section \ref{sec:QE}, and incredibly linear (compared with \texttt{c\_diagh}). 
 This highlights a very efficient parallelization of matrix evaluation.
 
 This is confirmed by the speedup of \texttt{fftw}, that constitutes a considerable part of matrix evaluation(see section \ref{sec:Diagonalization}).
 
-Finally, the plot of \texttt{fft\_scatter}\footnote{We remind that \texttt{fft\_scatter} is a subroutine that performs manily communication.} strongly suggests that the difference in performances can be attributed to the difference in communication performance.
+Finally, the plot of \texttt{fft\_scatter}\footnote{We remind that \texttt{fft\_scatter} is a subroutine that performs manily communication.} strongly suggests that communication is performed very differently on the two architectures.
 
 
-It seems time to investigate at a deeper level the role of communication in PWscf calculations.
+It seems time to investigate at a deeper level what is the performance of interprocess communication on the two architectures.
 
 \newpage
 ~
@@ -3255,7 +3259,7 @@ What architecture has the best implementation of interprocess communication?
 \end{figure}
 
 
-figure \ref{fig:archMpiPerc} reports the total percentage of time (calculated over PWscf CPU time), spent in MPI communication.
+Figure \ref{fig:archMpiPerc} reports the total percentage of time (calculated over PWscf CPU time), spent in MPI communication.
 
 We can see that the number increases particularly after 16 cores, as expected, and that it is a remarkably high percentage.
 
@@ -3296,7 +3300,7 @@ Obviously $n_{diag}$ cannot exceed the total number of cores destinated to PWscf
 To set the number of cores dedicated to diagonalization it is sufficient to use the \texttt{-ndiag} PWscf's argument.
 
 In appendix \ref{app:ndiag} we reported the results for PWscf's CPU time at fixed number of iterations in function of $n_{diag}$. 
-In figure \ref{fig:ndiag64} we report the data for run at 64 cores.
+In figure \ref{fig:ndiag64} we reprint the data for a run at 64 cores.
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{ndiag_64.pdf}	}
@@ -3306,10 +3310,11 @@ In figure \ref{fig:ndiag64} we report the data for run at 64 cores.
 
 First of all it is confirmed that \texttt{-ndiag} affects only the performance of \texttt{cdiaghg} and not \texttt{h\_psi}'s ones.
 Hence the overall speedup can only be attributed to \texttt{cdiaghg} optimization.
+In fact PWscf's curve and \texttt{cdiaghg}'s curve are identical.
 
 We can see also that the behavior of the two architectures is, once again, different.
 
-Starting from Galileo we it is evident that increasing $n_{diag}$ is very convenient when only one cluster node is used, i.e. at sixteen cores.
+Starting from Galileo it is evident that increasing $n_{diag}$ is very convenient when only one cluster node is used, i.e. at sixteen cores.
 
 On the contrary it is better to reduce the number of cores to sixteen when two or more cluster nodes are used.
 This behavior is consistent on what reported in \cite{QE} and \cite{QE2}.
@@ -3325,7 +3330,7 @@ An this is true regardless of the total number of cores\footnote{It is only inte
 We can also see that the default choice of $n_{diag}$ made by \QE is the optimal one only in the case of 32 cores on Galileo.
 
 Finally, we can extract another simple rule from our data to optimize the performance of matrix diagonalization, and PWscf's performance in general, when more than eight cores are used while simulating this kind of systems.
-However this time it will be an architecture dependent rule.
+However, this time, it will be an architecture dependent rule.
 
 \textbf{For multicomputer architectures:} it is convenient to reduce $n_{diag}$ to the number of cores present on a single cluster node.
 
@@ -3350,7 +3355,10 @@ To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summariz
 \end{framed}
 \end{center}
 
-
+\begin{itemize}
+	\item the lower the size the same is the scaling $\rightarrow$ cluster is better
+	\item the bigger the size the more important is the matrix diagonalization $\rightarrow$ NUMA is better
+\end{itemize}
 
 
 \begin{figure}[hhh!]
@@ -3435,7 +3443,7 @@ On rescaled runs figure \ref{fig:A_threads};
 \subsection{Ndiag}\label{app:ndiag}
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
-	\caption{
+	\caption{``D" marks the default choice.
 	}
 	\label{fig:ndiagSgi}
 
@@ -3443,7 +3451,7 @@ On rescaled runs figure \ref{fig:A_threads};
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{cineca_ndiag.pdf}}
-	\caption{
+	\caption{ ``D" marks the default choice.
 	}
 	\label{fig:ndiagCineca}
 
@@ -3453,7 +3461,7 @@ On rescaled runs figure \ref{fig:A_threads};
 
 
 
-May the force be with you.
+
 
 
 
@@ -3461,6 +3469,7 @@ May the force be with you.
 %  BIBLIOGRAPHY
 %------------------------------------------------------------------
 \clearpage
+May the force be with you.
 \addcontentsline{toc}{section}{Bibliography}
 \begin{thebibliography}{9}
 
