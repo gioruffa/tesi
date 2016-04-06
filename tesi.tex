@@ -3281,7 +3281,7 @@ Matrix diagonalization constitutes a major bottleneck in this kind of simulation
 
 Obviously this observation is true considering also that matrix evaluation has been finely optimized by \QE developers.
 
-We still have one way on how diagonalization is performed, but this way is effective only on a sufficiently high number of cores.
+We still have one way to affect how diagonalization is performed (besides threads), but this option is effective only on a sufficiently high number of cores.
 To be more clear we need to explain how matrix multiplication is perfomed by \QE when four cores or more are used.
 
 \QE uses the Cannon's algorithm\cite{Cannon} for parallel matrices multiplication\cite{QE2}. 
@@ -3293,25 +3293,53 @@ Hence, given our resources, the possible values are as follows:
 \end{equation*}
 Obviously $n_{diag}$ cannot exceed the total number of cores destinated to PWscf.
 
-In appendix \ref{app:ndiag} we reported the results for PWscf's CPU time at fixed number of iterations in function of $n_{diag}$.
+To set the number of cores dedicated to diagonalization it is sufficient to use the \texttt{-ndiag} PWscf's argument.
 
-We can see that the behavior of the two architecture is different.
+In appendix \ref{app:ndiag} we reported the results for PWscf's CPU time at fixed number of iterations in function of $n_{diag}$. 
+In figure \ref{fig:ndiag64} we report the data for run at 64 cores.
 
-Starting from Galileo we can clearly see that increasing $n_{diag}$ is very convenient when one cluster node is used, i.e. at sixteen cores.
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{ndiag_64.pdf}	}
+	\caption{CPU time of a 64 core PWscf's run in function of the number of ranks dedicated to diagonalization $n_{diag}$.}
+	\label{fig:ndiag64}
+\end{figure}
 
-On the contrary it is convenient to reduce the number of cores to sixteen when two or more cluster nodes are used.
+First of all it is confirmed that \texttt{-ndiag} affects only the performance of \texttt{cdiaghg} and not \texttt{h\_psi}'s ones.
+Hence the overall speedup can only be attributed to \texttt{cdiaghg} optimization.
+
+We can see also that the behavior of the two architectures is, once again, different.
+
+Starting from Galileo we it is evident that increasing $n_{diag}$ is very convenient when only one cluster node is used, i.e. at sixteen cores.
+
+On the contrary it is better to reduce the number of cores to sixteen when two or more cluster nodes are used.
 This behavior is consistent on what reported in \cite{QE} and \cite{QE2}.
+Note also that if \texttt{-ndiag} is specified, PWscf tries to keep the MPI ranks as close as possible (i.e. on the same node). 
+In fact we can see in figure \ref{fig:ndiagCineca}(32 core run) and in figure \ref{fig:ndiag64}(left plot) that the optimal $n_{diag}$ is at 16 cores, exactly the number of core on a single cluster node.
+
 
 What is really interesting is that the UV2000 seems to follow a very different rule: the higher $n_{diag}$ is, the lower the execution time will be.
-An this is true regardless of the total number of cores\footnote{It is only interesting to vary the $n_{diag}$ when 16 or more core are used since the only value possible for 8 cores is four. Remember that we have already found a good tuning approach on 8 cores in section \ref{sec:resArchDependent}}.
 
-We can also see that the default choice of $n_{diag}$ performed by \QE is the optimal one only in the case of 32 cores on Galileo.
+
+An this is true regardless of the total number of cores\footnote{It is only interesting to vary the $n_{diag}$ when 16 or more core are used since the only value possible for 8 cores is four. Remember that we have already found a good tuning approach on 8 cores in section \ref{sec:resArchDependent}} (see figure \ref{fig:ndiagSgi}).
+
+We can also see that the default choice of $n_{diag}$ made by \QE is the optimal one only in the case of 32 cores on Galileo.
+
+Finally, we can extract another simple rule from our data to optimize the performance of matrix diagonalization, and PWscf's performance in general, when more than eight cores are used while simulating this kind of systems.
+However this time it will be an architecture dependent rule.
+
+\textbf{For multicomputer architectures:} it is convenient to reduce $n_{diag}$ to the number of cores present on a single cluster node.
+
+\textbf{For multiprocessor architectures:} it is convenient to increase $n_{diag}$ as much as possible.
+
+Consider also that a single multicore cluster node is, de-facto, a small multiprocessor architecture, in fact, the best performance was always achieved occupying the maximum number of processors on the single node.
+
+To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summarize our results comparing the speedup achieved following the above rules and the speedup of a default PWscf run.
 
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{ndiag_speedup.pdf}	}
-	\caption{}
-	\label{fig:conclTitania}
+	\caption{PWscf's speedup comparison between default runs and runs that optimizes the number of diagonalization processors.}
+	\label{fig:ndiagSpeedup}
 \end{figure}
 
 
@@ -3321,6 +3349,7 @@ We can also see that the default choice of $n_{diag}$ performed by \QE is the op
 	What is the overall behavior of Quantum ESPRESSO in function of the scale of the physical system?
 \end{framed}
 \end{center}
+
 
 
 
@@ -3399,6 +3428,7 @@ On rescaled runs figure \ref{fig:A_threads};
 	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
 	\caption{
 	}
+	\label{fig:ndiagSgi}
 
 \end{figure}
 
@@ -3406,6 +3436,7 @@ On rescaled runs figure \ref{fig:A_threads};
 	\centerline{\includegraphics[width=1.2\linewidth]{cineca_ndiag.pdf}}
 	\caption{
 	}
+	\label{fig:ndiagCineca}
 
 \end{figure}
 
