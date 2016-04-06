@@ -3388,18 +3388,17 @@ To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summariz
 	\label{fig:conclOled}
 \end{figure}
 
+\newpage
 \section{Discussion and Conclusion}
 
+Mi piacerebbe costruire una progressione con le migliori run dei threads a basso numero di core e i migliori dati ottenuti ottimizzando la diagonalizzazione e confrontarlo con il comportamento di default dell'espresso.
 
-\mynotes{Metti molecola organica}.
+E' un modo per dire che seguendo le regole che abbiamo estrapolato e' possibile effettuare un tuning su entrambe le architetture a prescindere dal numero di core che si vogliono utilizzare, senza dover mettere le mani nel codice o settare parametri esotici.
 
-\mynotes{sarebbe bello patchare il codice per fargli tenere i core dell'algebra lineare tutti vicini! in modo che la comunicazione sulla numa sia localizzata! Hai tutto sugli appunti del 14/3 con Davide}
+Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invece vuoi fare un sacco di simulazioni contemporanemante fai quest'altro (threads).
 
-\mynotes{ci sono parti non parallelizzate fuori dai conti SCF, tipo il calcolo delle forze, c'e' spazio di miglioramento}
-\mynotes{il numero di iterazioni scf cambia con il numero dei core per via di come viene valutato il criterio di convergenza.}
-\mynotes{bisognerebbe dare piu' flessibilita' sulla posizione dei core dedicati alla diagonalizzazione.}
 
-\newpage
+
 
 \begin{appendices}
 
