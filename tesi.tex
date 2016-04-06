@@ -1543,7 +1543,7 @@ This is to be compared with the solution of equations \eqref{eq:KSeq} that must 
 
 Once $u_{\mf{k}j}(\erre)$ is found, the true electronic wave function $\psi_j(\erre)$ is extended to the whole lattice trough \eqref{eq:Bloch}.
 
-Apart for the $\mf{k}$ shift of wave vector, equation \eqref{eq:BlochEq} is equivalent to a stationary Schr\"oendiger equation. Then, for a fixed $\mf{k}$, its solutions must be qualitatively similar to those of standard Schr\"oendiger equations in a finite volume, namely : a ladder of discrete eigenenergies $\varepsilon_{\mf{k}j}$ associated with eigenfunctions $u_{\mf{k}j}(\erre)$ with larger and larger number of nodes for increasing energies, labeled precisely by the index $j$.\footnote{With a noticeable parallelism to atomic orbitals.}
+Apart for the $\mf{k}$ shift of wave vector, equation \eqref{eq:BlochEq} is equivalent to a stationary Schr\"oendiger equation. Then, for a fixed $\mf{k}$, its solutions must be qualitatively similar to those of standard Schr\"oendiger equations in a finite volume, namely: a ladder of discrete eigenenergies $\varepsilon_{\mf{k}j}$ associated with eigenfunctions $u_{\mf{k}j}(\erre)$ with larger and larger number of nodes for increasing energies, labeled precisely by the index $j$.\footnote{With a noticeable parallelism to atomic orbitals.}
 
 It is absolutely fundamental to note that $\mf{k}$ can vary freely within the first Brillouin zone; 
 then for a fixed $j$ the eigenenergies $\varepsilon_{\mf{k}j}$ depends on $\mf{k}$ as \textbf{continuous} functions!
@@ -1587,7 +1587,7 @@ This means that by using plane waves we can perform a set of calculations in the
 
 If we introduce the condition of a periodic potential, as a consequence of the Bloch's theorem, we have that $\tilde{v}_{eff}(\mf{k} - \mf{k'})$ is not-null only when $\mf{k} - \mf{k'} = \mf{G}$, where $\mf{G}$ is a vector of the reciprocal lattice \cite{Martin}.
 
-This means that in the continuous-indexed energy matrix of eq \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
+This means that in the continuous-indexed energy matrix of equation \eqref{eq:SCHFourier} most off-diagonal elements vanishes because for the element to be not-null the following relation must stand $\mf{k} = \mf{k'} + \mf{G}$.
 
 Then the continuous-indexed $\mf{H}^{KS}$ matrix becomes a diagonal discrete-indexed block matrix, meaning that one can diagonalize only the non-null blocks on the diagonal, and, more importantly, the operation can be performed independently for each block (i.e. in parallel!).
 
@@ -1645,9 +1645,7 @@ According to \cite[p.88]{Marx} a rough estimate of the number of plane waves is 
 
 A function given as a finite linear combination of plane waves can also be defined as a set of functional values on an equally spaced grid in real space.
 
-The sampling theorem gives the maximal grid spacing
-that still allows us to hold the same information as the expansion coefficients
-of the plane waves. The real space sampling points $\mf{R}$ are defined as: 
+The real space sampling points $\mf{R}$ are defined as: 
 
 \begin{equation}
 	\mf{R} = \left[\mf{a}_1 \mf{a}_2 \mf{a}_3 \right] \mf{N} \mf{q},
@@ -1656,8 +1654,7 @@ of the plane waves. The real space sampling points $\mf{R}$ are defined as:
 where N is a diagonal matrix with the entries $1/N_i$, $\mf{q}$ is a vector of
 integers ranging from $0$ to $N_i - 1$ and $i = x, y, z$. 
 
-In order to fulfill the
-sampling theorem $N_i$ has to be bigger than $2 max(\mf{b}_i) + 1$\footnote{Where $\mf{b}_i$ is a primitive vector of the reciprocal lattice}. 
+To prevent the loss of any information contained in the function\footnote{Respecting the sampling theorem.}  $N_i$ has to be bigger than $2 max(\mf{b}_i) + 1$\footnote{Where $\mf{b}_i$ is a primitive vector of the reciprocal lattice}. 
 In addition, $N_i$ must be decomposable into small prime numbers (typically 2, 3, and 5) when fast Fourier transformation techniques are used.
 In practice, the smallest number $N_i$ that fulfills the above requirements is
 chosen.
@@ -1717,6 +1714,9 @@ We shall now proceed with an in-depth analysis of the implementation of DFT SCF 
 
 \newpage
 
+~
+
+\newpage
 %----------------------------------------------------------------------------
 \section{\QE}\label{sec:QE}
 %----------------------------------------------------------------------------
@@ -1725,7 +1725,7 @@ We shall now proceed with an in-depth analysis of the implementation of DFT SCF 
 
 \QE is free, open-source software distributed under the terms of the GNU General Public License (GPL) and is written, mostly,in Fortran-95, with some parts in C or in Fortran-77.
 
-\QE core features are implemented leveraging the well optimized versions of linear algebra and parallelization libraries like BLAS, LAPACK, SCALAPACK, FFTW, that are easily available for a wide range of computational architectures.
+\QE core features are implemented leveraging the well optimized versions of linear algebra and parallelization libraries like BLAS\cite{BLAS}, LAPACK\cite{LAPACK}, SCALAPACK\cite{SCALAPACK}, FFTW\cite{FFTW}, that are easily available for a wide range of computational architectures.
 
 The MPI standard\cite{MPI} is used for interprocess communication and the OpenMP standard\cite{OMP} is used for thread parallelization.
 
@@ -1736,6 +1736,7 @@ Quantum ESPRESSO distribution is composed by a set of packages (executables) bui
 
 In our work we focused only on the \textit{PWscf} package, which implements an iterative approach to reach self-consistency, using at each step iterative diagonalization techniques, in the framework of plane waves basis set.
 
+As a note: in this work we will conform to the MPI standard calling each MPI process an \textit{MPI rank} and each group of MPI ranks a \textit{communicator}.
 
 \subsection{SCF Implementation in \textit{PWscf} package}
 In section \ref{sec:SCF-DFT} we gave a basic representation of an SCF algorithm based on DFT.
@@ -1758,7 +1759,7 @@ The figure is reprinted here to help the reader.
 \end{figure}
 
 \subsection{Initialization (Step 0)}
-For the SCF iteration to be performed, a set of preliminary initializations must occur.
+For the SCF iteration to be performed, a set of preliminahttp://www.netlib.org/scalapack/ry initializations must occur.
 This preliminary step is implemented within the \texttt{init\_run} subroutine.
 
 Besides the allocation of all the buffers and the tuning of grid dimensions\footnote{Remember that for the FFT to perform well, the number of points per dimension must be a multiple of a prime number, see sec \ref{sec:Grid}}, the real goal of this step is to obtain an initial electronic density $\dens$ and an estimate of the total energy of the system.
@@ -1832,7 +1833,8 @@ Instead of having to compute the integral in \eqref{eq:HartreePot}, we just need
 This is undoubtedly a great advantage from a computational standpoint, because all the complexity lies in the evaluation of $\tilde{\rho}(\mf{G})$, which is performed at the beginning of every iteration step as an FFT of $\dens$.
 Hence the computational cost associated to $v_{h}$ is $\bigO(N log(N))$.
 
-Using the definition \eqref{eq:HartreePot} would require to compute the integral for every point of the real grid . That is : for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). 
+Using the definition \eqref{eq:HartreePot} would require to compute the integral for every point of the real grid. 
+That is: for every of the $N$ point of the real grid (labeled by $\mf{r}$) one must sum (integrate) again for every point of the real grid $N$ (labeled by $\mf{r}'$). 
 This would lead to a complexity of $\mathcal{O}(N^2)$.
 
 For the sake of simplicity we can derive equation \eqref{eq:HartreePotReciprocal} in one dimension.
@@ -1969,7 +1971,7 @@ What \QE does is to divide the grid in a set of $N_x \cdot N_y$ columns along th
 This parallelization is implemented using MPI, that is : each rank calculates sequentially a set of columns.
 Since the terms in the rightmost sum in \eqref{eq:NestedFFT2} are independent from one another, the sum over each column can be parallelized. 
 This second layer of parallelization is performed using thread parallelization, thanks to the OpenMP library.
-Being every term independent, there are no race-conditions between threads, they do not need to wait the computation performed by other threads and they work on independent chunks of memory. \footnote{See section XXX for the effects of threads overload.}
+Being every term independent, there are no race-conditions between threads, they do not need to wait the computation performed by other threads and they work on independent chunks of memory. \footnote{See appendix \ref{app:Threads} for the effects of threads overload.}
 
 Once the sum on z columns is completed, the grid is separated in horizontal layers. 
 The layers are grouped in function of the MPI ranks and bidimensionals FFT are perfomed; the second thread parallelization can still be used.
@@ -1987,7 +1989,7 @@ The kind of parallelization used can be manually set or automatically decided.
 \paragraph{Serial diagonalization: }  In this case, only one MPI rank performs the diagonalization.
 \footnote{Actually, depending on the version of \QE, a set of different ranks would perform the same operation, obtaining the same result.}
 Be aware that thread parallelization is still an option, if threads are enabled and the threaded version of MKL libraries have been linked.
-See section XXX for an test case analysis of this scenario.
+See section \ref{sec:resArchIndependent} for an test case analysis of this scenario.
 
 \paragraph{Parallel Diagonalization: } In this case \QE leverages the features of the SCALAPACK library and distribuite the load over a set of MPI ranks. 
 Not all the ranks will be used: depending on the total number of ranks or on user setting, a number ranging from one-forth to one-half of ranks will be used. 
@@ -2109,7 +2111,8 @@ In table \ref{tab:coreRoutines} we present a summary of the most important subro
 
 In this section we are going to outline the hardware and software characteristics of the two computational architectures we used to perform \QE simulations.
 
-Nowadays the great majority of computational physics is performed on parallel computer architectures; large computing system composed by a multitude of CPUs interacting between each others.
+Nowadays the great majority of computational physics is performed on parallel computer architectures; 
+large computing systems composed by a multitude of CPUs interacting between each others.
 
 In any parallel computer system, CPUs working on different parts of the same job must communicate to exchange information. How precisely they should do this is the subject of much debate in the architectural community. 
 Two distinct designs, multiprocessors and multicomputers, have been proposed and implemented.
@@ -2294,7 +2297,7 @@ Cpu specifications:
 
 \subsection{Bias Factors}
 
-There are a number of factors that can impact on the performances of a \QE simulation both the systems	.
+There are a number of factors that can impact on the performances of a \QE simulation on both the systems.
 
 \subsubsection{Libraries and compilers}
 
@@ -2353,33 +2356,10 @@ For this reason all the tests we have done were performed using ``\textit{state 
 
 In modern HPC computing is common to share resources. Big multicomputers clusters are often used by thousands of users simultaneously.
 In this framework, if the amount of CPUs required by the task is less than the total number of CPUs available on the node, it is almost certain that the remaining CPUs will be occupied by other users' computations.
-As a consequence the L3 cache is divided among different uncoherent processes, as one can imagine the impact on performance is cannot be beneficial.
+As a consequence the L3 cache is divided among different uncoherent processes, as one can imagine the impact on performance cannot be beneficial.
 
 To estimate the effect of resource sharing on \QE simulations we performed a set of tests on the \CO  system. 
 
-On Galileo we have scheduled our runs completely reserving an entire node and without this precaution.
-
-To fully reserve a single node on the cluster one must use the following PBS \texttt{qsub} directive :
-\begin{verbatim}
-	PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
-\end{verbatim}
-
-Where the first number after the \texttt{select} statement is the number of nodes, \texttt{ncpus} is the number of CPUs to reserve, \texttt{mpiprocs} is the maximum number of MPI processes to be spawned and \texttt{mem} is the maximum memory required by the computation (on the single node).
-
-Finally, to occupy only a subset of cores and leave the others unused one must specify the total number of ranks to the MPI launcher :
-\begin{verbatim}
-	mpirun -np 1 pw.x
-\end{verbatim}
-where \texttt{-np 1} sets the number of mpi processes to use and \texttt{pw.x} is the executable.
-Note that in case threads are used, both explicitly or using the \texttt{OMP\_NUM\_THREADS} environment variable, the real number of CPUs used will be $N_{MPI ranks} \cdot N_{OMP threads}$.
-
-For example: to launch a 4 core run reserving the whole 16-core node the following submission script can be used:
-\begin{verbatim}
-#Other PBS directives
-#...
-#PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
-mpirun -np 4 pw.x -i input_file -o output_file 
-\end{verbatim}
 
 On Galileo cluster the results are reported in table \ref{tab:galileoNodeLoad}.
 
@@ -2407,7 +2387,8 @@ On the UV2000 we had the possibility to perform more extensive tests and the res
 \begin{center}
 	\captionsetup{justification=centering}
 	\includegraphics[width=0.7\linewidth]{sgiLoad.pdf}	
-	\caption{First plot: execution time of 1 rank independent PWscf process in function of the number of independent processes simultaneously running on the machine. Second Plot: execution time of 8 rank independent processes in function of the number of occupied processor on the machine.}
+	\caption{First plot: execution time of independent 1 rank PWscf process in function of the number of independent processes simultaneously running on the machine. 
+	\\Second Plot: execution time of independent 8 rank processes in function of the number of occupied processor on the machine.}
 	\label{fig:sgiLoad}
 \end{center}
 \end{figure}
@@ -2434,23 +2415,24 @@ The first bar occupies only one node per machine, the second occupies half of th
 The execution times are basically the same, our hypothesis is confirmed:
 
 \begin{center}
+\begin{framed}
 \textit{the UV2000 machine can be used to perform simultaneously different independent calculations, provided that each node (or set of nodes), is dedicated to the same task.}
+\end{framed}
 \end{center}
 
-The same results can be obtained with different numbers of MPI ranks per instance, see APPENDICE.
-\mynotes{metti appendice}
+The same results can be obtained with different numbers of MPI ranks per instance.
 
 \begin{framed}
 After these preliminary tests, we decided to run every calculation reserving the whole resource, being it a Galileo node or the whole UV2000 machine.
 \end{framed}
 
-
+To see how it's possible to reserve an entire Galileo node refer to appendix \ref{app:PBS}
 
 \subsubsection{Process migration (UV2000)}
 
 In modern multiprocessor architecture, even in a common desktop workstations, the Linux scheduler is used to migrate active processes from one CPU to another. 
 In machines with a single shared memory controller  or with multiple controllers with uniform memory access time \footnote{UMA \textit{Uniform Memory Access} machines.}, the migration of a process doesn't have an impact on performances.
-On NUMA machines instead, where the time to access a memory page depends on the page location withing the machine topology, this could negatively influence the performance of the code.
+On NUMA machines instead, where the time to access a memory page depends on the page location within the machine topology, this could negatively influence the performance of the code.
 On the UV2000, memory allocation requested by a process is performed on the same node the process is running on. 
 If the process is then migrated to another node the memory access time will increase roughly by a factor of five.\footnote{See section \ref{sec:UsefulCommands}.}
 The impact is mitigated by the NUMAlink behavior, which will migrate memory pages closer to the new process location (if available).
@@ -2526,11 +2508,11 @@ Thus \QE seems to adapt well to the NUMA environment.
 
 To evaluate the performance of the subroutines in \QE we mainly used two tools.
 
-\paragraph{Internal PWscf metrics}: when PWscf successfully completes a run, an extensive set of metrics are printed\footnote{On the stdout or the specified output file.}. 
+\paragraph{Internal PWscf metrics:} when PWscf successfully completes a run, an extensive set of metrics are printed\footnote{On the stdout or the specified output file.}. 
 For each of the main subroutines  \textit{cpu time}, \textit{wall time} and the number of calls are reported.
 See section \ref{sec:Metrics} for further detail on metrics values.
 
-\paragraph{Scorep code instrumenter}: \texttt{scorep}\cite{SCOREPManual} is a code instrumenter developed by the VI-HPS institute \cite{VH}. 
+\paragraph{Scorep code instrumenter:} \texttt{scorep}\cite{SCOREPManual} is a code instrumenter developed by the VI-HPS institute \cite{VH}. 
 A code instrumenter is a compiler wrapper able to ``\textit{instrument}" each function call inside source files.
 Namely, the time the subroutine is invoked and the time it exists are automatically stored.
 One of the great advantages of \texttt{scorep} is that it's a full \textit{in-memory instrumenter}, meaning that all the metrics computed are stored into the system RAM memory and are written to the disk only when the run is completed.
@@ -2546,7 +2528,7 @@ The metrics produced by these tools are compatible.\footnote{ Obviously after re
 
 In this work we were able to obtain most of the useful information from internal PWscf's metrics, nevertheless \texttt{scorep} was used for in-depth analysis of the call graph and to compute the percentage time spent during MPI communication.
 
-\paragraph{Developed tools :} I have developed a set of python scripts in order to analyze and plot internal metrics with a certain flexibility. The complete source code can be found at \cite{qetools}.
+\paragraph{Developed tools:} I have developed a set of python scripts in order to analyze and plot internal metrics with a certain flexibility. The complete source code can be found at \cite{qetools}.
 
 
 \subsection{Metrics}\label{sec:Metrics}
@@ -3412,7 +3394,7 @@ Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invec
 
 
 \newpage
-\subsection{Iterations Dynamic} \label{app:IterationDynamic}
+\section{Iterations Dynamic} \label{app:IterationDynamic}
 Se si vuole comparare si puo' usare lo speedup. 
 
 Risultato segue:
@@ -3424,7 +3406,7 @@ Risultato segue:
 	\label{fig:fixedvsvariablespeedup}
 \end{figure}
 
-\subsection{Threads}\label{app:Threads}
+\section{Threads}\label{app:Threads}
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=\linewidth]{A_threads.pdf}}
@@ -3439,7 +3421,7 @@ On rescaled runs figure \ref{fig:A_threads};
 \mynotes{Spiega rescaling}
 
 \newpage
-\subsection{Ndiag}\label{app:ndiag}
+\section{Ndiag}\label{app:ndiag}
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
 	\caption{``D" marks the default choice.
@@ -3455,6 +3437,30 @@ On rescaled runs figure \ref{fig:A_threads};
 	\label{fig:ndiagCineca}
 
 \end{figure}
+
+\section{Resource reservation on Galileo}\label{app:PBS}
+To fully reserve a single node on the cluster one must use the following PBS \texttt{qsub} directive :
+\begin{verbatim}
+	PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
+\end{verbatim}
+
+Where the first number after the \texttt{select} statement is the number of nodes, \texttt{ncpus} is the number of CPUs to reserve, \texttt{mpiprocs} is the maximum number of MPI processes to be spawned and \texttt{mem} is the maximum memory required by the computation (on the single node).
+
+Finally, to occupy only a subset of cores and leave the others unused one must specify the total number of ranks to the MPI launcher :
+\begin{verbatim}
+	mpirun -np 1 pw.x
+\end{verbatim}
+where \texttt{-np 1} sets the number of mpi processes to use and \texttt{pw.x} is the executable.
+Note that in case threads are used, both explicitly or using the \texttt{OMP\_NUM\_THREADS} environment variable, the real number of CPUs used will be $N_{MPI ranks} \cdot N_{OMP threads}$.
+
+For example: to launch a 4 core run reserving the whole 16-core node the following submission script can be used:
+\begin{verbatim}
+#Other PBS directives
+#...
+#PBS -l select=1:ncpus=16:mpiprocs=16:mem=20gb
+mpirun -np 4 pw.x -i input_file -o output_file 
+\end{verbatim}
+
 
 \end{appendices}
 
@@ -3562,6 +3568,15 @@ P. Giannozzi , S. Baroni , N. Bonini,``QUANTUM ESPRESSO: a modular and open-sour
 
 \bibitem{OMP}
 ``OpenMP Application Programming Interface", \url{http://www.openmp.org/mp-documents/openmp-4.5.pdf}
+
+\bibitem{BLAS}
+BLAS, ``Basic Linear Algebra Subprograms", \url{http://www.netlib.org/blas/}.
+
+\bibitem{LAPACK}
+LAPACK, ``Linear Algebra PACKage", \url{http://www.netlib.org/lapack/}
+
+\bibitem{SCALAPACK}
+ScaLAPACK, ``Scalable Linear Algebra PACKage", \url{http://www.netlib.org/scalapack/}
 
 \bibitem{FFTW}
 ``Fast Fourier Transform in the West" project page, \url{http://www.fftw.org/}.
