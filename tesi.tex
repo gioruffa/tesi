@@ -22,6 +22,8 @@
 \usepackage{caption}
 \usepackage{booktabs}
 
+\usepackage{fixltx2e}
+
 \usepackage{fancyhdr}
 \pagestyle{fancy}
 \fancyhead[LE,RO]{\slshape}
@@ -2679,9 +2681,18 @@ This section will underline the differences between the two architectures and pr
 
 \newpage
 
-\subsection{TiOH2}
-IMPORTANTE: Spiega perche' hai usato TITANIA.
+\subsection{The Physical System}
 
+
+Titanium dioxide (Titania) has been the subject of extensive research in recent years due to its relevant photochemical and photophysical properties combined with its natural abundance, low cost, and superior chemical and photostability. 
+
+Titanium dioxide is used in heterogeneous catalysis, as a photocatalyst, in solar cells for the production of hydrogen and electric energy, as gas sensor, as white pigment (e.g. in paints and cosmetic products), as a corrosion-protective coating, as an optical coating, in ceramics, and in electric devices such as varistors. 
+
+It is important in earth sciences, plays a role in the biocompatibility of bone implants, is being discussed as a gate insulator for the new generation of MOSFETS and as a spacer material in magnetic spin-valve systems, and finds applications in nanostructured form in Li-based batteries and electrochromic devices.
+
+For these reasons in this work we focused on the study of \QE performance when simulating Titanium dioxide  materials in nanocrystalline form.
+
+The full specification of PWscf input file can be fund in appendix \ref{app:titania}
 \newpage
 \subsection{Highlight of critical components}\label{sec:resCriticalComponents}
 
@@ -3380,6 +3391,13 @@ E' un modo per dire che seguendo le regole che abbiamo estrapolato e' possibile 
 Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invece vuoi fare un sacco di simulazioni contemporanemante fai quest'altro (threads).
 
 
+\section{Outlooks}
+
+Nuovi processori vanno verso le grandi quantita' di cores, sara' interessante vedere se converra' utilizzare la diagonalizzazione seriale o quella parallela e se varra' ancora la pena perdere performance nei confronti delle FFT.
+
+~
+
+
 
 
 \begin{appendices}
@@ -3461,6 +3479,18 @@ For example: to launch a 4 core run reserving the whole 16-core node the followi
 mpirun -np 4 pw.x -i input_file -o output_file 
 \end{verbatim}
 
+\section{PWscf input files}\label{app:inputFiles}
+\subsection{Titania}\label{app:titania}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/titania2.in}
+
+\subsection{Co3}\label{app:Co3}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/Co3.in}
+
+\subsection{AUSURF112}\label{app:Ausurf112}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/ausurf.in}
+
+\subsection{OLED}\label{app:Oled}
+\lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/CBP-relax.in}
 
 \end{appendices}
 
