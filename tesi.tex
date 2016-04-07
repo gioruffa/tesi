@@ -61,7 +61,7 @@
 \newcommand\numG{n_{G}}
 \newcommand\numR{n_{R}}
 \newcommand\bigO{\mathcal{O}}
-\newcommand\CO{CO3 } 
+\newcommand\CO{Co\textsubscript{3}O\textsubscript{4} } 
 %nome del sistema CO3
 
 \begin{document}
@@ -127,9 +127,9 @@ An outline of the structure of this work follows.
 In section \ref{sec:intro} we will review the theory behind ab initio calculations; starting from the Hartree-Fock method and concluding with the density functional theory.
 
 In section \ref{sec:QE} we will analyze how the components of self consistent density function theory are implemented inside \textsc{Quantum} ESPRESSO. 
-An analysis of the computational complexity is performed and a brief comparison with Hartree-Fock based softwares is exposed.
+An analysis of the computational complexity is performed and a brief comparison with Hartree-Fock-based softwares is exposed.
 
-In section \ref{sec:comparch} we will outline the main features of the computational architecture we had tested.
+In section \ref{sec:comparch} we will outline the main features of the computational architectures we tested.
 The structure of these systems, their differences and their strengths will be subject to an in-depth analysis along with a set of instructions to perform reliable tests.
 
 Sections \ref{sec:results} is dedicated to expose all the results we have obtained, characterizing how \QE adapts to each architecture, outlining how the critical components of the code performs and proposing simple rules to reach the best performance on any system.
@@ -2340,9 +2340,7 @@ Besides the FFTW, which is distributed within the \QE package, the libraries for
 A wide variety of implementation of those libraries exists each of these can be compiled with different compilers.
 There are two popular compilers used by \QE community: GNU compilers and Intel compilers \footnote{\QE is implemented using different languages (fortran, C, C++,...) }.
 
-
-\mynotes{metti una reference al paragrafo dove spieghi il \CO}
-We performed a simple test on Galileo using both the compilers on the \CO system. 
+We performed a simple test on Galileo using both the compilers on the Cobalt(II,III)oxide system( \CO, see appendix \ref{app:Co3}). 
 We measure the execution time\footnote{See section \ref{sec:Metrics}.} of the PWscf package compiled with different configurations: 
 \begin{itemize}
 	\item \textbf{GNU} : GNU compiler suite v4.9.2, OpenMPI v1.8.4, FFTW v3.3.4, BLAS v3.5.0, SCALAPACK 2.0.2\footnote{ All the libraries were compiled using the GNU suite.}.
@@ -3062,7 +3060,7 @@ This flexibility generates a wide range of possible combinations, especially whe
 
 In appendix \ref{app:Threads} we reported the results of our tests for all the possible combinations, both for fixed and variable number of SCF iterations.
 
-From the data exposed in \ref{app:Threads} we have composed two optimal set of runs for fixed and variable \footnote{The difference is only at 32 cores.} number of iterations.
+From the data exposed in appendix \ref{app:Threads} we have composed two optimal set of runs for fixed and variable \footnote{The difference is only at 32 cores.} number of iterations.
 The general rule was to keep the best result per total number of cores employed.\footnote{ The total number of cores is the number of MPI ranks times the number of threads per rank.}
 
 The results, compared with the runs without threads, are exposed in figure \ref{fig:threadsOverall}.
@@ -3399,38 +3397,61 @@ To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summariz
 \end{framed}
 \end{center}
 
+
+
+In the following we report PWscf's speedup on a series of different systems\footnote{Non optimized runs only.}, which were chosen to span the common dimensions of nanocrystalline systems.
+
 \begin{itemize}
-	\item the lower the size the same is the scaling $\rightarrow$ cluster is better
-	\item the bigger the size the more important is the matrix diagonalization $\rightarrow$ NUMA is better
+	\item As a ``\textit{small}" system we used the \CO system (see figure \ref{fig:conclCo3} and appendix \ref{app:Co3}).
+	\item As a ``\textit{medium-small}" system we used the AUSURF112 PRACE system\cite{prace} (see figure \ref{fig:conclAusurf} appendix \ref{app:Ausurf112}).
+	\item We consider the TiO\textsubscript{2} a ``\textit{medium-large}" system (see figure \ref{fig:conclTitania}).
+	\item An organic OLED crystal was used to simulate a ``\textit{large}" system (see figure \ref{fig:conclOled} and appendix \ref{app:Oled}).
 \end{itemize}
 
-
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=1.2\linewidth]{concl_co3.pdf}	}
-	\caption{}
+\centerline{ \includegraphics[width=1.\linewidth]{concl_co3.pdf}	}
+	\caption{PWscf's speedup for a ``\textit{small}" scale \CO system.}
 	\label{fig:conclCo3}
 \end{figure}
 
-\newpage
-\begin{figure}[hhh!]
-\centerline{ \includegraphics[width=0.7\linewidth]{concl_ausurf.pdf}	}
-	\caption{}
-	\label{fig:conclCo3}
-\end{figure}
 
-\newpage
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=1.2\linewidth]{concl_titania.pdf}	}
-	\caption{}
+\centerline{ \includegraphics[width=0.5\linewidth]{concl_ausurf.pdf}	}
+	\caption{PWscf's speedup for a ``\textit{medium-small}" scale AUSURF system.}
+	\label{fig:conclAusurf}
+\end{figure}
+\newpage
+
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.\linewidth]{concl_titania.pdf}	}
+	\caption{PWscf's speedup for a ``\textit{medium-large}" scale TiO\textsubscript{2} system.}
 	\label{fig:conclTitania}
 \end{figure}
 
 \newpage
 \begin{figure}[hhh!]
-\centerline{ \includegraphics[width=0.7\linewidth]{concl_oled.pdf}	}
-	\caption{}
+\centerline{ \includegraphics[width=0.5\linewidth]{concl_oled.pdf}	}
+	\caption{PWscf's speedup for a ``\textit{large}" scale OLED system.}
 	\label{fig:conclOled}
 \end{figure}
+
+
+Starting from the \CO system we can see that on \textit{small} scale systems there is only a slight advantage of the UV2000, which is limited to scaling and not to CPU time.
+
+
+The fact that the scalability plots of AUSURF (figure \ref{fig:conclAusurf}) and Titania (figure \ref{fig:conclTitania}) are incredibly alike (AUSURF was performed only at fixed number of iterations), suggests that the UV2000 is particularly suited to simulate this kind of systems; 
+where more than a hundred atoms with large empty portions of the supercell are present.
+
+We can say that when the system starts to increase in size, the UV2000 has a noticeable advantage compared to Galileo.
+Note that at 32 and 64 cores also the CPU time of the UV2000 is lower than Galileo's one, meaning that the advantage is both on scaling and overall performance.
+
+We can impute this to the increasing relevance of matrix diagonalization over matrix evaluation\footnote{We have seen that \texttt{h\_psi} speedup difference is less impac	ting that \texttt{cdiaghg}'s one.} and the subsequent necessity of high performance communication as said above and in \cite{QE2}.
+
+
+The advantage (in time and scalability) is maintained also on particularly large and complex systems, like OLED crystals (figure \ref{fig:conclOled}), but not increased; suggesting some sort of saturation.
+Unfortunately to investigate further this aspect, larger resources are needed, three points on a plot seems not to be sufficient.
+Consider also that, unfortunately, the time at our disposal was insufficient\footnote{Actually it was terminated.} to produce more precise profiling metrics (i.e. using \texttt{scorep}).
 
 \newpage
 \section{Discussion and Conclusion}\label{sec:conclusions}
@@ -3442,9 +3463,12 @@ E' un modo per dire che seguendo le regole che abbiamo estrapolato e' possibile 
 Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invece vuoi fare un sacco di simulazioni contemporanemante fai quest'altro (threads).
 
 
-\section{Outlooks}
+%How this theory translates into an algorithm and how this algorithm is implemented.
+%Also the numerical complexity of each step was investigated.
 
-Nuovi processori vanno verso le grandi quantita' di cores, sara' interessante vedere se converra' utilizzare la diagonalizzazione seriale o quella parallela e se varra' ancora la pena perdere performance nei confronti delle FFT.
+\subsection{Outlooks}
+
+%Nuovi processori vanno verso le grandi quantita' di cores, sara' interessante vedere se converra' utilizzare la diagonalizzazione seriale o quella parallela e se varra' ancora la pena perdere performance nei confronti delle FFT.
 
 ~
 
@@ -3453,6 +3477,7 @@ Nuovi processori vanno verso le grandi quantita' di cores, sara' interessante ve
 
 \begin{appendices}
 
+\newpage
 \section{Makefiles} \label{app:makefiles}
 \subsection{Galielo}
 \lstinputlisting[language=make,basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/make.sys.galileo}
@@ -3490,7 +3515,13 @@ On rescaled runs figure \ref{fig:A_threads};
 \mynotes{Spiega rescaling}
 
 \newpage
+
+~
+
+\newpage
+
 \section{Ndiag}\label{app:ndiag}
+
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
 	\caption{``D" marks the default choice.
@@ -3498,7 +3529,7 @@ On rescaled runs figure \ref{fig:A_threads};
 	\label{fig:ndiagSgi}
 
 \end{figure}
-
+\newpage
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{cineca_ndiag.pdf}}
 	\caption{ ``D" marks the default choice.
@@ -3530,11 +3561,13 @@ For example: to launch a 4 core run reserving the whole 16-core node the followi
 mpirun -np 4 pw.x -i input_file -o output_file 
 \end{verbatim}
 
+\newpage 
+
 \section{PWscf input files}\label{app:inputFiles}
 \subsection{Titania}\label{app:titania}
 \lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/titania2.in}
 
-\subsection{Co3}\label{app:Co3}
+\subsection{\CO}\label{app:Co3}
 \lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/Co3.in}
 
 \subsection{AUSURF112}\label{app:Ausurf112}
