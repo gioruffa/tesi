@@ -106,10 +106,41 @@ External Advisor: {\it Dott. Davide Ceresoli}\\
 
 
 \section{Ab Initio calculations in modern Solid State Physics}
-\mynotes{importanza dei conti nel calcula delle strutture elettroniche}
+The electronic structure (ES) of materials, which in the general  sense  determines  all  their  physical  properties,  can be  determined  accurately  by  ab  initio  (first-principles)  ES calculations,  i.e.  from  fundamental  quantum  theory.
 
+Here the atomic numbers of constituent atoms and, usually, some structural information are employed as the only input data.
+Such calculations are routinely performed within the framework of the density functional theory in which the complicated many-body interaction of all electrons is replaced by an equivalent but simpler problem of a single electron moving  in  an  effective  potential.
 
-\section{Theoretical Introduction}\label{model:sec}
+For  a  given  material, the calculated total energies can be used to obtain equilibrium lattice parameters, elastic moduli, relative stabilities of competing crystal structures, energies associated with point
+and planar defects, etc. 
+
+In addition, we also obtain information  about  electronic  densities  of  states  and  charge  densities that enables us to attain deeper insights and learn which aspects of the problem are important.
+
+The calculations are usually  performed  at  zero  temperature  (0 K),  but  the  results  obtained  often  constitute  the  basis  for  understanding finite-temperature properties.
+
+This work focuses on the study of the \QE suite, in particular the PWscf package,  one of the most reliable and widespread  suite of codes for quantum chemistry calculations of nanostructures.
+
+PWscf package implements an iterative approach to reach self-consistency, using at each step iterative diagonalization techniques, in the framework of density functional theory and plane waves basis set.
+
+An outline of the structure of this work follows.
+
+In section \ref{sec:intro} we will review the theory behind ab initio calculations; starting from the Hartree-Fock method and concluding with the density functional theory.
+
+In section \ref{sec:QE} we will analyze how the components of self consistent density function theory are implemented inside \textsc{Quantum} ESPRESSO. 
+An analysis of the computational complexity is performed and a brief comparison with Hartree-Fock based softwares is exposed.
+
+In section \ref{sec:comparch} we will outline the main features of the computational architecture we had tested.
+The structure of these systems, their differences and their strengths will be subject to an in-depth analysis along with a set of instructions to perform reliable tests.
+
+Sections \ref{sec:results} is dedicated to expose all the results we have obtained, characterizing how \QE adapts to each architecture, outlining how the critical components of the code performs and proposing simple rules to reach the best performance on any system.
+
+Finally, section \ref{sec:conclusions} contains a summary and the conclusions we inferred from the results obtained along with a series of outlooks.
+
+As a final note we want to highlight that a great amount of work was done simulating real case systems, i.e. system that have been used to produce scientific results, avoiding as much as possible the use of ad-hoc benchmarks, which are more interesting for hardware vendors than the scientific community.
+
+\newpage
+
+\section{Theoretical Introduction}\label{sec:intro}
 
 This section will cover the basic theory upon which Quantum ESPRESSO is based.
 
@@ -2681,18 +2712,39 @@ This section will underline the differences between the two architectures and pr
 
 \newpage
 
-\subsection{The Physical System}
+\subsection{Titanium Dioxide}\label{sec:titania}
 
-
-Titanium dioxide (Titania) has been the subject of extensive research in recent years due to its relevant photochemical and photophysical properties combined with its natural abundance, low cost, and superior chemical and photostability. 
+Titanium dioxide (TiO\textsubscript{2} or  Titania) has been the subject of extensive research in recent years due to its relevant photochemical and photophysical properties combined with its natural abundance, low cost, and superior chemical and photostability \cite{Titania1},\cite{Titania3}. 
 
 Titanium dioxide is used in heterogeneous catalysis, as a photocatalyst, in solar cells for the production of hydrogen and electric energy, as gas sensor, as white pigment (e.g. in paints and cosmetic products), as a corrosion-protective coating, as an optical coating, in ceramics, and in electric devices such as varistors. 
 
-It is important in earth sciences, plays a role in the biocompatibility of bone implants, is being discussed as a gate insulator for the new generation of MOSFETS and as a spacer material in magnetic spin-valve systems, and finds applications in nanostructured form in Li-based batteries and electrochromic devices.
+It is important in earth sciences, plays a role in the biocompatibility of bone implants, is being discussed as a gate insulator for the new generation of MOSFETS and as a spacer material in magnetic spin-valve systems, and finds applications in nanostructured form in Li-based batteries and electrochromic devices \cite{Titania2},\cite{Titania4},\cite{Titania5}.
 
-For these reasons in this work we focused on the study of \QE performance when simulating Titanium dioxide  materials in nanocrystalline form.
+For these reasons, in this work we focused on the study of \QE performance when simulating Titanium dioxide  materials in nanocrystalline form.
 
-The full specification of PWscf input file can be fund in appendix \ref{app:titania}
+The supercells hosts a surface of TiO\textsubscript{2} in which proximity is present an H\textsubscript{2} molecule.
+To simulate the surface configuration it is necessary to extend the supercell on the z axis leaving a wide portion of the cell empty.
+
+Note that in this way the number of plane waves needed to approximate empty regions of space increases significantly, both because the cell is bigger (see section \ref{sec:FFT}) and because the Kohn-Sham orbitals must be null if no electron is expected to be found, implying an higher number of Fourier's coefficients to null the state function.
+
+The system is composed by 54 Titania atoms, 108 Oxygen atoms and 2 atoms of Hydrogen for a total of 2054 electrons; 
+The full specification of PWscf input file can be fund in appendix \ref{app:titania}. 
+A rendering of the system is represented in figure \ref{fig:titania}.
+
+This kind of system was chosen as a representative sample of all the possible configurations that can be studied, it is also compelling for molecular dynamic simulations, where a great number of sequenced SCF iterations have to be performed.
+
+\begin{figure}[hhh!]
+
+\centerline{\includegraphics[scale=0.5]{titania_crystal.png}}
+	\caption{Test system: TiO\textsubscript{2} surface with an H\textsubscript{2} molecule in proximity.}
+	\label{fig:titania}
+
+\end{figure}
+
+\newpage
+
+~
+
 \newpage
 \subsection{Highlight of critical components}\label{sec:resCriticalComponents}
 
@@ -2975,7 +3027,6 @@ First of all we need to understand what is happening and how \QE performs the di
 The first thing to notice is that at one and two cores the diagonalization is performed serially, only by the first MPI rank. This is why the CPU time of \texttt{cdiaghg} is the same at one and two cores.
 
 Starting at four cores a different approach is used: a parallel and full memory distributed ScaLAPACK diagonalization is performed \cite{QE2}.
-\mynotes{how ranks are picked}
 
 %core/core diagonalizzazione
 %8/4
@@ -3382,7 +3433,7 @@ To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summariz
 \end{figure}
 
 \newpage
-\section{Discussion and Conclusion}
+\section{Discussion and Conclusion}\label{sec:conclusions}
 
 Mi piacerebbe costruire una progressione con le migliori run dei threads a basso numero di core e i migliori dati ottenuti ottimizzando la diagonalizzazione e confrontarlo con il comportamento di default dell'espresso.
 
@@ -3609,7 +3660,7 @@ LAPACK, ``Linear Algebra PACKage", \url{http://www.netlib.org/lapack/}
 ScaLAPACK, ``Scalable Linear Algebra PACKage", \url{http://www.netlib.org/scalapack/}
 
 \bibitem{FFTW}
-``Fast Fourier Transform in the West" project page, \url{http://www.fftw.org/}.
+``Fast Fourier Transform in the West", \url{http://www.fftw.org/}.
 
 
 \bibitem{Marx}
@@ -3680,6 +3731,30 @@ L. E. Cannon,
 Montana State University,
 1969.
 
+\bibitem{Titania1}
+C. Marchiori, G. Di Liberto, G. Soliveri, L. Loconte, L. Lo Presti, D. Meroni, M. Ceotto, C. Oliva, S. Cappelli, G. Cappelletti, C. Aieta, S. Ardizzone,
+``Unraveling the Cooperative Mechanism of Visible-Light Absorption in Bulk N,Nb Codoped TiO\textsubscript{2} Powders of Nanomaterials",
+The Journal of Physical Chemistry C \textbf{118} 41, (2014).
+
+\bibitem{Titania2}
+U. Diebold,
+``The surface science of titanium dioxide",
+Surf. Sci. Rep. \textbf{48} 53-229, (2003) .
+
+\bibitem{Titania3}
+O. Carp, 
+``Photoinduced Reactivity of Titanium Dioxide", 
+Prog. Solid State Chem. \textbf{32}, 33−177, (2004).
+
+\bibitem{Titania4}
+X. Chen, S. Mao, 
+``Titanium Dioxide Nanomaterials: Synthesis, Properties, Modifications, and Applications", 
+Chem. Rev. \textbf{107}, 2891−2959 (2007).
+
+\bibitem{Titania5}
+A. Fujishima, X. Zhang,D. Tryk, 
+``Tio2 Photocatalysis and Related Surface Phenomena", 
+Surf. Sci. Rep. \textbf{63}, 515−582 (2008).
 
 \end{thebibliography}
 
