@@ -3446,7 +3446,7 @@ where more than a hundred atoms with large empty portions of the supercell are p
 We can say that when the system starts to increase in size, the UV2000 has a noticeable advantage compared to Galileo.
 Note that at 32 and 64 cores also the CPU time of the UV2000 is lower than Galileo's one, meaning that the advantage is both on scaling and overall performance.
 
-We can impute this to the increasing relevance of matrix diagonalization over matrix evaluation\footnote{We have seen that \texttt{h\_psi} speedup difference is less impac	ting that \texttt{cdiaghg}'s one.} and the subsequent necessity of high performance communication as said above and in \cite{QE2}.
+We can impute this to the increasing relevance of matrix diagonalization over matrix evaluation\footnote{We have seen that \texttt{h\_psi} speedup difference is less impac	ting that \texttt{cdiaghg}'s one.} and the subsequent necessity of high performance communication( see above and \cite{QE2}).
 
 
 The advantage (in time and scalability) is maintained also on particularly large and complex systems, like OLED crystals (figure \ref{fig:conclOled}), but not increased; suggesting some sort of saturation.
@@ -3489,18 +3489,18 @@ Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invec
 
 \newpage
 \section{Iterations Dynamic} \label{app:IterationDynamic}
-Se si vuole comparare si puo' usare lo speedup. 
-
-Risultato segue:
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=0.6\linewidth]{fixed_vs_variable_speedup.pdf}}
-	\caption{ ha davvero poco senso, meglio mettere in appendice.
+	\caption{ Speedup comparison between fixed and variable iterations.
 	}
 	\label{fig:fixedvsvariablespeedup}
 \end{figure}
 
 \section{Threads}\label{app:Threads}
+
+In absence of a run at fixed number of iterations we have performed a rescaling of the CPU time and WALL time of all the functions.
+To rescale factor was calculated obtaining the CPU time at the end of the 20\textsuperscript{th} iteration ( this information can bee extracted form PWscf output, see \cite{qetools}) and dividing it by the total PWscf's CPU time.
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=\linewidth]{A_threads.pdf}}
@@ -3510,9 +3510,14 @@ Risultato segue:
 	\label{fig:A_threads}
 \end{figure}
 
-
-On rescaled runs figure \ref{fig:A_threads};
-\mynotes{Spiega rescaling}
+\newpage
+\subsection{Overthreading}
+Looking at figure \ref{fig:A_threadsOverload} it is clear that use an excessive number of threads (more than the number of cores on the resource) is counterproductive.
+\begin{figure}[hhh!]
+	\centerline{\includegraphics[width=0.5\linewidth]{threads_overload.pdf}}
+	\caption{ CPU time with 8 threads per MPI rank (total of 64 threads) and 9 threads for MPI rank (total of 72 threads).}
+	\label{fig:A_threadsOverload}
+\end{figure}
 
 \newpage
 
