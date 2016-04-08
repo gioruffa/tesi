@@ -3466,7 +3466,7 @@ We studied its critical features and mechanisms.
 
 Starting from the computational limits of HF method we introduced the density functional theory (DFT), which shifts the problem from finding exact electronic orbitals to finding the ground state electronic density.
 We highlighted how in this framework variational approaches translates into a new SCF formulation, and how the choice of plane waves as a basis set impacts on the computational dimensionality of the problem.
-A comparison between HF and DFT was performed to underline how this new theory can overcome previous computational limits.
+A comparison between HF and DFT was performed to underline how this new theory overcomes previous computational limits.
 
 Only at this point we were able to fully understand how SCF DFT is translated into real world algorithms inside QE.
 We studied how each step of the SCF cycle is implemented, what algorithm are used to perform the calculations, what are the subroutines implementing each step of the SCF cycle and what are the computational complexities of each relevant subroutine.
@@ -3480,7 +3480,7 @@ We performed also a series of introductory tests to find the main factors that c
 We also outlined all the critical aspects that rises when trying to evaluate the performance of an SCF algorithm; namely the numerical instability associated both to the number of iterations needed to reach self consistency and the differences in execution time of each iterative step.
 We also performed an in depth analysis of where and how interprocess communication (MPI) is performed within the code.
 
-Given the knowledge accumulated we finally had all the tools to properly tune the computational architecture for QE calculations.
+Given the knowledge accumulated, we finally had all the tools to properly tune the computational architecture.
 
 Our results can be structured in two main categories : architecture independent tuning and architecture dependent tuning.
 
@@ -3501,30 +3501,59 @@ For Galileo cluster the best results were achieved reducing the number of cores 
 On the contrary, for the UV2000 the best results are obtained by increasing as much as possible the cores dedicated to diagonalization.
 Since distributed matrix diagonalization performs high volume communication, shared memory architectures proves to be more efficient for this kind of calculations.
 
-To conclude this work we propose two plots that summarizes the improvements obtained by applying the tuning strategies discussed above.
+To conclude this work we propose in figure \ref{fig:conclFinalComparison}	two plots that summarizes the improvements obtained by applying the tuning strategies discussed above.
+
+\begin{figure}[hhh!]
+\centerline{ \includegraphics[width=1.2\linewidth]{concl_final_comparison.pdf}	}
+	\caption{Tuned runs were performed applying the rules exposed in section \ref{sec:results}.}
+	\label{fig:conclFinalComparison}
+\end{figure}
+
+We can see that our tuning strategies have a positive impact both at fixed and variable iterations.
+
+Another important thing to note is that on the right plot we have finally reached linear scaling after the one node limit is passed and this was only possible with proper tuning strategies.
+
+Also note that at 16 cores a properly tuned run on the Galileo cluster can still outscore a default run on the UV2000, but when more than one cluster node is needed the UV2000 have a sensible lead.
+
+The fact that the multiprocessor system outscores the multicomputer system especially at variable number of iterations (i.e. until self-consistency is reached) should motivate a certain interest in investigating further how ab initio calculations can benefit from this kind of computational architecture.
 
 
 \newpage
-
-Mi piacerebbe costruire una progressione con le migliori run dei threads a basso numero di core e i migliori dati ottenuti ottimizzando la diagonalizzazione e confrontarlo con il comportamento di default dell'espresso.
-
-E' un modo per dire che seguendo le regole che abbiamo estrapolato e' possibile effettuare un tuning su entrambe le architetture a prescindere dal numero di core che si vogliono utilizzare, senza dover mettere le mani nel codice o settare parametri esotici.
-
-Della serie se hai fretta (e vuoi usare tanti core) fai questo (ndiag), se invece vuoi fare un sacco di simulazioni contemporanemante fai quest'altro (threads).
-
-
-%How this theory translates into an algorithm and how this algorithm is implemented.
-%Also the numerical complexity of each step was investigated.
-
 \subsection{Outlooks}
 
-%Nuovi processori vanno verso le grandi quantita' di cores, sara' interessante vedere se converra' utilizzare la diagonalizzazione seriale o quella parallela e se varra' ancora la pena perdere performance nei confronti delle FFT.
+This work have outlined some interesting aspects of \QE SCF DFT implementation.
 
-~
+\paragraph{Numerical (in)stability} We have seen in section \ref{sec:resCriticalComponents} that the time required to complete a single SCF iteration step varies considerably from step to step.
+By investigating further the distribution of the CPU time of each step, no particular trend or distribution can be inferred.
+We think that a further analysis of the implementation can lead to better results an increase the efficiency of the cycle.
 
-%migliorare stabilita' numerica di ogni iterazione
+Also the wide difference in the number of iterations needed to reach self-consistency while changing the number of total cores is somewhat of an unexpected behavior. 
+Note that the variation of the number of cores dedicated to diagonalization do not affects SCF dynamics, the energies obtained at the end of each step are exactly the same, regardless of the number of cores implied.
+This suggests that the instability must lies in the evaluation of the Hamiltonian and that better convergence performance can still be achieved.
 
-%investigare a fondo perche' il numero diverso id core a disposizione abbia degli impatti cosi' grandi sulla stabilita' SCF
+One possible approach to narrow the causes could be to variate independently the size of the various MPI communicators available in QE and measure how the number of iterations changes.
+
+\paragraph{Multithreading} The other unexpected result was that the use of threads could enhance performance, especially at variable iterations. 
+It is interesting to note that modern HPC processors will host a constantly greater number of cores, embedding the technologies developed for Intel Xeon Phi accelerators inside the main board chipset (the so-called MIC architecture).
+How this new technology is going to impact on QE performances is hard to predict beforehand but it will be interesting to see if the trade-off between an FFT performance loss and an linear algebra performance boost will still pay on such scale.
+
+
+\paragraph{Matrix multiplication algorithms} In section \ref{sec:resArchDependent} section we have stated that QE needs a $n*n$ grid of cores (where $n$ is a natural number) to perform a full memory distributed matrix multiplication.
+This limitation can leave a considerable number of cores unused.
+It would be interesting to see if the use of different algorithms without this limitation can positively impact on QE performances, especially on the UV2000 where increasing the number of diagonalization cores seems only to enhance the performance. 
+For example the SUMMA (Scalable Universal Matrix Multiplication Algorithm) algorithm doesn't require an $n*n$ grid to work.
+
+We have also seen in section \ref{sec:resArchDependent} that the default number of diagonalization cores was the optimal one only when 32 total cores where used on Galileo. 
+In previous version of QE the diagonalization of a test matrix was performed during the initialization with different numbers of diagonalization cores, in order to find the optimal one.
+The approach was deprecated because considered unreliable.
+
+In the current release the size of the diagonalization communicator is calculated in function of the number of total cores employed. 
+Maybe an approach that takes under consideration also the dimension of the system could lead to a better guess.
+
+
+\paragraph{Increasing the resources} It would be interesting to see for how long the linear scaling achieved in figure \ref{fig:conclFinalComparison} will be maintained and if the advantages of the UV2000 will still stand on bigger nanocrystals and on different regions of the core's scale.
+
+Also the coupling of the UV2000 with the GPU accellerators can lead to interesting results.
 
 
 
