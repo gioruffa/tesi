@@ -1,0 +1,130 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage[english]{babel} 
+\usepackage{fixltx2e}
+
+% Dimensione della pagina
+\setlength{\oddsidemargin}{.1in}  % Distance from the left edge -1 inch 
+\setlength{\textwidth}{165mm}     % Normal width of the text
+\setlength{\topmargin}{.25in}     % Distance from top to PAGE'S HEAD -1 inch
+\setlength{\textheight}{225mm}    % Height of the body of page
+\setlength{\headheight}{0mm}      % Height of a box containing the head
+\setlength{\parskip}{0.5mm}         % Extra vertical space before a paragraph
+\setlength{\parindent}{4mm}       % Width of the indentation 
+\linespread{1.12}                 % Line spacing
+
+\begin{document}
+
+\thispagestyle{plain}
+\begin{center}
+	\vspace*{-4cm}
+    \Large
+    \textbf{ Tuning the computational architecture for Quantum Espresso ab initio calculation of nanostructures }
+    
+    \vspace{0.4cm}
+    \textbf{Giorgio Ruffa}
+    
+    \vspace{0.5cm}
+    \textbf{Summary}
+\end{center}
+
+Quantum Espresso (QE) is one of the most reliable and widespread  suite of codes for quantum chemistry calculations of nanostructures\cite{QE}. 
+Given the relevance of QE for the condensed matter physics community, the aim of this work was to find tuning strategies to optimize QE performances on two different computational architectures: 
+the CINECA Galileo multicomputer cluster and the Sgi UV2000 shared-memory CC-NUMA multiprocessor.
+
+To fully understand the behavior of QE a considerable amount of preparatory work had been performed.
+First we studied the theoretical foundations of ab initio calculations, familiarizing with the fundamental Hartree-Fock (HF) self consistent field (SCF) method\cite{Attila}.
+Starting from the computational limits of HF method we introduced density functional theory (DFT)\cite{Parr} upon which QE is based.
+We highlighted how, in this framework, variational approaches translates into a new, computationally efficient, SCF formulation\cite{Martin}.
+
+Only at this point we were able to fully understand how each step of the SCF cycle is implemented\cite{Marx}.
+We highlighted what algorithm are used to perform the calculations, what are the subroutines implementing each step of the SCF cycle and what are the computational complexities of each relevant subroutine.
+
+
+Once the mechanics of QE were clear, we underlined all the differences between the two computational architectures, which mainly lies in the presence or absence of global shared memory and the interconnect technology adopted\cite{Tanenbaum}.
+We performed also a series of introductory tests to find the main factors that could bias our measurements and reported clear methods to minimize them. 
+We also outlined all the critical aspects that rises when trying to evaluate the performance of an SCF algorithm; namely the numerical instability associated both to the number of iterations needed to reach self consistency and the differences in execution time of each iterative step.
+An in-depth analysis of communication (MPI) patterns within the code was also perfomed.
+The knowledge we gained (theoretically and technically) gave us the necessary tools to obtain solid results that can be divided in two main categories : architecture independent and architecture dependent tuning.
+
+For architecture independent tuning we found that, in contrast to what reported in literature, multi-threading parallelization (OpenMP) can have a strong positive impact when a relatively low number of cores is employed.
+This result can be of great interest for hight throughput computing scenarios or when shared computational resources are overloaded and low parallelized runs performed locally can lead to sooner results than high parallelized jobs waiting to be executed on massive, nevertheless overcrowded, shared clusters.
+
+With an architecture dependent perspective we found that the UV2000 is more suited to perform calculations of ``\textit{medium size}" systems\cite{Titania1}\cite{prace} (one hundred to two hundreds atoms in surface configuration) while Galileo cluster has a general advantage on ``\textit{small size}" systems (approximately fifty atoms).
+We have also performed a brief test with a ``\textit{large}" organic OLED crystal confirming that the advantage of the UV2000.
+
+We also found that UV2000's performances overtakes Galileo's ones when two or more Galileo's cluster nodes are employed.
+This suggested a more efficient handling of the interprocess communication performed by the UV2000, this impression was confirmed by the profiling metrics obtained with professional tools and by comparing the behavior of QE's communication subroutines.
+
+We also found that linear algebra constitutes a major bottleneck above the 8 core landmark and the methods to optimize its performance are very different between the two architectures.
+For Galileo cluster the best results are achieved reducing the number of cores dedicated to linear algebra, while on the UV2000 increasing them as much as possible lead to the best results (as discouraged in literature\cite{QE2}), marking a clear advantage for shared-memory architectures.
+
+Applying the resulting tuning strategies we were able to obtain a sensible boost in performance and finally reach linear scaling on both architectures.
+
+\begin{thebibliography}{9}
+
+
+\bibitem{QE}
+P. Giannozzi , S. Baroni , N. Bonini,``QUANTUM ESPRESSO: a modular and open-source software project for quantum simulations of materials", J. Phys.: Condens. Matter \textbf{21} 395502 (19pp), (2009).
+
+\bibitem{Attila}
+A. Szabo, N. S. Ostlund,
+Modern Quantum Chemistry: Introduction to Advanced Electronic Structure Theory,
+Dover Pubblications, New York,
+1996.
+
+
+\bibitem{Parr}
+R. G. Parr, W. Yang,
+Density Functional Theory of Atoms and Molecules,
+Oxford University Press,
+1989.
+
+
+\bibitem{Martin}
+R. Martin, 
+Electronic Structure,
+Cambridge University Press,
+2008.
+
+
+\bibitem{Marx}
+D. Marx, J. Hutter,
+Ab initio Molecular Dynamics,
+Basic Theory and Advanced Methods,
+Cambridge University Press,
+2009.
+
+
+\bibitem{Tanenbaum}
+A. S. Tanenbaum, T. Austin,
+Structured Computer Organization,
+Sixth edition,
+Pearson,
+2012
+
+
+\bibitem{Titania1}
+C. Marchiori, G. Di Liberto, G. Soliveri, L. Loconte, L. Lo Presti, D. Meroni, M. Ceotto, C. Oliva, S. Cappelli, G. Cappelletti, C. Aieta, S. Ardizzone,
+``Unraveling the Cooperative Mechanism of Visible-Light Absorption in Bulk N,Nb Codoped TiO\textsubscript{2} Powders of Nanomaterials",
+The Journal of Physical Chemistry C \textbf{118} 41, (2014).
+
+\bibitem{prace}
+I. Girotto, N. Varini, F. Spiga, C. Cavazzoni, D. Ceresoli, L. Martin-Samos, T. Gorni,
+``Enabling of Quantum ESPRESSO to Petascale Scientific Challenges",
+PRACE Whitepapers,
+PRACE,
+(2012).
+
+\bibitem{QE2}
+P. Giannozzi, C. Cavazzoni,
+``Large-scale computing with QUANTUM Espresso",
+Il Nuovo Cimento, Vol. \textbf{32 C}, N. 2, (2009).
+
+
+
+
+
+
+\end{thebibliography}
+
+\end{document}

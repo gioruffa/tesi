@@ -73,7 +73,7 @@
 Dipartimento di Fisica, Universit\`a degli Studi di Milano,\\
 Via Celoria 16, 20133 Milano, Italia
 }
-\date{April 22, 2016} % the exact date of graduation, when available
+\date{April 28, 2016} % the exact date of graduation, when available
 
 
 \include {frontespizio} % eccezionalmente qui include il frontespizio
@@ -866,7 +866,6 @@ The iterative method outlined below will be explained in terms of Roothaan equat
 	\item If the difference between $\mathbf{C'}$ and $\mathbf{C} $ is under our consistency threshold, we reached self-consistency and the computation is concluded. Otherwise the iteration is repeated from step 3 with $\mathbf{C'}$ as the new matrix of the expansion coefficients. Alternatively it is possible to check that the total energy has reached a minimum (even though usually only the lowest $\varepsilon_i$ is used in the comparison).
 \end{enumerate}
 
-\mynotes{ma una bella immaginetta???}
 
 The iteration proceeds until the expansion coefficients are stable within multiple iterations. In reality the matrix $\mathbf{C'}$ is not used ``\textit{as is}"" to start the next iteration, it's usually combined with a subset of the previously obtained coefficients matrices. This is done to speed up the convergence towards self consistency.
 
@@ -1839,7 +1838,7 @@ Note that because ions' position is fixed under the Born-Oppenheimer approximati
 
 As said above, the calculation of $\tilde{v}(\GI)$ happens inside the \texttt{init\_run} routine in the first evaluation of $v_{eff}$.
 
-\mynotes{in realta' puo' essere costoso anche applicarli gli pseudopotenziali per via di come sono fatti. (Davide)}
+
 
 \paragraph{The Hartree Potential:}
 
@@ -3464,7 +3463,7 @@ First we studied the theoretical foundations of ab initio calculations, familiar
 We studied its critical features and mechanisms.
 
 Starting from the computational limits of HF method we introduced the density functional theory (DFT), which shifts the problem from finding exact electronic orbitals to finding the ground state electronic density.
-We highlighted how, in this framework, variational approaches translates into a new SCF formulation, and how the choice of plane waves as a basis set impacts changes computational dimensionality of the problem.
+We highlighted how, in this framework, variational approaches translates into a new SCF formulation, and how the choice of plane waves as a basis set changes the computational dimensionality of the problem.
 A comparison between HF and DFT was performed to underline how this new theory overcomes previous computational limits.
 
 Only at this point we were able to fully understand how SCF DFT is translated into real world algorithms inside QE.
@@ -3579,6 +3578,7 @@ Also the coupling of the UV2000 with the GPU accellerators can lead to interesti
 	\label{fig:fixedvsvariablespeedup}
 \end{figure}
 
+\newpage
 \section{Threads}\label{app:Threads}
 
 In absence of a run at fixed number of iterations we have performed a rescaling of the CPU time and WALL time of all the functions.
@@ -3625,6 +3625,7 @@ Looking at figure \ref{fig:A_threadsOverload} it is clear that use an excessive 
 
 \end{figure}
 
+\newpage
 \section{Resource reservation on Galileo}\label{app:PBS}
 To fully reserve a single node on the cluster one must use the following PBS \texttt{qsub} directive :
 \begin{verbatim}
