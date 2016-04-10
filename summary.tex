@@ -23,7 +23,7 @@
     \vspace{0.4cm}
     \textbf{Giorgio Ruffa}
     
-    \vspace{0.5cm}
+    \vspace{0.2cm}
     \textbf{Summary}
 \end{center}
 
@@ -32,33 +32,33 @@ Given the relevance of QE for the condensed matter physics community, the aim of
 the CINECA Galileo multicomputer cluster and the Sgi UV2000 shared-memory CC-NUMA multiprocessor.
 
 To fully understand the behavior of QE a considerable amount of preparatory work had been performed.
-First we studied the theoretical foundations of ab initio calculations, familiarizing with the fundamental Hartree-Fock (HF) self consistent field (SCF) method\cite{Attila}.
-Starting from the computational limits of HF method we introduced density functional theory (DFT)\cite{Parr} upon which QE is based.
-We highlighted how, in this framework, variational approaches translates into a new, computationally efficient, SCF formulation\cite{Martin}.
+First we studied the theoretical foundations of \textit{ab initio} calculations, familiarizing with the fundamental Hartree-Fock (HF) self consistent field (SCF) method\cite{Attila}.
+Then, starting from the computational limits of HF method we introduced density functional theory (DFT)\cite{Parr} upon which QE is based.
+We highlighted how, in this framework, the variational approach translates into a new, computationally efficient, SCF formulation\cite{Martin}.
 
 Only at this point we were able to fully understand how each step of the SCF cycle is implemented\cite{Marx}.
-We highlighted what algorithm are used to perform the calculations, what are the subroutines implementing each step of the SCF cycle and what are the computational complexities of each relevant subroutine.
+Therefore we highlighted which algorithm are used to perform the calculations, which are the subroutines implementing each step of the SCF cycle and which are the computational complexities of each relevant subroutine.
 
 
 Once the mechanics of QE were clear, we underlined all the differences between the two computational architectures, which mainly lies in the presence or absence of global shared memory and the interconnect technology adopted\cite{Tanenbaum}.
-We performed also a series of introductory tests to find the main factors that could bias our measurements and reported clear methods to minimize them. 
-We also outlined all the critical aspects that rises when trying to evaluate the performance of an SCF algorithm; namely the numerical instability associated both to the number of iterations needed to reach self consistency and the differences in execution time of each iterative step.
-An in-depth analysis of communication (MPI) patterns within the code was also perfomed.
-The knowledge we gained (theoretically and technically) gave us the necessary tools to obtain solid results that can be divided in two main categories : architecture independent and architecture dependent tuning.
+We also performed a series of introductory tests to find the main factors that could bias our measurements and we reported precise methods to minimize them. 
+We also outlined all the critical aspects that rise when trying to evaluate the performance of an SCF algorithm; namely the numerical instability associated both to the number of iterations needed to reach self consistency and the differences in the execution time of each iterative step.
+An in-depth analysis of communication (MPI) patterns within the code was also performed.
+The theoretical and technical knowledge we gained was essential to give us the necessary tools to obtain solid results. Said results can be divided in two main categories : architecture independent tuning and architecture dependent tuning.
 
-For architecture independent tuning we found that, in contrast to what reported in literature, multi-threading parallelization (OpenMP) can have a strong positive impact when a relatively low number of cores is employed.
-This result can be of great interest for hight throughput computing scenarios or when shared computational resources are overloaded and low parallelized runs performed locally can lead to sooner results than high parallelized jobs waiting to be executed on massive, nevertheless overcrowded, shared clusters.
+For architecture independent tuning we discovered that, in contrast to what reported in literature, multi-threading parallelization (OpenMP) can have a strong positive impact when a relatively low number of cores is employed.
+This result can be of great interest for hight throughput computing scenarios or when shared computational resources are overloaded and low parallelized runs performed locally can lead to sooner results than high parallelized jobs waiting to be executed on massive, nevertheless overcrowded, clusters.
 
-With an architecture dependent perspective we found that the UV2000 is more suited to perform calculations of ``\textit{medium size}" systems\cite{Titania1}\cite{prace} (one hundred to two hundreds atoms in surface configuration) while Galileo cluster has a general advantage on ``\textit{small size}" systems (approximately fifty atoms).
-We have also performed a brief test with a ``\textit{large}" organic OLED crystal confirming that the advantage of the UV2000.
+With an architecture dependent perspective we found that the UV2000 multiprocessor is more suited to perform calculations of ``\textit{medium size}" systems\cite{Titania1}\cite{prace} (one hundred to two hundreds atoms in surface configuration) whereas Galileo cluster has a general advantage on ``\textit{small size}" systems (approximately fifty atoms).
+We have also performed a brief test with a ``\textit{large}" organic OLED crystal confirming the advantage of the UV2000.
 
 We also found that UV2000's performances overtakes Galileo's ones when two or more Galileo's cluster nodes are employed.
-This suggested a more efficient handling of the interprocess communication performed by the UV2000, this impression was confirmed by the profiling metrics obtained with professional tools and by comparing the behavior of QE's communication subroutines.
+This suggested a more efficient handling of the interprocess communication performed by the UV2000, this hypothesis was confirmed by the profiling metrics obtained with professional tools and by comparing the behavior of QE's communication subroutines.
 
-We also found that linear algebra constitutes a major bottleneck above the 8 core landmark and the methods to optimize its performance are very different between the two architectures.
-For Galileo cluster the best results are achieved reducing the number of cores dedicated to linear algebra, while on the UV2000 increasing them as much as possible lead to the best results (as discouraged in literature\cite{QE2}), marking a clear advantage for shared-memory architectures.
+We also found that linear algebra constitutes a major bottleneck above the eight cores landmark and the methods to optimize its performance are very different between the two architectures.
+The best results from Galileo cluster are achieved reducing the number of cores dedicated to linear algebra, whereas on the UV2000 multiprocessor the increase of said cores as much as possible leads to the best results (therefore this increase is  oftentimes discouraged in literature\cite{QE2}), marking a clear advantage for shared-memory architectures.
 
-Applying the resulting tuning strategies we were able to obtain a sensible boost in performance and finally reach linear scaling on both architectures.
+Applying the resulting tuning strategies, we were able sensibly boost the performance of the code and finally reach a linear scaling on both the architectures.
 
 \begin{thebibliography}{9}
 
