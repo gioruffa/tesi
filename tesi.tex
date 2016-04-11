@@ -298,7 +298,7 @@ The complete approximate solution to \eqref{eq:theHamiltonian} will be  \cite[p.
 Since this work will mainly focus on the \textit{``electronic problem"}, from now on we will drop the suffix ``$e$" for the Hamiltonian $H_{e}$.
 
 \subsection{The Hartree Product}
-\subsubsection{Spin-Orbit}
+\subsubsection{Spin-Orbital}
 We introduce two single particle spin functions  $\alpha(\omega), \beta(\omega)$, corresponding respectively to spin up and spin down.
 The only conditions we impose is that these two functions are orthonormal and form a complete set of auto-functions for the spin operator $\hat{S}_z$ \footnote{Even if it isn't necessary to specify the eigenvalues of the spin operator (as stated in \cite{Attila}), we prefer to specify them since we'll deal only with fermions. }:
 
@@ -589,7 +589,7 @@ Using \eqref{eq:SlaterLeibniz}, the orthonormality of the spin-orbitals composin
 
 \begin{align}
 	& \bra{\Psi} \mathcal{O}_{1} \ket{\Psi} = \sum_{i}^{N} \bra{\chi_{i}} \hat{h}_i \ket{\chi_{i}} ;\\
-	& \bra{\Psi} \mathcal{O}_{2} \ket{\Psi} = \frac{1}{2} \sum_{i \neq j}^{N} \bra{\chi_i \chi_i} \frac{1}{r_{ij}} \ket{ \chi_{i} \chi_{i}} - \bra{\chi_i \chi_j} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}}.
+	& \bra{\Psi} \mathcal{O}_{2} \ket{\Psi} = \frac{1}{2} \sum_{i \neq j}^{N} \bra{\chi_i \chi_i} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{j}} - \bra{\chi_i \chi_j} \frac{1}{r_{ij}} \ket{ \chi_{j} \chi_{i}}.
 \end{align}
 
 Introducing the following notation:
@@ -601,7 +601,7 @@ Introducing the following notation:
 
 we can express expectation energy for a single Slater determinant as :
 \begin{equation}
-	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{i} - \ksqrt{i}{j}.
+	\bra{\Psi} \hat{H} \ket{\Psi} = \sum_{i}^{N} \bra{i} \hat{h} \ket{i} + \frac{1}{2} \sum_{i \neq j}^{N} \jsqrt{i}{j} - \ksqrt{i}{j}.
 \end{equation}
 
 Still the equation is not separable and far from being reduced to an eigenvalue problem, but we have an handy expression for the expectation energy of the state of the system
@@ -814,8 +814,6 @@ Equation \eqref{eq:RoothaanEquation} is called the \textit{Roothaan equation} an
 
 
 \subsubsection{The Self Consistent Field Method} \label{sec:SCF}
-
-
 
 We have finally obtained an expression of $\hat{V}_{ee}$ that keeps the electronic Hamiltonian \eqref{eq:H_elec} separated.
 
