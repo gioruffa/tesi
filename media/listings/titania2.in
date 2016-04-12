@@ -38,6 +38,7 @@ ATOMIC_SPECIES
     H 1.00794 H.pbe-van_ak.UPF
     Ti 47.867 Ti.pbe-sp-van_ak.UPF
     O 15.9994 O.pbe-van_ak.UPF
+    U oy htiw Be.ecrof-eht.YAM
  
 ATOMIC_POSITIONS (angstrom)
  H      9.5000      8.00000     14.70    !  1

@@ -106,7 +106,7 @@ External Advisor: {\it Dott. Davide Ceresoli}\\
 
 
 \section{Ab Initio calculations in modern Solid State Physics}
-The electronic structure (ES) of materials, which in the general  sense  determines  all  their  physical  properties,  can be  determined  accurately  by  ab  initio  (first-principles)  ES calculations,  i.e.  from  fundamental  quantum  theory.
+The electronic structure (ES) of materials, which in the general  sense  determines  all  their  physical  properties,  can be  determined  accurately  by  ab initio  (first-principles)  ES calculations,  i.e.  from  fundamental  quantum  theory.
 
 Here the atomic numbers of constituent atoms and, usually, some structural information are employed as the only input data.
 Such calculations are routinely performed within the framework of the density functional theory in which the complicated many-body interaction of all electrons is replaced by an equivalent but simpler problem of a single electron moving  in  an  effective  potential.
@@ -2645,7 +2645,7 @@ To summarize the configuration used for all the tests:
 \section{Results}\label{sec:results}
 This section consists of a very deep insight into all the components of the PWscf package and their interaction with the computational architecture used.
 
-Therefore what follows can be considered as a very technical section, both for the tools used and for the observations made.
+Therefore, what follows can be considered as a very technical section, both for the tools used and the observations made.
 
 Nevertheless we will try to expose the results from two points of views :
 \begin{itemize}
@@ -2814,7 +2814,7 @@ Is it possible to have a rough estimate of the weight of communication over comp
 \end{figure}
 
 In figure \ref{fig:cubeMPI} we have two screenshots taken directly from \texttt{cube}, the \texttt{scorep} visualization tool (see section \ref{sec:profTools}).
-As one can see the subroutines are represented in a call tree.
+The subroutines are represented in a call tree.
 
 The number on the left of each subroutine is the percentage of bytes sent using MPI communication library inside the subroutine. 
 The percentage is calculated over the total number of bytes sent in the whole execution, i.e. an absolute metric.
@@ -2861,7 +2861,7 @@ As a result only the final communication subroutines (MPI, in this case) have no
 We can clearly see that 88\% of the bytes sent/received are exchanged using the \texttt{MPI\_Allreduce} subroutine.
 This subroutine is an all-to-all function that performs a reduce operation\footnote{Applies a function on a subset of data and yields the result, in parallel.} and broadcasts the result of the computation to all the MPI ranks in the communicator. An MPI communicator is a well defined group of MPI ranks.
 
-In the design of \QE's communication layer, the developers have favored all-to-all directives. 
+In the design of \QE communication layer, the developers have favored all-to-all directives. 
 This kind of approach is very popular because it provides a cleaner design and a less error-prone implementation.
 The popularity of all-to-all directives have induced interconnect vendors and MPI developers to particularly optimize this kind of communication, which in architecture with vast topologies can constitute a scalability problem.
 To mitigate this effect \QE provides a series of nested communicators, which size can be modified according to the computational infrastructure. 
@@ -2902,7 +2902,8 @@ Hence the time necessary to obtain a physically reliable result can vary in func
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{iterstats.pdf}}
-	\caption{ iter stats
+	\caption{ Mean iteration CPU time in seconds in function of the number of cores employed, the error bar represent the standard deviation (see table \ref{tab:iterations}.
+	The plot on the right is in logarithmic scale to highlight the weight of the standard deviation.
 	}
 	\label{fig:iterstats}
 \end{figure}
@@ -2963,16 +2964,16 @@ In order to profile and compare the performances of PWscf and its subroutines in
 We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
 reasonable run time\footnote{Read below for a more precise justification of this choice.}.
 
-We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state community.
+We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state physics community.
 Hence the need for a more ``pragmatical" point of view.
 
-This is why from now on we will report the results with both with fixed and variable iterations.
+This is why from now on we will report the results with both fixed and variable iterations.
 
 An alternative approach, which is mainly used in industry benchmarks\cite{HPC}, is to fix the WALL time dedicated to computation and count the number of iterations performed.
 This approach has two main downsides: 
 first we will lose the data provided by the internal metrics, which are accountable and do not implies any form of overhead; 
 second, for the data to be reliable, a reasonable number of iterations at a single core will be requested. 
-In our case, for a twenty step iteration, the execution time is six hours, which will imply to reserve the computational resource for that amount of time for every test performed.
+In our case, for a twenty step iteration, the execution time is six hours, which would imply to reserve the computational resource for that amount of time for every test performed.
 Since the time we had available was not indefinite and the resources, especially the UV2000, had to be shared without the help of a batch scheduler, we decided to fix the number of iterations and use the CPU time as a metric.
 
 This gave us the possibility to perform many more tests and investigate more aspects of \QE scalability.
@@ -2983,7 +2984,7 @@ Nevertheless the mean iteration time can be used as a general indicator of the d
 \newpage
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{fixed_vs_variable.pdf}}
-	\caption{ iter stats
+	\caption{ CPU time (seconds) for variable number of iterations on the left and fixed number (20) of iterations on the right.
 	}
 	\label{fig:fixedvsvariable}
 \end{figure}
@@ -3052,7 +3053,7 @@ This is done setting the \texttt{OMP\_NUM\_THREADS} environmental variable to th
 In general it is suggested that the total number of threads must not exceed the number of physical cores on the resource (see appendix \ref{app:Threads}).
 
 The total number of threads can be obtained easily by multiplying the number of threads per MPI rank times the number of MPI ranks.
-For example if we have a 64 core resource and we want to use 16 MPI ranks, the number of threads per MPI rank should not be more than 4.
+For example if we have a 64 core resource and we want to use 16 MPI ranks, the number of threads per MPI rank should not exceed 4.
 
 This flexibility generates a wide range of possible combinations, especially when the number of core increases.
 
@@ -3216,7 +3217,7 @@ At 32 cores we have the same performance and at 64 cores the UV2000 outperforms 
 
 By comparing the speedup (right plot of figure \ref{fig:archCompareIterations}) we can get a picture on what architecture is scaling the best.
 
-As we were suspecting the speedup of UV2000 marks a sensible improvement after eight cores.
+As we were suspecting, the speedup of UV2000 marks a sensible improvement after eight cores.
 To get a more precise idea it is convenient to look at the PWscf execution CPU time.
 
 
@@ -3303,7 +3304,7 @@ Figure \ref{fig:archMpiPerc} reports the total percentage of time (calculated ov
 
 We can see that the number increases particularly after 16 cores, as expected, and that it is a remarkably high percentage.
 
-On both architecture more than 40\% of the CPU time is spent in communication when the number of cores is more than sixteen, this is a remarkably high number and points out that communication plays a central role in tuning the architecture performance.
+On both architecture more than 40\% of the CPU time is spent in communication when the number of cores is more than sixteen, this is a considerably high number and points out that communication plays a central role in tuning the architecture performance.
 
 We can see also that Galileo spends more time in communication compared to the UV2000, and the gap increases with the number of cores.
 
@@ -3326,10 +3327,10 @@ Matrix diagonalization constitutes a major bottleneck in this kind of simulation
 Obviously this observation is true considering also that matrix evaluation has been finely optimized by \QE developers.
 
 We still have one way to affect how diagonalization is performed (besides threads), but this option is effective only on a sufficiently high number of cores.
-To be more clear we need to explain how matrix multiplication is perfomed by \QE when four cores or more are used.
+To be more clear, we need to explain how matrix multiplication is perfomed by \QE when four cores or more are used.
 
 \QE uses the Cannon's algorithm\cite{Cannon} for parallel matrices multiplication\cite{QE2}. 
-This algorithm needs to distribute the matrices\footnote{Which in our case are always squared!} in a bi-dimensional grid of actors, in our case actors is a synonym of MPI rank.
+This algorithm needs to distribute the matrices\footnote{Which in our case are always squared!} in a bi-dimensional grid of ``actors", in our case actors is a synonym of MPI rank.
 This implies that the number of ranks dedicated to the matrix diagonalization is $n^2$ where $n$ is a natural number.
 Hence, given our resources, the possible values are as follows:
 \begin{equation*}
@@ -3383,7 +3384,7 @@ To conclude this ``\textit{\nameref{sec:resArchDependent}}"  section we summariz
 
 \begin{figure}[hhh!]
 \centerline{ \includegraphics[width=1.2\linewidth]{ndiag_speedup.pdf}	}
-	\caption{PWscf's speedup comparison between default runs and runs that optimizes the number of diagonalization processors.}
+	\caption{PWscf's speedup comparison between default runs and runs that optimizes the number of diagonalization processors (fixed number of iterations).}
 	\label{fig:ndiagSpeedup}
 \end{figure}
 
@@ -3456,13 +3457,13 @@ Consider also that, unfortunately, the time at our disposal was insufficient\foo
 
 The aim of this work was to find tuning strategies to optimize \QE (QE) performances on different computational architectures.
 
-In order to do it properly a great amount of preparatory work had to be performed.
+In order to do it properly a great amount of preparatory work was performed.
 
 First we studied the theoretical foundations of ab initio calculations, familiarizing with the first, and nowadays still popular, self consistent field (SCF) method: the Hartree-Fock (HF) method.
 We studied its critical features and mechanisms.
 
 Starting from the computational limits of HF method we introduced the density functional theory (DFT), which shifts the problem from finding exact electronic orbitals to finding the ground state electronic density.
-We highlighted how, in this framework, variational approaches translates into a new SCF formulation, and how the choice of plane waves as a basis set changes the computational dimensionality of the problem.
+We highlighted how, in this framework, the variational approach translates into a new SCF formulation, and how the choice of plane waves as a basis set changes the computational dimensionality of the problem.
 A comparison between HF and DFT was performed to underline how this new theory overcomes previous computational limits.
 
 Only at this point we were able to fully understand how SCF DFT is translated into real world algorithms inside QE.
@@ -3489,7 +3490,7 @@ With an architecture dependent perspective we found that the UV2000 is more suit
 We have also performed a brief test with a ``\textit{large}" organic OLED crystal confirming that the advantage of the UV2000 is still present but not increased compared to medium size systems.
 
 We also found that UV2000's performances overtakes Galileo's ones when two or more Galileo's cluster nodes are employed in the calculations.
-This suggested a more efficient handling of the interprocess communication performed by the UV2000, this impression was confirmed by the profiling metrics obtained and by comparing the behavior of QE's communication routines.
+This suggests a more efficient handling of the interprocess communication performed by the UV2000, this impression was confirmed by the profiling metrics obtained and by comparing the behavior of QE's communication routines.
 
 We also found that matrix diagonalization still constitutes a major bottleneck above the 8 core landmark and we found that the methods to optimize its performances where very different between the two architectures.
 
@@ -3553,6 +3554,12 @@ Maybe an approach that takes under consideration also the dimension of the syste
 Also the coupling of the UV2000 with the GPU accellerators can lead to interesting results.
 
 
+\paragraph{Predictive analytics for better tuning} How many \QE calculations are performed every day? It sure is an interesting amount of profiling metrics, generated for free by the PWscf profiler. 
+In this work we have seen that these metrics are reliable and can lead to efficient tuning strategies.
+We have also seen that such strategies varies strongly with the computational architecture and the size and type of the physical system.
+In my opinion it could be incredibly interesting to harvest and accumulate all those metrics along with systems configurations and computational architecture specifications to see if it is possible to find trends and algorithms to predict better tuning parameters beforehand.
+It will require for sure a great amount of collaboration within the community, a solid infrastructure and great analytical capabilities, but I hardly doubt that the costs will be higher than a couple of racks of the next top 500 supercomputer.
+
 
 
 \begin{appendices}
@@ -3569,6 +3576,8 @@ Also the coupling of the UV2000 with the GPU accellerators can lead to interesti
 
 \newpage
 \section{Iterations Dynamic} \label{app:IterationDynamic}
+
+Various metrics relative to single iterations and their behavior in function of the number of cores employed.
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=0.6\linewidth]{fixed_vs_variable_speedup.pdf}}
@@ -3619,6 +3628,8 @@ Looking at figure \ref{fig:A_threadsOverload} it is clear that use an excessive 
 
 \newpage
 \section{Diagonalization cores}\label{app:ndiag}
+
+PWscf performances in function of the total number of diagonalization cores (\texttt{-ndiag} flag).
 
 \begin{figure}[hhh!]
 	\centerline{\includegraphics[width=1.2\linewidth]{sgi_ndiag.pdf}}
@@ -3675,6 +3686,7 @@ mpirun -np 4 pw.x -i input_file -o output_file
 \subsection{OLED}\label{app:Oled}
 \lstinputlisting[basicstyle=\tiny ,breaklines=true,tabsize=2]{media/listings/CBP-relax.in}
 
+
 \end{appendices}
 
 
@@ -3694,7 +3706,7 @@ mpirun -np 4 pw.x -i input_file -o output_file
 %  BIBLIOGRAPHY
 %------------------------------------------------------------------
 \clearpage
-May the force be with you.
+
 \addcontentsline{toc}{section}{Bibliography}
 \begin{thebibliography}{9}
 
