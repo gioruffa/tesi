@@ -1,12 +1,14 @@
-\documentclass[10pt]{beamer}
+\documentclass[8pt]{beamer}
 
 
 
 \mode<presentation>
 {
-  \usetheme{Berkeley}
+%  \usetheme{Berkeley}
+	\usetheme{Dresden}
 %	\usetheme{Berlin}
-%   \usecolortheme{}
+%   \usecolortheme{dove}
+%   \usecolortheme{dolphin}
 %   \useinnertheme{circles}
    
   \setbeamercovered{transparent}
@@ -26,13 +28,17 @@
 \usepackage{amsmath}
 \usepackage[absolute,overlay]{textpos}
 \usepackage{physics}
+\usepackage{fixltx2e}
 
 \graphicspath{{./media/images/}}
 
 \definecolor{paint}{RGB}{150,0,0}
 \setbeamercolor {structure} {fg=paint}
-\setbeamercolor{title}{fg=black}
-\setbeamertemplate{itemize items}[circle]
+%\setbeamercolor{title}{fg=black}
+%\setbeamertemplate{itemize items}[circle]
+
+
+
 
 \newcommand{\jsqrt}[2]{\bqty{ #1 #1 | #2 #2 }}
 \newcommand{\ksqrt}[2]{\bqty{ #1 #2 | #2 #1 }}
@@ -71,29 +77,62 @@
 \end{frame}
 
 \section{Introduzione}
+\subsection{\QE e la Density Functional Theory}
+% ********** slide 2 *****************
 
-% ********** 2 slide *****************
+\begin{frame}{Introduzione}
+\begin{center}
+		\includegraphics[width=4cm]{beam_qe_logo.jpg}
+\end{center}
+\begin{columns}
+	\column{0.33\textwidth}
+		\begin{center}
+			\includegraphics[height=3.5cm]{beam_co3.png}
+		\end{center}
+	\column{0.33\textwidth}
+		\begin{center}
+			\includegraphics[height=3.5cm]{titania_crystal.png}
+		\end{center}
+	\column{0.33\textwidth}
+		\begin{center}
+			\includegraphics[height=3.5cm]{beam_cbp.png}
+		\end{center}
+\end{columns}
+		
+\end{frame}
+
+
 \begin{frame}{Introduzione}
 
-\begin{textblock*}{3cm}(2cm,2cm) 
-	\includegraphics[width=3cm]{beam_qe_logo.jpg}
-\end{textblock*}
 
-\begin{textblock*}{3cm}(9cm,2cm)
-	\includegraphics[width=3cm]{titania_crystal.png}
-\end{textblock*}
+\begin{columns}
+	\column{0.5\textwidth}
+%		\begin{center}
+%			\includegraphics[width=4cm]{beam_qe_logo.jpg}		
+%		\end{center}
+	
+	\invisible<1>{\begin{block}{Density Functional Theory (DFT)}
+		\begin{itemize}
+			\setlength\itemsep{1em}
+			\item[]<2-> Equazioni di Kohn-Sham :
+			\item[]<2-> $ \displaystyle  \lbrace  - \frac{1}{2} \nabla_{i}^2+ v_{eff}(\erre) \rbrace 	\psi_{i}^{KS}(\erre) = \varepsilon_{i}^{KS} 	\psi_{i}^{KS}(\erre)$
+			\item[]<3-> $ \displaystyle  v_{eff}(\erre) = v_{ion}(\erre) + v_{h}(\erre) + v_{xc}(\erre)$
+			\item[]<3-> $ \displaystyle v_{h}(\erre) = \int \frac{\rho(\erre')}{\mid \erre - \erre'\mid} \dd{\erre'} $
+			\item[]<3-> $ \displaystyle v_{xc}(\erre) =	\frac{\var{E_{xc}[\dens]}}{\var{\dens}}$
+		\end{itemize}
+	\end{block}}
+		
+	\column{0.5\textwidth}
+		\begin{center}
 
-\begin{textblock*}{10cm}(2cm,4.5cm)
-Density Functional Theory (DFT) \\
-Equazioni Kohn-Sham : 
-\begin{align*}
-&\lbrace  - \frac{1}{2} \nabla_{i}^2+ v_{eff}(\erre) \rbrace 	\psi_{i}^{KS}(\erre) = \varepsilon_{i}^{KS} \psi_{i}^{KS}(\erre)\\
-&v_{eff}(\erre) = v_{ion}(\erre) + v_{h}(\erre) + v_{xc}(\erre) \\ 
-&v_{h}(\erre) = \int \frac{\rho(\erre')}{\mid \erre - \erre'\mid} \dd{\erre'}\\ 
-&v_{xc}(\erre) =	\frac{\var{E_{xc}[\dens]}}{\var{\dens}}
-\end{align*}
+			\includegraphics[width=3.5cm]{titania_crystal.png}	\\
 
-\end{textblock*}
+			~ \\
+			Superficie TiO\textsubscript{2} : \\ $\sim 150$ Atomi , $\sim 2 \cdot 10 ^{3} e^{-}$	
+
+		\end{center}
+\end{columns}
+
 
 
 \end{frame}
