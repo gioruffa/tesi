@@ -57,8 +57,8 @@
 \newcommand\CO{Co\textsubscript{3}O\textsubscript{4} } 
 
 
-\title[Tuning the computational architecture for Quantum Espresso ab initio calculation of nanostructures] % (optional, use only with long paper titles)
-{Tuning the computational architecture for Quantum Espresso ab initio calculation of nanostructures}
+\title[Tuning the computational architecture for Quantum Espresso \textit{ab initio} calculation of nanostructures] % (optional, use only with long paper titles)
+{Tuning the computational architecture for Quantum Espresso \textit{ab initio} calculation of nanostructures}
 
 \author[Giorgio Ruffa] 
 {Giorgio Ruffa}
@@ -77,7 +77,7 @@
 \end{frame}
 
 \section{Introduzione}
-\subsection{\QE e la Density Functional Theory}
+\subsection{Density Functional Theory}
 % ********** slide 2 *****************
 
 \begin{frame}{Introduzione}
@@ -136,6 +136,8 @@
 \end{frame}
 
 % ********** slide 4 *****************
+\section{SCF DFT in \QE}
+
 \begin{frame}{Self Consistent DFT}
 \begin{center}
 	\includegraphics[width=\textwidth]{beam_SCF_0.pdf}	
@@ -143,13 +145,172 @@
 \end{frame}
 
 
+% ********** slide 5 *****************}
 
-% ********** slide 5 *****************
-\begin{frame}{Self Consistent}
-\begin{center}
-	\includegraphics[width=\textheight]{beam_relevant_subroutines.pdf}	
-\end{center}
+\def \inputPos {3}
+\def \electronsPos {4}
+\def \cegtergPos {5}
+\def \hpsiPos {6}
+\def \cdiaghgPos {7}
+\def \sumbandPos {8}
+\def \fftPos {9}
+\def \fftscatterPos {10}
+
+\begin{frame}{Self Consistent DFT}
+\vbox{
+    \begin{minipage}[t][0.5\textheight][t]{\textwidth}
+    	\begin{columns}
+    		\column{0.5\textwidth}
+			   \begin{flushleft}
+			   	\only<1,\fftPos,\fftscatterPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_0.pdf}	
+				}
+				\only<2>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_PWSCF.pdf}	
+				}
+				\only<\inputPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_init_run.pdf}	
+				}
+				\only<\electronsPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_electrons.pdf}	
+				}				
+				\only<\cegtergPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_cegterg.pdf}	
+				}
+				\only<\hpsiPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_h_psi.pdf}	
+				}
+				\only<\cdiaghgPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_cdiaghg.pdf}	
+				}
+				\only<\sumbandPos>{
+					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_sum_bands.pdf}	
+				}
+
+				\end{flushleft}    	
+			\column{0.5\textwidth}
+
+				\only<1->{\vspace{-1cm}}
+				
+				\only<1,2>{
+
+					\begin{block}{Pacchetto PWscf} 
+						\begin{itemize}
+							\item Self Consistent DFT
+							\item Onde Piane come \textit{basis-set}
+						\end{itemize}
+					\end{block}
+				}
+				
+				\only<\inputPos>{
+					\begin{block}{Inizializzazione} 
+						\begin{itemize}
+							\item calcolo $\dens$ iniziale
+							\item calcolo primi autovettori
+							\item calcolo energia inizale
+					\end{itemize}
+					\end{block}
+				}
+				
+				\only<\electronsPos>{
+					\begin{block}{Problema elettronico} 
+						\begin{itemize}
+							\item Intero ciclo SCF
+							\item Al termine si ottiene $\dens$ di ground state
+					\end{itemize}
+					\end{block}
+				}
+				\only<\cegtergPos>{
+					\begin{block}{Bande elettroniche} 
+						\begin{itemize}
+							\item Risoluzione equazioni di Kohn-Sham\\in forma matriciale
+					\end{itemize}
+					\end{block}
+				}
+				\only<\hpsiPos>{
+					\begin{block}{Valutazione Hamiltoniana} 
+						\begin{itemize}
+							\item Applicazione laplaciano in spazio reciproco
+							\item Applicazione del potenziale in spazio reale
+						\end{itemize}
+					\end{block}
+				}
+				\only<\cdiaghgPos>{
+					\begin{block}{Diagonalizzazione Hamiltoniana} 
+						\begin{itemize}
+							\item Algoritmo iterativo di Davidson
+						\end{itemize}
+					\end{block}
+				}
+				\only<\sumbandPos>{
+					\begin{block}{Calcolo densit\`a elettronica} 
+						\begin{itemize}
+							\item calcolo occupazione orbitali
+							\item $\displaystyle \dens = \sum_{i} \psi_{i}^{*KS}(\erre) ~ \psi_{i}^{KS}(\erre)$
+						\end{itemize}
+					\end{block}
+				}
+				\only<\fftPos,\fftscatterPos>{
+					\begin{block}{Moduli generici} 
+						\begin{itemize}
+							\visible<\fftPos,\fftscatterPos>{\item Calcolo FFT}
+							\visible<\fftscatterPos>{\item Distribuzione griglia}
+
+						\end{itemize}
+					\end{block}
+				}
+				
+    	\end{columns}
+
+    \end{minipage}
+
+    \nointerlineskip
+    \begin{minipage}[b][0.5\textheight][t]{\textwidth}
+        	\begin{columns}
+			\column{0.5\textwidth}
+				
+			\column{0.5\textwidth}
+				\vspace{-1cm}
+				\begin{center}
+			   	\only<1>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines.pdf}	
+				}
+				\only<2>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_PWSCF.pdf}	
+				}
+				\only<3>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_init_run.pdf}	
+				}
+				\only<4>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_electrons.pdf}	
+				}
+				\only<5>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_cegterg.pdf}	
+				}
+				\only<6>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_h_psi.pdf}	
+				}
+				\only<7>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_cdiaghg.pdf}	
+				}				
+				\only<8>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_sum_band.pdf}	
+				}
+				\only<9>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_fftw.pdf}	
+				}
+				\only<10>{
+					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_fft_scatter.pdf}	
+				}
+				
+				\end{center}    	
+    	\end{columns}
+
+    \end{minipage}
+}
+
 \end{frame}
+
 
 
 
