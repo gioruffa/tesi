@@ -137,7 +137,7 @@
 
 % ********** slide 4 *****************
 \section{SCF DFT in \QE}
-
+\subsection{Implementazione Self Consistent Field DFT in \QE}
 \begin{frame}{Self Consistent DFT}
 \begin{center}
 	\includegraphics[width=\textwidth]{beam_SCF_0.pdf}	
@@ -155,42 +155,45 @@
 \def \sumbandPos {8}
 \def \fftPos {9}
 \def \fftscatterPos {10}
+\def \scfPicWidth {1.1}
+\def \scfPicHeight {0.62}
 
-\begin{frame}{Self Consistent DFT}
+\begin{frame}{Funzioni rilevanti}
 \vbox{
     \begin{minipage}[t][0.5\textheight][t]{\textwidth}
     	\begin{columns}
     		\column{0.5\textwidth}
+
 			   \begin{flushleft}
 			   	\only<1,\fftPos,\fftscatterPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_0.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_0.pdf}	
 				}
 				\only<2>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_PWSCF.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_PWSCF.pdf}	
 				}
 				\only<\inputPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_init_run.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_init_run.pdf}	
 				}
 				\only<\electronsPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_electrons.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_electrons.pdf}	
 				}				
 				\only<\cegtergPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_cegterg.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_cegterg.pdf}	
 				}
 				\only<\hpsiPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_h_psi.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_h_psi.pdf}	
 				}
 				\only<\cdiaghgPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_cdiaghg.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_cdiaghg.pdf}	
 				}
 				\only<\sumbandPos>{
-					\includegraphics[height=0.53\textheight, width=1.1\textwidth]{beam_SCF_sum_bands.pdf}	
+					\includegraphics[height=\scfPicHeight\textheight, width=\scfPicWidth\textwidth]{beam_SCF_sum_bands.pdf}	
 				}
 
 				\end{flushleft}    	
 			\column{0.5\textwidth}
 
-				\only<1->{\vspace{-1cm}}
+				\only<1->{\vspace{-2cm}}
 				
 				\only<1,2>{
 
@@ -246,7 +249,7 @@
 					\begin{block}{Calcolo densit\`a elettronica} 
 						\begin{itemize}
 							\item calcolo occupazione orbitali
-							\item $\displaystyle \dens = \sum_{i} \psi_{i}^{*KS}(\erre) ~ \psi_{i}^{KS}(\erre)$
+							\item $\displaystyle \dens = \sum_{i} f_{\psi_{i}} ~ \psi_{i}^{*KS}(\erre) ~ \psi_{i}^{KS}(\erre)$
 						\end{itemize}
 					\end{block}
 				}
