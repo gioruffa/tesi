@@ -305,7 +305,6 @@
 				\only<10>{
 					\includegraphics[height=0.5\textheight, width=1\textwidth]{beam_relevant_subroutines_fft_scatter.pdf}	
 				}
-				
 				\end{center}    	
     	\end{columns}
 
@@ -313,6 +312,121 @@
 }
 
 \end{frame}
+
+
+% ********** slide 6 *****************}
+\section{Architetture computazionali}
+\subsection{Architetture computazionali}
+\begin{frame}{Cluster Infiniband}
+
+\begin{columns}
+	\column{0.5\textwidth}
+	\begin{block}{CINECA Galileo cluster}
+		\begin{itemize}
+			\item Architettura multicomputer
+			\item Ogni nodo indipendente
+			\item 16 core per nodo divisi su due socket
+			\item Interconnect Infiniband
+		\end{itemize}
+	\end{block}
+
+	\column{0.5\textwidth}
+			\begin{center}
+				schema CLUSTER
+			\end{center}
+\end{columns}
+
+\end{frame}
+
+% ********** slide 7 *****************}
+\begin{frame}{Macchina a memoria condivisa}
+\begin{columns}
+	\column{0.5\textwidth}
+	\begin{block}{Sgi Altix UV2000 CC-NUMA}
+		\begin{itemize}
+			\item Architettura multiprocessore
+			\item Unica macchina a memoria condivisa
+			\item 8 core per nodo numa
+			\item 64 core totali
+		\end{itemize}
+	\end{block}
+	
+	\column{0.5\textwidth}
+	\begin{center}
+		schema NUMA
+	\end{center}
+	
+\end{columns}
+
+\end{frame}
+
+
+% ********** slide 9 *****************}
+
+\section{Risultati}
+\subsection{Risultati}
+
+\begin{frame}{Struttura risultati}
+\begin{columns}
+	\visible<1->{
+	\column{0.5\textwidth}
+		\begin{block}{Indipendenti dall'architettura}
+			\begin{itemize}
+				\item Su singolo nodo
+				%\item Bassa parallelizzazione
+				\item Basso numero di core
+				\item No interconnect
+			\end{itemize}
+		\end{block}
+	}
+	\visible<1->{
+	\column{0.5\textwidth}
+		\begin{block}{Dipendenti dall'architettura}
+			\begin{itemize}
+				\item Nodi multipli
+				\item Alta parallelizzazione
+				%\item Alto numero di core
+				\item Interconnect o memoria condivisa
+			\end{itemize}
+		\end{block}
+	}
+\end{columns}
+\begin{center}
+	\visible<2->{
+	\includegraphics[height=0.6\textheight]{concl_final_comparison.pdf}	
+	}
+\end{center}
+\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+% ********** Conclusioni *****************}
+
+\section{Conclusioni}
+\subsection{Conclusioni}
+
+\begin{frame}{Conclusioni}
+
+
+\end{frame}
+
+\end{document}
+
+
+
+
+
+
+
 
 
 
