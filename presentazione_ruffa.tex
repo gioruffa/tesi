@@ -366,7 +366,7 @@
 \section{Risultati}
 \subsection{Risultati}
 
-\begin{frame}{Struttura risultati}
+\begin{frame}{Risultati}
 \begin{columns}
 	\visible<1->{
 	\column{0.5\textwidth}
@@ -393,14 +393,41 @@
 \end{columns}
 \begin{center}
 	\visible<2->{
-	\includegraphics[height=0.6\textheight]{concl_final_comparison.pdf}	
+	\includegraphics[height=0.6\textheight]{beam_results_arch_comparison.pdf}	
 	}
 \end{center}
 \end{frame}
 
 
 
-
+% ********** slide 10 *****************}
+\begin{frame}{Indipendenti dall'architettura}
+\begin{columns}
+\column{0.5\textwidth}
+	\only<1>{
+	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly.pdf}	
+	}
+	\only<2->{
+	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly_cdiaghg.pdf}	
+	}
+	\only<3->{
+	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly_cdiaghg.pdf}	
+	}
+\column{0.5\textwidth}
+	\visible<1->{
+	\begin{block}{Comportamento}
+		\begin{itemize}
+			\visible<1->{\item MPI: parallelizzazione multiprocesso a memoria distribuita}
+			\visible<2->{\item Diagonalizzazione ScaLapack inefficiente}
+			\visible<3->{
+			\item Threads forzano diagonalizzazione ``\textit{seriale}"
+			\item MKL con threads pi\`u efficiente
+			}
+		\end{itemize}
+	\end{block}
+	}
+\end{columns}
+\end{frame}
 
 
 
