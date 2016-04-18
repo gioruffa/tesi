@@ -474,19 +474,50 @@
 % ********** slide 13 *****************}
 \begin{frame}{Dipendenti dall'architettura}
 \begin{columns}
-	\column{0.5\textwidth}
-			\includegraphics[width=1\textwidth]{beam_arch_global.jpg}			
-	\column{0.5\textwidth}
-		\begin{block}{Confronto Architetture}
+	\column{0.66\textwidth}
+		\begin{center}			
+			\vspace{-1cm}
+			\includegraphics[width=1.1\textwidth]{beam_arch_subroutines.pdf}			
+		\end{center}
+	\column{0.33\textwidth}
+		\begin{overlayarea}{\linewidth}{\textheight}
+		\begin{block}{Funzioni}
 			\begin{itemize}
-				\item UV2000 miglior scaling
-				\item Differenza cresce all'aumentare dei nodi
-				\item Andamento funzioni?		
-			\end{itemize}
+				\item<1-> Equazioni di Kohn-Sham
+				\item<2-> Diagonalizzazione Hamiltoniana
+				\item<3-> Valutazione Hamiltoniana
+				\item<4-> Distribuzione griglia
+				\item<5-> Comunicazione?
+			\end{itemize}		
 		\end{block}
+
+		\end{overlayarea}
 \end{columns}
+
 \end{frame}
 
+% ********** slide 14 *****************}
+\begin{frame}{Dipendenti dall'architettura}
+\begin{columns}
+	\column{0.6\textwidth}
+		\begin{center}			
+			\vspace{-1cm}
+			\includegraphics[width=1\textwidth]{arch_mpi_perc.pdf}			
+		\end{center}
+	\column{0.4\textwidth}
+		\begin{overlayarea}{\linewidth}{\textheight}
+		\begin{block}{Comunicazione}
+			\begin{itemize}
+				\item<1-> Ruolo comunicazione cresce sensibilmente
+				\item<2-> Oltre il singolo nodo UV200 \`e pi\`u efficiente.
+				\item<3-> ScaLAPACK non \`e profilata!
+			\end{itemize}		
+		\end{block}
+
+		\end{overlayarea}
+\end{columns}
+
+\end{frame}
 
 
 
