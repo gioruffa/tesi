@@ -136,8 +136,6 @@
 \end{frame}
 
 % ********** slide 4 *****************
-\section{SCF DFT in \QE}
-\subsection{Implementazione Self Consistent Field DFT in \QE}
 \begin{frame}{Self Consistent DFT}
 \begin{center}
 	\includegraphics[width=\textwidth]{beam_SCF_0.pdf}	
@@ -404,45 +402,90 @@
 
 \begin{frame}{Indipendenti dall'architettura}
 
-\begin{columns}
+\begin{columns}[c]
 
 \column{0.5\textwidth}
+\parbox[c]{0.5\linewidth}
+{
+\begin{center}
 	\only<1>{
-	\includegraphics[width=1.1\textwidth, height=0.55 \textheight]{beam_threads_MPIonly.pdf}	
+	\includegraphics[width=1\textwidth, height=0.5 \textheight]{beam_threads_MPIonly.pdf}	
 	}
 	\only<2>{
-	\includegraphics[width=1.1\textwidth, height=0.55 \textheight]{beam_threads_MPIonly_cdiaghg.pdf}	
+	\includegraphics[width=1\textwidth, height=0.5 \textheight]{beam_threads_MPIonly_cdiaghg.pdf}	
 	}
 	%\only<3>{
 	%\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI.pdf}	
 	%}
-	\only<3>{
+	\only<3->{
+	\vspace{-1cm}
 	\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI_threads.pdf}	
 	}
+\end{center}
+}
+
 \column{0.5\textwidth}
-	\only<1->{
+\begin{center}
+\begin{overlayarea}{\linewidth}{\textheight}
+
+
 	\begin{block}{Comportamento}
 		\begin{itemize}
-			\visible<1->{\item MPI: parallelizzazione multiprocesso a memoria distribuita}
-			\visible<2->{\item Diagonalizzazione ScaLapack inefficiente}
-			\visible<3->{
-			\item Threads forzano diagonalizzazione ``\textit{seriale}"
-			\item MKL con threads pi\`u efficiente
-			}
+			\item<1-> MPI: parallelizzazione multiprocesso a memoria distribuita
+			\item<2-> Diagonalizzazione ScaLapack poco performante
+			\item<3-> Threads forzano diagonalizzazione con MKL
+			\item<4-> Valutazione Hamiltoniana rallenta ma diagonalizzazione \`e pi\`u efficiente
+			\item<5-> Risultato?
 		\end{itemize}
 	\end{block}
-	}
+
+\end{overlayarea}
+\end{center}
+
+\end{columns}
+
+
+\end{frame}
+
+
+% ********** slide 11 *****************}
+\begin{frame}{Indipendenti dall'Architettura}
+	\includegraphics[width=1\textwidth]{threads_comparison.pdf}	
+\end{frame}
+
+
+
+% ********** slide 12 *****************}
+\begin{frame}{Dipendenti dall'architettura}
+\begin{columns}
+	\column{0.5\textwidth}
+			\includegraphics[width=1\textwidth]{beam_arch_global.jpg}			
+	\column{0.5\textwidth}
+		\begin{block}{Confronto Architetture}
+			\begin{itemize}
+				\item UV2000 miglior scaling
+				\item Differenza cresce all'aumentare dei nodi
+				\item Andamento funzioni?		
+			\end{itemize}
+		\end{block}
 \end{columns}
 \end{frame}
 
-\begin{frame}
-	\includegraphics[width=1\textwidth]{threads_comparison.pdf}	
-	
+% ********** slide 13 *****************}
+\begin{frame}{Dipendenti dall'architettura}
+\begin{columns}
+	\column{0.5\textwidth}
+			\includegraphics[width=1\textwidth]{beam_arch_global.jpg}			
+	\column{0.5\textwidth}
+		\begin{block}{Confronto Architetture}
+			\begin{itemize}
+				\item UV2000 miglior scaling
+				\item Differenza cresce all'aumentare dei nodi
+				\item Andamento funzioni?		
+			\end{itemize}
+		\end{block}
+\end{columns}
 \end{frame}
-
-
-
-
 
 
 
