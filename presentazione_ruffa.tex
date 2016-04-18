@@ -401,20 +401,26 @@
 
 
 % ********** slide 10 *****************}
+
 \begin{frame}{Indipendenti dall'architettura}
+
 \begin{columns}
+
 \column{0.5\textwidth}
 	\only<1>{
-	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly.pdf}	
+	\includegraphics[width=1.1\textwidth, height=0.55 \textheight]{beam_threads_MPIonly.pdf}	
 	}
-	\only<2->{
-	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly_cdiaghg.pdf}	
+	\only<2>{
+	\includegraphics[width=1.1\textwidth, height=0.55 \textheight]{beam_threads_MPIonly_cdiaghg.pdf}	
 	}
-	\only<3->{
-	\includegraphics[width=1.1\textwidth]{beam_threads_MPIonly_cdiaghg.pdf}	
+	%\only<3>{
+	%\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI.pdf}	
+	%}
+	\only<3>{
+	\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI_threads.pdf}	
 	}
 \column{0.5\textwidth}
-	\visible<1->{
+	\only<1->{
 	\begin{block}{Comportamento}
 		\begin{itemize}
 			\visible<1->{\item MPI: parallelizzazione multiprocesso a memoria distribuita}
@@ -427,6 +433,11 @@
 	\end{block}
 	}
 \end{columns}
+\end{frame}
+
+\begin{frame}
+	\includegraphics[width=1\textwidth]{threads_comparison.pdf}	
+	
 \end{frame}
 
 
