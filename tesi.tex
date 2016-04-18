@@ -2065,6 +2065,10 @@ The details of how the mixing is performed can be found in \cite{Johnson} and th
 
 The computational cost of this operation roughly goes as the size of the grid ($\bigO(N)$) and it's definitely negligible.
 
+\subsection{Energy evaluation}
+At the end of every iteration step the energy of the system is always calculated. The expression used by \QE is the one in equation \eqref{eq:DFTEnergy}.
+
+Other physical properties of the system, like the forces the ions are subjected to, are calculated after self-consistency has been achieved.
 
 \subsection{Brief comparison with Hartree-Fock method}
 In table \ref{tab:HF-DFTComp} we perform a comparison between two of the most popular computational model in solid state physics: DFT SCF algorithm using plane waves as basis set and HF SCF algorithm using Gaussian orbitals.
@@ -2103,10 +2107,7 @@ An approach based on the automatic projection of Gaussian orbitals into plane wa
 %to perform some calculation with HF and some with DFT, 
 is actually under development and will be included in future releases of \QE.
 
-\subsubsection{Energy evaluation}
-At the end of every iteration step the energy of the system is always calculated. The expression used by \QE is the one in equation \eqref{eq:DFTEnergy}.
 
-Other physical properties of the system, like the forces the ions are subjected to, are calculated after self-consistency has been achieved.
 
 \subsection{Core Routines}\label{sec:CoreRoutines}
 
@@ -3697,7 +3698,9 @@ mpirun -np 4 pw.x -i input_file -o output_file
 
 \newpage
 
+\include{ringraziamenti	}
 
+\newpage
 
 
 %
