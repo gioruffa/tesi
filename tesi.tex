@@ -104,7 +104,7 @@ External Advisor: {\it Dott. Davide Ceresoli}\\
 \tableofcontents
 \newpage
 
-
+%\justify
 \section{Ab Initio calculations in modern Solid State Physics}
 The electronic structure (ES) of materials, which in the general  sense  determines  all  their  physical  properties,  can be  determined  accurately  by  ab initio  (first-principles)  ES calculations,  i.e.  from  fundamental  quantum  theory.
 
@@ -2965,7 +2965,7 @@ In order to profile and compare the performances of PWscf and its subroutines in
 We decided to pick 20 as a fixed number of iterations, this seems a good compromise between having a good statistic and a 
 reasonable run time\footnote{Read below for a more precise justification of this choice.}.
 
-We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible. Which is a topic of great interest for the quantum chemistry and solid state physics community.
+We also want to find if it is possible to tune the architecture in order to lower the number of iteration requested to reach self consistency, i.e. to find the physical result as soon as possible, which is a topic of great interest for the quantum chemistry and solid state physics community.
 Hence the need for a more ``pragmatical" point of view.
 
 This is why from now on we will report the results with both fixed and variable iterations.
@@ -3113,7 +3113,7 @@ In fact, on such a low number of cores, the use of threads forces PWscf to permo
 We have annotated in figure \ref{fig:threadsOverall} when distributed diagonalization starts on MPI only runs and when serial diagonalization ends on threaded runs.
 
 But the benefits of threads are not restricted to numerical stability.
-In fact, by looking at to plot at fixed number of iterations, on the right of figure \ref{fig:threadsOverall}, we see that (especially at eight cores) the advantage is still substantial.
+In fact, by looking at the plot at fixed number of iterations, on the right of figure \ref{fig:threadsOverall}, we see that (especially at eight cores) the advantage is still substantial.
 
 Note that the gain obtained from eight to sixteen cores cannot be ascribed to the effect of threads because the number of threads used is the same and the diagonalization algorithm is serial.
 
@@ -3481,7 +3481,7 @@ We also performed an in depth analysis of where and how interprocess communicati
 
 Given the knowledge accumulated, we finally had all the tools to properly tune the computational architecture.
 
-Our results can be structured in two main categories : architecture independent tuning and architecture dependent tuning.
+Our results can be structured in two main categories: architecture independent tuning and architecture dependent tuning.
 
 For architecture independent tuning we found that, in contrast to what reported in literature, second level parallelization performed within the multi-threading paradigm (OpenMP) can have a strong positive impact when a relatively low number of cores is employed.
 The use of threads in this framework achieves a better numerical stability lowering the number of SCF iterations step needed to reach self consistency and improves sensibly the performance of matrix diagonalization, which constitutes the major computational bottleneck.
@@ -3690,6 +3690,11 @@ mpirun -np 4 pw.x -i input_file -o output_file
 
 \end{appendices}
 
+\newpage
+
+\include{ringraziamenti	}
+
+
 
 \newpage
 
@@ -3698,9 +3703,7 @@ mpirun -np 4 pw.x -i input_file -o output_file
 
 \newpage
 
-\include{ringraziamenti	}
 
-\newpage
 
 
 %

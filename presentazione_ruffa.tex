@@ -29,6 +29,8 @@
 \usepackage[absolute,overlay]{textpos}
 \usepackage{physics}
 \usepackage{fixltx2e}
+\usepackage{appendixnumberbeamer}
+\usepackage{booktabs}
 
 \graphicspath{{./media/images/}}
 
@@ -411,13 +413,13 @@
 	\only<1>{
 	\includegraphics[width=1\textwidth, height=0.5 \textheight]{beam_threads_MPIonly.pdf}	
 	}
-	\only<2>{
+	\only<2,3>{
 	\includegraphics[width=1\textwidth, height=0.5 \textheight]{beam_threads_MPIonly_cdiaghg.pdf}	
 	}
 	%\only<3>{
 	%\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI.pdf}	
 	%}
-	\only<3->{
+	\only<4->{
 	\vspace{-1cm}
 	\includegraphics[width=0.9\textwidth, height=0.85 \textheight]{beam_threads_subroutines_MPI_threads.pdf}	
 	}
@@ -433,7 +435,7 @@
 		\begin{itemize}
 			\item<1-> MPI: parallelizzazione multiprocesso a memoria distribuita
 			\item<2-> Diagonalizzazione ScaLapack poco performante
-			\item<3-> Threads forzano diagonalizzazione con MKL
+			\item<3-> Alternativa: uso MKL Threads
 			\item<4-> Valutazione Hamiltoniana rallenta ma diagonalizzazione \`e pi\`u efficiente
 			\item<5-> Risultato?
 		\end{itemize}
@@ -519,6 +521,82 @@
 
 \end{frame}
 
+% ********** slide 15 *****************}
+\begin{frame}{Dipendenti dall'architettura}
+
+	\begin{center}
+		\includegraphics[width=0.95\textwidth]{beam_ndiag_64.pdf}			
+	\end{center}
+
+	\begin{overlayarea}{\linewidth}{\textheight}
+	\vspace{-0.6cm}
+	\begin{columns}
+	\hspace{0.1\textwidth}
+		\column{0.45\textwidth}
+		\visible<1->
+		{
+		\begin{center}
+			\begin{block}{Galileo}
+				\begin{itemize}
+				\item migliori prestazioni diminuendo i core
+				\item miglior risultato con tutti i processi su singolo nodo
+				\end{itemize}							
+			\end{block}			
+		\end{center}
+		}
+		
+		\column{0.45\textwidth}
+		\visible<2->
+		{
+		\begin{center}
+			\begin{block}{UV2000}
+			\begin{itemize}
+				\item migliori prestazioni aumentando i core
+				\item miglior risultato occupando tutti i processori
+				\item sconsigliato in letteratura
+				\end{itemize}	
+			\end{block}		
+		\end{center}
+		}
+	\end{columns}
+	\end{overlayarea}
+
+
+\end{frame}
+
+
+% ********** slide 16 *****************}
+\begin{frame}{Dipendenti dall'architettura}
+
+
+	\begin{columns}
+	\column{0.33\textwidth}
+	\begin{center}	
+		50 Atomi\\
+		\includegraphics[width=0.95\textwidth]{beam_concl_co3.pdf}			
+	\end{center}
+
+	
+	\column{0.33\textwidth}
+	\begin{center}	
+		100-150 Atomi\\
+		\includegraphics[width=0.95\textwidth]{concl_ausurf.pdf}			
+	\end{center}	
+			
+	\column{0.33\textwidth}
+
+	\begin{center}	
+		250-300 Atomi\\
+		\includegraphics[width=0.95\textwidth]{concl_oled.pdf}			
+	\end{center}		
+	
+	
+	\end{columns}
+
+\end{frame}
+
+
+
 
 
 % ********** Conclusioni *****************}
@@ -527,17 +605,193 @@
 \subsection{Conclusioni}
 
 \begin{frame}{Conclusioni}
+\begin{center}
+	\includegraphics[height=0.5\textheight]{beam_results_arch_comparison.pdf}	
+\end{center}
+
+
+Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
+
+\begin{itemize}
+
+	\item L'utilizzo dei thread \`e interessante in scenari HTC e in casi di overload risorse condivise.
+	\pause
+	\item L'architettura a memoria condivisa \`e chiaramente piu' performante su sistemi medio-grandi in ambito altamente parallelizzato.
+	\pause
+	\item Il peso della diagonalizzazione (trascurato in letteratura) \`e importante e le strategie per ottimizzarla variano a seconda dell'architettura computazione.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Sviluppi futuri}
+	\begin{itemize}
+		\item Studio comportamento su nuove architetture Knight Landing (Intel MIC), CINECA Marconi.
+		\item Miglior stima dei processori per diagonalizzazione.
+		\item Algoritmi di moltiplicazione matrici alternativi (SUMMA).
+		\item Aumento di risorse computazionali.
+		\item Combinazione NUMA + GPU.
+		\item Analisi predittiva per miglior ottimizzazione.
+	\end{itemize}
+\end{frame}
+
+
+
+\appendix
+% ********** Backup *****************}
+
+\begin{frame}{Bias control}
+\begin{itemize}
+	\item allocazione totale risorse
+	\item riduzione massima I/O su disco
+	\item process pinning (NUMA)
+	\item uso di migliori librerie
+\end{itemize}
+\begin{center}
+	\includegraphics[height=0.5\textheight]{cpuwalltime.pdf}	
+\end{center}
+\end{frame}
+
+
+\begin{frame}{Potenziali}
+\begin{equation}
+	v_{eff} = v_{ion} + v_{h} + v_{xc},
+\end{equation}
+\begin{equation}
+	\tilde{v}_{ion}(\mf{G}) = \sum_{\mf{G}} f_{ps}^{sp}(G) e^{i \mf{G} \cdot \mf{R}_{\alpha}},
+\end{equation}
+\begin{equation}
+	\tilde{v}_{h}(\mf{G}) = \frac{\tilde{\rho}(\mf{G})}{G^2 \varepsilon_{0}},
+\end{equation}
+\begin{equation}
+	v_{xc}(\erre) =	\frac{\var{E_{xc}[\dens]}}{\var{\dens}}
+\end{equation}
+\begin{equation}
+	v_{eff}(\erre) = IFFT\{\tilde{v}(\mf{G})\}(\erre) + IFFT\{\tilde{v}_{h}(\mf{G})\}(\erre) + v_{xc}(\erre).
+\end{equation}
 
 
 \end{frame}
 
-\end{document}
+
+\begin{frame}{\texttt{h\_psi} e FFT}
+\begin{align*}
+	IFFT[f(\GI)] &= \sum_{j}^{N_x} \sum_{k}^{N_y} \sum_{l}^{N_z} f^{\GI}_{jkl}
+		exp \left[i \frac{2\pi}{N_x}ju \right] 
+		exp \left[i \frac{2\pi}{N_y}kv \right] 
+		exp \left[i \frac{2\pi}{N_x}lw \right] \\
+		[u,v,w] &= \mf{q} \\
+		[j,k,l] &= \mf{b}_i.
+\end{align*}
+	\begin{center}
+		\includegraphics[width=0.6\textwidth]{h_psi.pdf}
+	\end{center}
+\end{frame}
 
 
 
+\begin{frame}{Complessita Numerica}
+
+\begin{table}[h]
+\centering
 
 
+\begin{tabular}{llll}
+\textbf{Routine}            & \textbf{Description} & \textbf{Calls} & \textbf{Complexity} \\
+\hline
+\hline
+\\[0pt]
+\texttt{init\_run} &  \begin{tabular}[c]{@{}l@{}} first approximation of\\ $\dens$, $\{u_{kj}\}$ and $v_{eff}$. \end{tabular} & 1 per PWscf run &  \begin{tabular}[c]{@{}l@{}} $v_{eff} : \bigO(N log (N) )$ \\ Diag $: \bigO(N_{b}^3)$ \end{tabular} \\[20pt]
+\texttt{c\_bands}  & Diagonalization of $\mf{H}^{KS}$ & 1 per SCF step & $\bigO(N_{b}^3)$           
+\\[20pt]
+\texttt{h\_psi}    & Compute $\mf{H}^{KS} \ket{u_{kj}}$  & $N_{b}$ per Davidson step     & $\bigO(N log (N))$            
+\\[20pt]
 
+\texttt{sum\_bads} & \begin{tabular}[c]{@{}l@{}} Calculate $\densout$,$\varepsilon_{j}$\\ and occupations \end{tabular} & 1 per SCF step      &  $\bigO(N log (N))$  
+\\[20pt]
+\hline         
+
+\end{tabular}
+\caption{Summary of the most important routines in \QE}
+\label{tab:coreRoutines}
+\end{table}
+\end{frame}
+
+\begin{frame}
+
+\begin{table}[]
+\centering
+\begin{tabular}{lc}
+\hline
+\multicolumn{1}{|l|}{\textbf{Size}} & \multicolumn{1}{l|}{\textbf{Description}}                                                                                                                        \\ \hline
+\multicolumn{1}{|l|}{$N_{R}$}       & \multicolumn{1}{l|}{Number of $\mf{R}$ points in the real grid}                                                                                                  \\ \hline
+\multicolumn{1}{|l|}{$N_{G}$}       & \multicolumn{1}{l|}{Number of $\GI$ points in the reciprocal grid}                                                                                               \\ \hline
+\multicolumn{1}{|l|}{$N_{G}^{PW}$}  & \multicolumn{1}{l|}{\begin{tabular}[c]{@{}l@{}}Number of $\GI$ points in the reciprocal grid associated to \\ plane waves below the cutoff energy\end{tabular}} \\ \hline
+
+                                    & \multicolumn{1}{l}{}                                                                                                                                             \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Relationships}}                                                                                                                      \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{R} = N_{G} = N = N_x N_y N_z$}                                                                                                                         \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$N_{G}^{PW} < N$}                                                                                                                       \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Estimate for a 100 atom system}}                                                                                                                       \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{ $N_{b} \simeq \frac{1}{2} N_{e^{-}} \simeq 10^3~;~ N_{G}^{PW} \simeq 10^{6} ~;~ N \simeq 10^7 $}                                                                                                                       \\ \cline{2-2} 
+                                    &                                                                                                                                                                  \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{\textbf{Computational cost of every Fast Fourier Transform}}                                                                                           \\ \cline{2-2} 
+\multicolumn{1}{l|}{}               & \multicolumn{1}{c|}{$\mathcal{O}(N log (N))$}                                                                                                                    \\ \cline{2-2} 
+\end{tabular}
+\caption{Summary of typical dimensions between direct and reciprocal grid}
+\label{tab:FFTSummary}
+\end{table}
+
+\end{frame}
+
+\begin{frame}{Comparazione con HF}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l|l|ll|l|}
+\cline{2-2} \cline{5-5}
+                                    & \textbf{DFT-PW}        &                       &                    & \textbf{HF-Gaussian} \\ \cline{1-2} \cline{4-5} 
+\multicolumn{1}{|l|}{\textbf{FFT}}  & $\bigO(N_{b}N ln(N) )$ & \multicolumn{1}{l|}{} & $\mf{H}_{ij}$ & $\bigO(N_{gauss}^4)$ \\ \cline{1-2} \cline{4-5} 
+\multicolumn{1}{|l|}{\textbf{DIAG}} & $\bigO(N_{b}^3)$       & \multicolumn{1}{l|}{} & \textbf{DIAG}      & $\bigO(N_{b}^3)$     \\ \cline{1-2} \cline{4-5} 
+\end{tabular}
+\caption{Comparison of computational complexity between DFT method using plane waves and HF method using Gaussian orbitals. $\mf{H}_{ij}$ stands for the evaluation of the Hamiltonian(mainly the Fock operator), \textbf{DIAG} is the cost of the diagonalization, $N_b$ is the number of bands, $N_{gauss}$ is the number of Gaussian orbitals in the basis set.}
+\label{tab:HF-DFTComp}
+\end{table}
+\end{frame}
+
+
+\begin{frame}{Iterazioni Variabili}
+	\begin{center}
+		\includegraphics[width=0.9\textwidth]{concl_final_comparison.pdf}
+	\end{center}
+\end{frame}
+
+
+\begin{frame}{Dinamica SCF}
+	\begin{center}
+		\includegraphics[width=0.9\textwidth]{iterstats.pdf}
+	\end{center}
+	
+	
+\begin{table}[hhh!]
+\begin{center}
+\begin{tabular}{r|cccc}
+\toprule
+cores &        mean iteration time(s) &         st-dev(s) &   relative error(\%) &   number of iterations \\
+\midrule
+1  &  676 &  201 &  29 &  43 \\
+2  &  363 &  118 &  32 &  42 \\
+4  &  207 &   68 &  33 &  70 \\
+8  &  204 &  102 &  50 &  86 \\
+16 &  154 &  109 &  71 &  55 \\
+32 &   80 &   44 &  55 &  36 \\
+64 &   58 &   35 &  60 &  50 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\caption{Iterations statistics for self consistent calculation on variable number of cores.}
+\label{tab:iterations}
+\end{table}
+
+\end{frame}
 
 
 
