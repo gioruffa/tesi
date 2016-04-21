@@ -82,10 +82,7 @@
 \subsection{Density Functional Theory}
 % ********** slide 2 *****************
 
-\begin{frame}{Introduzione}
-\begin{center}
-		\includegraphics[width=4cm]{beam_qe_logo.jpg}
-\end{center}
+\begin{frame}{}
 \begin{columns}
 	\column{0.33\textwidth}
 		\begin{center}
@@ -99,6 +96,21 @@
 		\begin{center}
 			\includegraphics[height=3.5cm]{beam_cbp.png}
 		\end{center}
+\end{columns}
+\begin{columns}
+	\column{0.5\textwidth}
+		\begin{center}
+			\includegraphics[height=3.5cm]{beam_first_slide.pdf}
+		\end{center}
+	\column{0.5\textwidth}
+	\begin{block}{}
+		\begin{itemize}
+			\item Teoria DFT
+			\item Implementazione SCF
+			\item Strategie di ottimizzazione
+			\item Risultati
+		\end{itemize}
+	\end{block}
 \end{columns}
 		
 \end{frame}
@@ -467,36 +479,13 @@
 			\begin{itemize}
 				\item UV2000 miglior scaling
 				\item Differenza cresce all'aumentare dei nodi
-				\item Andamento funzioni?		
+				\item Comunicazione	
 			\end{itemize}
 		\end{block}
 \end{columns}
 \end{frame}
 
-% ********** slide 13 *****************}
-\begin{frame}{Dipendenti dall'architettura}
-\begin{columns}
-	\column{0.66\textwidth}
-		\begin{center}			
-			\vspace{-1cm}
-			\includegraphics[width=1.1\textwidth]{beam_arch_subroutines.pdf}			
-		\end{center}
-	\column{0.33\textwidth}
-		\begin{overlayarea}{\linewidth}{\textheight}
-		\begin{block}{Funzioni}
-			\begin{itemize}
-				\item<1-> Equazioni di Kohn-Sham
-				\item<2-> Diagonalizzazione Hamiltoniana
-				\item<3-> Valutazione Hamiltoniana
-				\item<4-> Distribuzione griglia
-				\item<5-> Comunicazione?
-			\end{itemize}		
-		\end{block}
 
-		\end{overlayarea}
-\end{columns}
-
-\end{frame}
 
 % ********** slide 14 *****************}
 \begin{frame}{Dipendenti dall'architettura}
@@ -512,7 +501,7 @@
 			\begin{itemize}
 				\item<1-> Ruolo comunicazione cresce sensibilmente
 				\item<2-> Oltre il singolo nodo UV200 \`e pi\`u efficiente.
-				\item<3-> ScaLAPACK non \`e profilata!
+				\item<3-> Indicativo ma non giustifica la differenza in prestazioni.\\Comunicazione ScaLAPACK non \`e profilata!
 			\end{itemize}		
 		\end{block}
 
@@ -573,25 +562,28 @@
 	\column{0.33\textwidth}
 	\begin{center}	
 		50 Atomi\\
-		\includegraphics[width=0.95\textwidth]{beam_concl_co3.pdf}			
+		\includegraphics[width=0.95\textwidth]{beam_concl_co3.pdf}	\\		
+		\includegraphics[height=3cm]{beam_co3.png}
 	\end{center}
 
 	
 	\column{0.33\textwidth}
 	\begin{center}	
 		100-150 Atomi\\
-		\includegraphics[width=0.95\textwidth]{concl_ausurf.pdf}			
+		\includegraphics[width=0.95\textwidth]{concl_ausurf.pdf}\\		
+		\includegraphics[height=3cm]{titania_crystal.png}
 	\end{center}	
 			
 	\column{0.33\textwidth}
 
 	\begin{center}	
 		250-300 Atomi\\
-		\includegraphics[width=0.95\textwidth]{concl_oled.pdf}			
+		\includegraphics[width=0.95\textwidth]{concl_oled.pdf}	\\	
+		\includegraphics[height=3cm]{beam_cbp.png}
 	\end{center}		
 	
-	
 	\end{columns}
+	
 
 \end{frame}
 
@@ -638,7 +630,32 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 \appendix
 % ********** Backup *****************}
 
-\begin{frame}{Bias control}
+\begin{frame}{Scaling Funzioni} %ex slide 13
+\begin{columns}
+	\column{0.66\textwidth}
+		\begin{center}			
+			\vspace{-1cm}
+			\includegraphics[width=1.1\textwidth]{beam_arch_subroutines.pdf}			
+		\end{center}
+	\column{0.33\textwidth}
+		\begin{overlayarea}{\linewidth}{\textheight}
+		\begin{block}{Funzioni}
+			\begin{itemize}
+				\item Equazioni di Kohn-Sham
+				\item Diagonalizzazione Hamiltoniana
+				\item Valutazione Hamiltoniana
+				\item Distribuzione griglia
+				\item Comunicazione?
+			\end{itemize}		
+		\end{block}
+
+		\end{overlayarea}
+\end{columns}
+
+\end{frame}
+
+
+\begin{frame}{Azzeramento}
 \begin{itemize}
 	\item allocazione totale risorse
 	\item riduzione massima I/O su disco
