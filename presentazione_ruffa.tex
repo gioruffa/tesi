@@ -103,12 +103,17 @@
 			\includegraphics[height=3.5cm]{beam_first_slide.pdf}
 		\end{center}
 	\column{0.5\textwidth}
-	\begin{block}{}
+	\begin{block}{Outline}
 		\begin{itemize}
 			\item Teoria DFT
-			\item Implementazione SCF
+			\pause
+			\item Implementazione PW SCF
+			\pause
 			\item Strategie di ottimizzazione
-			\item Risultati
+			\pause
+			\item Miglioramento prestazioni
+			\pause
+			\item Conclusioni e scenari di utilizzo
 		\end{itemize}
 	\end{block}
 \end{columns}
@@ -156,6 +161,8 @@
 \end{center}
 \end{frame}
 
+\section{Implementazione e Architetture}
+\subsection{Implementazione e Architetture}
 
 % ********** slide 5 *****************}
 
@@ -222,7 +229,7 @@
 						\begin{itemize}
 							\item calcolo $\dens$ iniziale
 							\item calcolo primi autovettori
-							\item calcolo energia inizale
+							\item calcolo energia iniziale
 					\end{itemize}
 					\end{block}
 				}
@@ -327,9 +334,10 @@
 
 
 % ********** slide 6 *****************}
-\section{Architetture computazionali}
-\subsection{Architetture computazionali}
-\begin{frame}{Cluster Infiniband}
+
+\begin{frame}{Architetture computazionali}
+
+\vspace{-1cm}
 
 \begin{columns}
 	\column{0.5\textwidth}
@@ -344,28 +352,26 @@
 
 	\column{0.5\textwidth}
 			\begin{center}
-				schema CLUSTER
+				\includegraphics[height=0.4\textheight]{beam_galileo_schema.pdf}
 			\end{center}
 \end{columns}
 
-\end{frame}
-
-% ********** slide 7 *****************}
-\begin{frame}{Macchina a memoria condivisa}
 \begin{columns}
 	\column{0.5\textwidth}
 	\begin{block}{Sgi Altix UV2000 CC-NUMA}
 		\begin{itemize}
 			\item Architettura multiprocessore
 			\item Unica macchina a memoria condivisa
-			\item 8 core per nodo numa
+			\item 8 core per nodo NUMA
 			\item 64 core totali
 		\end{itemize}
 	\end{block}
 	
 	\column{0.5\textwidth}
 	\begin{center}
-		schema NUMA
+			\begin{center}
+				\includegraphics[height=0.4\textheight]{beam_numa_schema.pdf}
+			\end{center}
 	\end{center}
 	
 \end{columns}
@@ -473,11 +479,11 @@
 \begin{frame}{Dipendenti dall'architettura}
 \begin{columns}
 	\column{0.5\textwidth}
-			\includegraphics[width=1\textwidth]{beam_arch_global.jpg}			
+			\includegraphics[width=1\textwidth]{beam_arch_global.pdf}			
 	\column{0.5\textwidth}
 		\begin{block}{Confronto Architetture}
 			\begin{itemize}
-				\item UV2000 miglior scaling
+				\item UV2000 miglior speedup
 				\item Differenza cresce all'aumentare dei nodi
 				\item Comunicazione	
 			\end{itemize}
@@ -500,7 +506,7 @@
 		\begin{block}{Comunicazione}
 			\begin{itemize}
 				\item<1-> Ruolo comunicazione cresce sensibilmente
-				\item<2-> Oltre il singolo nodo UV200 \`e pi\`u efficiente.
+				\item<2-> Oltre il singolo nodo UV2000 \`e pi\`u efficiente.
 				\item<3-> Indicativo ma non giustifica la differenza in prestazioni.\\Comunicazione ScaLAPACK non \`e profilata!
 			\end{itemize}		
 		\end{block}
@@ -556,12 +562,13 @@
 
 % ********** slide 16 *****************}
 \begin{frame}{Dipendenti dall'architettura}
-
+\vspace{-0.5cm}
 
 	\begin{columns}
 	\column{0.33\textwidth}
 	\begin{center}	
 		50 Atomi\\
+		\CO \\
 		\includegraphics[width=0.95\textwidth]{beam_concl_co3.pdf}	\\		
 		\includegraphics[height=3cm]{beam_co3.png}
 	\end{center}
@@ -570,6 +577,7 @@
 	\column{0.33\textwidth}
 	\begin{center}	
 		100-150 Atomi\\
+		Au Surf 112 - TiO\textsubscript{2}\\
 		\includegraphics[width=0.95\textwidth]{concl_ausurf.pdf}\\		
 		\includegraphics[height=3cm]{titania_crystal.png}
 	\end{center}	
@@ -578,6 +586,7 @@
 
 	\begin{center}	
 		250-300 Atomi\\
+		Cristallo Organico\\
 		\includegraphics[width=0.95\textwidth]{concl_oled.pdf}	\\	
 		\includegraphics[height=3cm]{beam_cbp.png}
 	\end{center}		
@@ -597,8 +606,9 @@
 \subsection{Conclusioni}
 
 \begin{frame}{Conclusioni}
+\vspace{-0.07\textheight}
 \begin{center}
-	\includegraphics[height=0.5\textheight]{beam_results_arch_comparison.pdf}	
+	\includegraphics[height=0.6\textheight]{beam_last_slide.pdf}	
 \end{center}
 
 
@@ -606,9 +616,9 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 
 \begin{itemize}
 
-	\item L'utilizzo dei thread \`e interessante in scenari HTC e in casi di overload risorse condivise.
+	\item L'utilizzo dei thread \`e interessante in scenari HTC e in casi di sovraccarico risorse condivise.
 	\pause
-	\item L'architettura a memoria condivisa \`e chiaramente piu' performante su sistemi medio-grandi in ambito altamente parallelizzato.
+	\item L'architettura a memoria condivisa \`e chiaramente pi\`u performante su sistemi medio-grandi in ambito altamente parallelizzato.
 	\pause
 	\item Il peso della diagonalizzazione (trascurato in letteratura) \`e importante e le strategie per ottimizzarla variano a seconda dell'architettura computazione.
 \end{itemize}
@@ -623,11 +633,41 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 		\item Combinazione NUMA + GPU.
 		\item Analisi predittiva per miglior ottimizzazione.
 	\end{itemize}
+	\vspace{1cm}
+	\begin{columns}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=1.2\textwidth]{beam_qe_logo.jpg}
+		\end{center}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{beam_e4_logo.png}
+		\end{center}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=0.8\textwidth]{beam_eap_logo.jpg}
+		\end{center}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=\textwidth]{beam_istm_logo.png}
+		\end{center}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=\textwidth]{beam_cnr_logo.png}
+		\end{center}
+		\column{0.15\textwidth} 
+		\begin{center}
+			\includegraphics[width=\textwidth]{beam_lcm_logo.png}
+		\end{center}											
+	\end{columns}
+\end{frame}
+
+\appendix	
+\begin{frame}
+
 \end{frame}
 
 
-
-\appendix
 % ********** Backup *****************}
 
 \begin{frame}{Scaling Funzioni} %ex slide 13
@@ -668,7 +708,11 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 \end{frame}
 
 
-\begin{frame}{Potenziali}
+\begin{frame}{DFT1}
+
+\end{frame}
+
+\begin{frame}{DFT2}
 \begin{equation}
 	v_{eff} = v_{ion} + v_{h} + v_{xc},
 \end{equation}
@@ -684,7 +728,29 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 \begin{equation}
 	v_{eff}(\erre) = IFFT\{\tilde{v}(\mf{G})\}(\erre) + IFFT\{\tilde{v}_{h}(\mf{G})\}(\erre) + v_{xc}(\erre).
 \end{equation}
+\\
+\begin{equation}
+	E[\dens] = \sum_{j}\varepsilon^{KS}_{j} - E_{h}[\dens] - \int \dens v(\erre) \dd{\erre}+ E_{xc}[\dens].
+\end{equation}
+\begin{equation}\label{eq:HartreeEnergy}
+E_{h}[\dens] = \frac{1}{2} \iint \frac{\rho(\mathbf{r_{1}}) \rho(\mathbf{r_{2}}) }{r_{12}} \dd{\mathbf{r_1}} \dd{\mathbf{r_2}} = J[\dens]
+\end{equation}
 
+
+\end{frame}
+
+
+
+\begin{frame}{Criterio di convergenza}
+\begin{equation}
+	\Delta\dens = \densin - \densout.
+\end{equation}
+QE considers the terms in $E[\dens + \Delta\dens] - E[\dens ]$ quadratical in $\Delta\dens$ 
+\begin{align}
+	\Delta E &= E[\dens + \Delta\dens] - E[\dens ] \\
+	&\simeq \frac{e^2}{2} \iint \frac{\Delta\rho(\erre) \Delta\rho(\erre')}{\mid \erre - \erre' \mid} \dd{\erre} \dd{\erre'}\\
+	 &= \int \Delta\dens \Delta v_{h}(\erre') \dd{\erre},
+\end{align}
 
 \end{frame}
 
@@ -781,6 +847,11 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 	\end{center}
 \end{frame}
 
+\begin{frame}
+	\begin{center}
+		\includegraphics[width=\textwidth]{threads_overall.pdf}
+	\end{center}
+\end{frame}
 
 \begin{frame}{Dinamica SCF}
 	\begin{center}
