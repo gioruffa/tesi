@@ -612,6 +612,7 @@
 \end{center}
 
 
+\pause
 Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 
 \begin{itemize}
@@ -623,6 +624,8 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 	\item Il peso della diagonalizzazione (trascurato in letteratura) \`e importante e le strategie per ottimizzarla variano a seconda dell'architettura computazione.
 \end{itemize}
 \end{frame}
+
+
 
 \begin{frame}{Sviluppi futuri}
 	\begin{itemize}
@@ -709,7 +712,31 @@ Abbiamo trovato strategie di ottimizzazione adatte a vari scenari:
 
 
 \begin{frame}{DFT1}
+	\begin{align}
+		E[\dens] = T[\dens] + V_{ee}[\dens] + \int \dens v_{ion}(\erre) \dd{\erre} \\
+			\mu_{HK} = v(\erre) + \frac{\var{E_{HK}[\dens]}}{\var{\dens}}
+	\end{align}
+	\begin{align}
+&\hat{H}_{ref} = \sum_{i} \hat{h}_i^{KS} ;
+&\hat{h}_i^{KS} = - \frac{\nabla^{2}_{i}}{2} + v(\erre)_{ref} .
+\end{align}
 
+\begin{align}
+		E[\dens] &= 	T_{ref}[\dens] + J[\dens] + \int \dens v_{ion}(\erre) \dd{\erre}\\
+			 &+ \lbrace
+			 	T[\dens] + V_{ee}[\dens] - 
+			 	\left( 
+			 		T_{ref}[\dens] + J[\dens] 
+			 	\right)
+			 \rbrace
+\end{align}
+	
+\begin{align}
+	&\mu_{KS} = \frac{\var{T_{ref}[\dens]}}{\var{\dens}}  + v_{eff}(\erre); &v_{eff}(\erre) = v_{ion}(\erre) + v_{h}(\erre) + v_{xc}(\erre)
+\end{align}
+\begin{equation}
+ \lbrace  - \frac{1}{2} \nabla^2+ v_{eff}(\erre) \rbrace 	\psi_{j}^{KS}(\erre) = \varepsilon_{j}^{KS} 	\psi_{j}^{KS}(\erre)
+\end{equation}
 \end{frame}
 
 \begin{frame}{DFT2}
